@@ -165,6 +165,8 @@ public:
 
     void init(double t, const xpalm::ModelParameters& parameters) //TODO externals in init ???
     {
+        last_time = t;
+
         //        parameters
         POURCENT_NSC_ST_INI = parameters.get("POURCENT_NSC_ST_INI");
         POURCENT_NSC_ST_MAX = parameters.get("POURCENT_NSC_ST_MAX");

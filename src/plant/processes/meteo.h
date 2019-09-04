@@ -62,7 +62,7 @@ public:
         Internal(RG, &Meteo::Rg);
         Internal(RAIN, &Meteo::Rain);
         Internal(TEFF, &Meteo::TEff);
-        Internal(Et0, &Meteo::Et0);
+        Internal(ET0, &Meteo::Et0);
     }
 
     virtual ~Meteo()
@@ -154,7 +154,7 @@ public:
 
     void init(double t, const xpalm::ModelParameters& parameters)
     {
-        last_time = t-1;
+        last_time = t;
         _parameters = parameters;
 
         //        parameters
@@ -178,6 +178,7 @@ public:
         Rg = 0;
         Rain = 0;
         TEff = 0;
+        Et0 = 0;
     }
 
     void compute(double t, bool /* update */)

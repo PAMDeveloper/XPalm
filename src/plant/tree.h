@@ -351,6 +351,11 @@ public:
         female_bunch_biomass = 0;
         male_biomass = 0 ;
 
+        meteo->init(t, parameters);
+        reserve->init(t, parameters);
+        racines->init(t, parameters);
+        bh->init(t, parameters);
+
 //        init_structure(t);
 
 //        compute_SF(t);
@@ -573,9 +578,12 @@ public:
     void compute(double t, bool /* update */)
     {
         std::cout << t << std::endl;
-        if(t == 0)
+        if(t == 0) {
             init_structure(t);
-        else {
+
+            (*racines)(t);
+            return;
+        } else {
             std::cout << "pas 0" << std::endl;
         }
 
@@ -622,8 +630,6 @@ public:
             }
         }
 
-
-
         productionSpeed = max(MINIMAL_PRODUCTION_SPEED, (-DECREASE_OF_PRODUCTION_SPEED * t) + INITIAL_PRODUCTION_SPEED);
 
         newPhytomerEmergence += TEff * productionSpeed * pow(ic,VITESSE_SENSITIVITY) * ( ftsw > SEUIL_ORGANO ? 1 : ftsw / SEUIL_ORGANO);
@@ -652,9 +658,7 @@ public:
                 respirable_bunch_biomass += phytomer->bunch_model()->get <double, Bunch>(t, Bunch::RESPIRABLE_BIOMASS);
                 female_bunch_biomass += phytomer->bunch_model()->get <double, Bunch>(t, Bunch::FEMELLE_BIOMASS);
                 male_biomass += phytomer->bunch_model()->get <double, Bunch>(t, Bunch::MALE_BIOMASS);
-
                 trunk_height += phytomer->internode_model()->get <double>(t, Internode::LENGTH);
-
                 internode_demand +=  phytomer->internode_model()->get <double>(t, Internode::DEMAND);
                 leaf_demand += phytomer->leaf_model()->get <double>(t, Leaf::DEMAND);
                 bunch_demand += phytomer->bunch_model()->get <double, Bunch>(t, Bunch::DEMAND);

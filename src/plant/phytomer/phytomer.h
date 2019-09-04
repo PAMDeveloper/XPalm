@@ -100,6 +100,7 @@ public:
         }
     }
 
+
     Leaf * leaf_model() const { return leaf.get(); }
     Bunch * bunch_model() const { return bunch.get(); }
     Internode * internode_model() const { return internode.get(); }

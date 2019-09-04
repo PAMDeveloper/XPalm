@@ -138,7 +138,7 @@ public:
         Internal(EVAPC1MOINSVAP, &WaterBalance::EvapC1moinsVap);
         Internal(EVAPMAX, &WaterBalance::EvapMax);
         Internal(EVAPVAP, &WaterBalance::EvapVap);
-        Internal(ftsw, &WaterBalance::ftsw);
+        Internal(FTSW, &WaterBalance::ftsw);
         Internal(FRACTIONC, &WaterBalance::FractionC);
         Internal(FRACTIONC1, &WaterBalance::FractionC1);
         Internal(FRACTIONC1RACINE, &WaterBalance::FractionC1Racine);
@@ -184,6 +184,7 @@ public:
 
     void init(double t, const xpalm::ModelParameters& parameters)
     {
+        last_time = t;
         _parameters = parameters;
 //        parameters
         H_CR = parameters.get("H_CR");

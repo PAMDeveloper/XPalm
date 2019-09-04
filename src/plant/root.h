@@ -84,6 +84,8 @@ public:
 
 
     void init(double t, const xpalm::ModelParameters& parameters) {
+        last_time = t-1;
+
         //    parameters variables
         FTSW_RACINES = parameters.get("FTSW_RACINES");
         VITESSE_RACINES = parameters.get("VITESSE_RACINES");
