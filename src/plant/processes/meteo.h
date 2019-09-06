@@ -162,10 +162,10 @@ public:
         ALTITUDE = parameters.get("ALTITUDE");
         IRRIGATION_DAY = parameters.get("IRRIGATION_DAY");
         IRRIGATION_QUANTITY = parameters.get("IRRIGATION_QUANTITY");
-        TBase = parameters.get("TBase");
-        TOpt1 = parameters.get("TOpt1");
-        TOpt2 = parameters.get("TOpt2");
-        TLim = parameters.get("TLim");
+        TBase = parameters.get("T_BASE");
+        TOpt1 = parameters.get("T_OPT1");
+        TOpt2 = parameters.get("T_OPT2");
+        TLim = parameters.get("T_LIM");
 
         //       internals
         tt = 0;

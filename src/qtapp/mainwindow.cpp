@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
         folderName = folder;
         ui->pathLabel->setText(folder);
         load_simulation(folder);
-        on_actionLaunch_simulation_triggered();
+//        on_actionLaunch_simulation_triggered();
     }
 }
 

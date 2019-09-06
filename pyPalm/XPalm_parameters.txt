@@ -95,7 +95,7 @@ IND_FRUIT_WEIGHT = float(6.5)
 # else :    
 MASSE_REGIME_INI = 3.5    
 
-MASSE_INFLO_MALE_ADULTE = 1.2
+MASSE_INFLO_MALE_ADULTE = float(1.2)
 # INCREASE_OF_BUNCH_MASS = 0.00259
 # POURC_FRUIT_REGIME = 0.85
 # MASSE_REGIMES_ADULTE = (MEAN_FRUIT_NUMBER_ADULTE * IND_FRUIT_WEIGHT * 1/POURC_FRUIT_REGIME ) / 1000
@@ -116,13 +116,13 @@ RATIO_DUREE_JEUNES_OLEO = 1
 
 ### parametre_genotypique_feuilles
 #### 0.0141
-MINIMAL_PRODUCTION_SPEED = 0.0063  # l appeler plutot adulte  -  (Cd-1)
+MINIMAL_PRODUCTION_SPEED = 0.0063  # l appeler plutot adulte
 ## if TYPE == 'ADULTE' :
-INITIAL_PRODUCTION_SPEED = 0.0141 ### 0.0063 ## MINIMAL_PRODUCTION_SPEED - adulte  - (Cd-1)
+INITIAL_PRODUCTION_SPEED = 0.0141 ### 0.0063 ## MINIMAL_PRODUCTION_SPEED - adulte
 ## else :    
 ## INITIAL_PRODUCTION_SPEED =       
 
-DECREASE_OF_PRODUCTION_SPEED = 0.00000329  ## (Cd-1)
+DECREASE_OF_PRODUCTION_SPEED = 0.00000329 
 RANG_D_ABLATION = 50   #l appeler rang de mort
 
 MAXIMAL_SFIND = 12    
@@ -133,7 +133,7 @@ INITIAL_SFIND = 2.5
 
 ### 2.5
 # l appeler adulte
-INCREASE_OF_LEAF_AREA =  0.00419  # (cm2.Cd-1)
+INCREASE_OF_LEAF_AREA =  0.00419  # (cm2.?Cd-1)
 
 INFLEXION = 200     # deux parametres rendant compte de la vitesse d expansion des feuilles
 COURBURE = 50
@@ -154,7 +154,7 @@ VITESSE_SENSITIVITY = 0.15 #plasticite de la vitesse de prod a l'IC
 
 ### stipe
 # if TYPE == 'ADULTE' :
-INITIAL_HEIGHT = 4 # (m)
+INITIAL_HEIGHT = 4
 # else :    
 # INITIAL_HEIGHT = 0.2     
 

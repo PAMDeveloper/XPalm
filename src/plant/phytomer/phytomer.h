@@ -67,6 +67,12 @@ public:
         bunch.reset(nullptr);
     }
 
+    void init_structure(double t) {
+        leaf->init_structure(t);
+        internode->init_structure(t);
+        bunch->init_structure(t);
+    }
+
     void init(double t, const xpalm::ModelParameters& parameters)
     {
 //        parameters
@@ -91,6 +97,7 @@ public:
         leaf->put(t, Leaf::BUNCH_STATUT, bunch->get<bunch::bunch_states, Bunch>(t, Bunch::STATUS));
         (*leaf)(t);
 
+        internode->put(t, Internode::PHYTOMER_NUMBER, number);
         (*internode)(t);
 
         bunch::bunch_states bunch_statut = bunch.get()->get< bunch::bunch_states, Bunch >(t, Bunch::STATUS);

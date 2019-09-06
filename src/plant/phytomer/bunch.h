@@ -259,7 +259,6 @@ public:
     {
         //        parameters
         DEBUT_RANG_SENSITIVITY_NOUAISON = parameters.get("DEBUT_RANG_SENSITIVITY_NOUAISON");
-        FACTEUR_AGE_INI = parameters.get("FACTEUR_AGE_INI");
         FIN_RANG_SENSITIVITY_NOUAISON = parameters.get("FIN_RANG_SENSITIVITY_NOUAISON");
         IC_spikelet_RANG_DEBUT = parameters.get("IC_spikelet_RANG_DEBUT");
         IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
@@ -268,7 +267,10 @@ public:
         ICsex_RANG_DEBUT = parameters.get("ICsex_RANG_DEBUT");
         ICsex_RANG_FIN = parameters.get("ICsex_RANG_FIN");
 //        INCREASE_OF_BUNCH_MASS = parameters.get("INCREASE_OF_BUNCH_MASS");
-        INCREASE_TAILLE_REGIMES = parameters.get("INCREASE_TAILLE_REGIMES");
+        FACTEUR_AGE_INI = parameters.get("AGE") / parameters.get("AGE_ADULTE");
+        INCREASE_TAILLE_REGIMES = (1-0) * 1 / parameters.get("AGE_ADULTE") * 365;
+
+
         INITIAL_PRODUCTION_SPEED = parameters.get("INITIAL_PRODUCTION_SPEED");
 //        MASSE_REGIMES_ADULTE = parameters.get("MASSE_REGIMES_ADULTE");
 //        MASSE_REGIME_INI = parameters.get("MASSE_REGIME_INI");
@@ -442,8 +444,8 @@ public:
         }
     }
 
-    void init_structure() {
-        //bunch
+    void init_structure(double t) {
+          //bunch
 //          phytomers[phytomer.name].bunch.thermalTimeSinceAppearance = TTfeuille
 //          phytomers[phytomer.name].bunch.TT_corrige = TTfeuille
 //          SF = min(GlobalVariables.INCREASE_OF_LEAF_AREA * ( - nb_jour_depuis_l_appari ) + GlobalVariables.INITIAL_SFIND, GlobalVariables.MAXIMAL_SFIND)

@@ -135,11 +135,6 @@ private:
     double SEUIL_PHOTO;
     double SLW_ini;
     double SLW_min;
-    double SORTIE1;
-    double SORTIE2;
-    double SORTIE3;
-    double SORTIE4;
-    double SORTIE5;
     double STEM_APPARENT_DENSITY;
     double STEM_RAYON;
     double Seuil_IC_abort;
@@ -200,7 +195,13 @@ private:
     double trunk_biomass;
     double trunk_height;
 
-    //     externals
+    // attributes
+    //t-1
+    double rootTailleC;
+    double rootTailleC1;
+    double rootTailleC2;
+    double rootTailleC1MVAP;
+    double rootTailleVAP;
 
 
 public:
@@ -282,6 +283,7 @@ public:
 
     void init(double t, const xpalm::ModelParameters& parameters)
     {
+        last_time = t-1;
         _parameters = parameters;
 
         //        parameters
@@ -326,11 +328,6 @@ public:
         SEUIL_PHOTO = parameters.get("SEUIL_PHOTO");
         SLW_ini = parameters.get("SLW_ini");
         SLW_min = parameters.get("SLW_min");
-        SORTIE1 = parameters.get("SORTIE1");
-        SORTIE2 = parameters.get("SORTIE2");
-        SORTIE3 = parameters.get("SORTIE3");
-        SORTIE4 = parameters.get("SORTIE4");
-        SORTIE5 = parameters.get("SORTIE5");
         STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
         STEM_RAYON = parameters.get("STEM_RAYON");
         Seuil_IC_abort = parameters.get("Seuil_IC_abort");
@@ -358,7 +355,7 @@ public:
 
 //        init_structure(t);
 
-//        compute_SF(t);
+        compute_SF(t);
         lai = totalLeafArea * DENS / 10000;
         ei = 1 - exp(- K * lai);
         Assim= 0;
@@ -404,82 +401,22 @@ public:
                     setsubmodel(PHYTOMERS, phytomer);
                     phytomer->init(t, _parameters);
                     phytomers.push_back(phytomer);
-
+                    phytomer->init_structure(t);
 
         //            phytomer.compute_facteur_age()
         //            if phytomers[phytomer.name].rank > GlobalVariables.ICsex_RANG_FIN :
         //                phytomers[phytomer.name].bunch.sexe = phytomer.bunch.sexe_decision(GlobalVariables.INI_SEX_RATIO)
                 }
 
-        //        for key in range(1 , GlobalVariables.RANG_D_ABLATION + 1) :
-        //            nb_jour_depuis_l_appari = ((GlobalVariables.RANG_D_ABLATION) - key)/( 10 * GlobalVariables.INITIAL_PRODUCTION_SPEED)                         # rang d'ablation = nbre ini
-        //            TTfeuille = nb_jour_depuis_l_appari * 10  # 10 temps thermique moyen a calculer
-
-
-        //            phytomer = Phytomer(key , GlobalVariables.RANG_D_ABLATION - key + 1  , "ACTIVE", self,  0, 0, 0, TTfeuille, 0, 0, 0, 0)
-
-
-        //            phytomers[phytomer.name] = phytomer
-        //            phytomers[phytomer.name].step_apparition = simulation.step - (GlobalVariables.INACTIVE_PHYTOMER_NUMBER + GlobalVariables.RANG_D_ABLATION - phytomers[phytomer.name].name) * (1/ (10 * GlobalVariables.INITIAL_PRODUCTION_SPEED))
-        //            phytomer.compute_facteur_age()
-
-        //            phytomers[phytomer.name].bunch.thermalTimeSinceAppearance = TTfeuille
-        //            phytomers[phytomer.name].bunch.TT_corrige = TTfeuille
-        //            SF = min(GlobalVariables.INCREASE_OF_LEAF_AREA * ( - nb_jour_depuis_l_appari ) + GlobalVariables.INITIAL_SFIND, GlobalVariables.MAXIMAL_SFIND)
-        //            phytomers[phytomer.name].bunch.sexe = phytomer.bunch.sexe_decision(GlobalVariables.INI_SEX_RATIO)
-        //            if phytomers[phytomer.name].rank > GlobalVariables.ICabort_RANG_FIN :
-        //                phytomers[phytomer.name].bunch.avort = phytomer.bunch.abortion_decision(GlobalVariables.INI_TAUX_D_AVORTEMENT)
-        //            phytomer.bunch.compute_structure_ini()
-        //            phytomer.bunch.compute_flowering_date(GlobalVariables.INITIAL_PRODUCTION_SPEED)
-        //            phytomer.bunch.compute_harvest_date(GlobalVariables.INITIAL_PRODUCTION_SPEED)
-
-        //            if phytomers[phytomer.name].rank< 0 :
-        //                phytomers[phytomer.name].bunch.statut = "INITIE"
-        //            else :
-
-        //                if (phytomers[phytomer.name].bunch.thermalTimeSinceAppearance > phytomers[phytomer.name].bunch.estimated_flowering_date)  : # on calcule une moyenne entre la dtae ? l'apparition et la date au jour j
-        //                    if (phytomers[phytomer.name].bunch.thermalTimeSinceAppearance > phytomers[phytomer.name].bunch.estimated_harvest_date)  :
-        //                        phytomers[phytomer.name].bunch.statut = "RECOLTE"
-        //                    else :
-        //                        phytomers[phytomer.name].bunch.statut = "FLORAISON_RECOLTE"
-        //                else :
-        //                    phytomers[phytomer.name].bunch.statut = "APPARITION_FLORAISON"
-
-        //            phytomers[phytomer.name].leaf.thermalTimeSinceAppearance = TTfeuille
-        //            phytomers[phytomer.name].leaf.TT_corrige = TTfeuille
-        //            phytomers[phytomer.name].internode.TT_corrige = TTfeuille
-        //            SF = min(GlobalVariables.INCREASE_OF_LEAF_AREA * ( - nb_jour_depuis_l_appari ) + GlobalVariables.INITIAL_SFIND, GlobalVariables.MAXIMAL_SFIND)
-
-
-        //            phytomers[phytomer.name].leaf.leafArea = phytomer.leaf.computeSF_ind_finale(SF , TTfeuille)
-
-        //            phytomers[phytomer.name].leaf.structural_biomass = phytomers[phytomer.name].leaf.leafArea * GlobalVariables.SLW_min * 10 / GlobalVariables.POURC_FOLIOLE
-        //            phytomers[phytomer.name].leaf.non_structural_biomass = phytomers[phytomer.name].leaf.leafArea * (GlobalVariables.SLW_ini - GlobalVariables.SLW_min) * 10 / GlobalVariables.POURC_FOLIOLE
-
-        //            if phytomers[phytomer.name].bunch.statut == "RECOLTE" :
-        //                if phytomers[phytomer.name].bunch.avort == "NON_AVORTE" :
-        //                    if phytomers[phytomer.name].bunch.sexe == "FEMELLE" :
-        //                        phytomers[phytomer.name].leaf.leafArea = 0
-        //                        phytomers[phytomer.name].leaf.structural_biomass = 0
-        //                        phytomers[phytomer.name].leaf.non_structural_biomass = 0
-        //            phytomers[phytomer.name].leaf.potLeafArea = phytomers[phytomer.name].leaf.leafArea
-
-        //            if phytomers[phytomer.name].leaf.leafArea != 0 :
-        //                phytomers[phytomer.name].leaf.SLW = (phytomers[phytomer.name].leaf.structural_biomass + phytomers[phytomer.name].leaf.non_structural_biomass) * GlobalVariables.POURC_FOLIOLE / phytomers[phytomer.name].leaf.leafArea / 10
-
-        //            #print "STRUCTURE_INI", "sexe",phytomers[phytomer.name].bunch.sexe,  "avort", phytomers[phytomer.name].bunch.avort,  "statut", phytomers[phytomer.name].bunch.statut, "leafarea", phytomers[phytomer.name].leaf.leafArea, "structural_biomass", phytomers[phytomer.name].leaf.structural_biomass, "non_structural_biomass", phytomers[phytomer.name].leaf.non_structural_biomass, "SLW",phytomers[phytomer.name].leaf.SLW
-
-        //            phytomers[phytomer.name].internode.duree_allongement = 1 / productionSpeed
-        //            #phytomers[phytomer.name].internode.length = GlobalVariables.INITIAL_HEIGHT / GlobalVariables.RANG_D_ABLATION
-        //            date_d_appar =  (GlobalVariables.RANG_D_ABLATION - phytomer.name) * 1 /(10 * productionSpeed )
-        //            if phytomers[phytomer.name].internode.TT_corrige > phytomers[phytomer.name].internode.duree_allongement :
-        //                phytomers[phytomer.name].internode.length = phytomer.internode.compute_final_length(- date_d_appar )  # 10Cj en moyenne
-        //            else :
-        //                phytomers[phytomer.name].internode.length = phytomer.internode.compute_final_length(- date_d_appar ) * ( phytomers[phytomer.name].internode.TT_corrige) / phytomers[phytomer.name].internode.duree_allongement
-
-        //            phytomers[phytomer.name].internode.biomass = 1000 * phytomers[phytomer.name].internode.length * GlobalVariables.STEM_APPARENT_DENSITY * pi * ( GlobalVariables.STEM_RAYON )**2
-
-
+                for (int key = 0; key < RANG_D_ABLATION; ++key) {
+                    double nb_jour_depuis_l_appari = ((RANG_D_ABLATION) - key)/( 10 * INITIAL_PRODUCTION_SPEED); // rang d'ablation = nbre ini
+                    double TTfeuille = nb_jour_depuis_l_appari * 10; // 10 temps thermique moyen a calculer
+                    Phytomer * phytomer = new Phytomer(key,RANG_D_ABLATION -key + 1, phytomer::INACTIVE, t);
+                    setsubmodel(PHYTOMERS, phytomer);
+                    phytomer->init(t, _parameters);
+                    phytomers.push_back(phytomer);
+                    phytomer->init_structure(t);
+                }
 
     }
 
@@ -487,33 +424,33 @@ public:
         totalLeafArea = 0;
 
         //surface
-        auto it = phytomers.begin();
-        while (it != phytomers.end()) {
-            Phytomer* phytomer = (*it);
-            if (phytomer->get< phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) != phytomer::DEAD)
-                totalLeafArea += phytomer->leaf_model()->get < double >(t, Leaf::LEAFAREA);
+//        auto it = phytomers.begin();
+//        while (it != phytomers.end()) {
+//            Phytomer* phytomer = (*it);
+//            if (phytomer->get< phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) != phytomer::DEAD)
+//                totalLeafArea += phytomer->leaf_model()->get < double >(t, Leaf::LEAFAREA);
 
-        }
+//        }
     }
 
 
-//    void compute_biomasse_prod(double t) {
-//        double Rg = meteo->get<double>(t, Meteo::RG);
-//        double FTSW = bh->get<double>(t, WaterBalance::FTSW);
-//        double SF = totalLeafArea;
-//        lai = totalLeafArea * DENS / 10000;
-//        ei = 1 - exp(- K * lai);
 
-//        total_beta_interception_leaf = 0;
+    void compute_biomasse_prod(double t) {
+        double Rg = meteo->get<double>(t, Meteo::RG);
+        double FTSW = bh->get<double>(t, WaterBalance::FTSW);
+        double SF = totalLeafArea;
+        lai = totalLeafArea * DENS / 10000;
+        ei = 1 - exp(- K * lai);
+        double total_beta_interception_leaf = 0;
 
 
-//        if (LOCAL_LIGHT_INTERCEPTION == 1) {
-//            auto it = phytomers.begin();
-//            while (it != phytomers.end()) {
-//                Phytomer* phytomer = (*it);
-//                total_beta_interception_leaf += phytomer->leaf_model()->get < double >(t, Leaf::NIVEAU_D_ECLAIREMENT_LOI_BETA);
-//            }
-//            biomasse_prod  = 0;
+        if (LOCAL_LIGHT_INTERCEPTION == 1) {
+            auto it = phytomers.begin();
+            while (it != phytomers.end()) {
+                Phytomer* phytomer = (*it);
+                total_beta_interception_leaf += phytomer->leaf_model()->get < double >(t, Leaf::NIVEAU_D_ECLAIREMENT_LOI_BETA);
+            }
+            biomasse_prod  = 0;
 
 //            it = phytomers.begin();
 //            while (it != phytomers.end()) {
@@ -528,12 +465,12 @@ public:
 //                leaf.compute_biomasse_prod(leaf.light_pourc_interception, leaf.assim_max, ei, GlobalVariables.DENS, Rg)   // on cacule la biomasse produite par la feuille en absence de contrainte
 //                        biomasse_prod += compute_decrease_FTSW(FTSW, GlobalVariables.SEUIL_PHOTO) * leaf.biomasse_prod;
 
-//            }
+            }
 //        } else {
 //            biomasse_prod = compute_decrease_FTSW(FTSW, GlobalVariables.SEUIL_PHOTO) * 10 * ei * EFFICIENCE_BIOLOGIQUE * 0.48 * Rg / GlobalVariables.DENS  # on multiplie par 10 pour passer en kg
 //        }
 
-//    }
+    }
 
     void update_organs(double t, double newPhytomerEmergence) {
         //       #### defiolation le jour de la mise en place des traitements
@@ -580,11 +517,7 @@ public:
         std::cout << t << std::endl;
         if(t == 0) {
             init_structure(t);
-
-            (*racines)(t);
             return;
-        } else {
-            std::cout << "pas 0" << std::endl;
         }
 
         (*meteo)(t);
@@ -593,11 +526,11 @@ public:
         //            pluie = simulation.meteo.Rain + simulation.meteo.irrigation[simulation.meteo.jour_julien]
         //        else :
         //            pluie = simulation.meteo.Rain
-        bh->put<double>(t, WaterBalance::RACINES_TAILLEC, racines->get<double>(t-1, Racines::TAILLEC));
-        bh->put<double>(t, WaterBalance::RACINES_TAILLEC1, racines->get<double>(t-1, Racines::TAILLEC1));
-        bh->put<double>(t, WaterBalance::RACINES_TAILLEC2, racines->get<double>(t-1, Racines::TAILLEC2));
-        bh->put<double>(t, WaterBalance::RACINES_TAILLEC1MOINSVAP, racines->get<double>(t-1, Racines::TAILLEC1MOINSVAP));
-        bh->put<double>(t, WaterBalance::RACINES_TAILLEVAP, racines->get<double>(t-1, Racines::TAILLEVAP));
+        bh->put<double>(t, WaterBalance::RACINES_TAILLEC, rootTailleC);
+        bh->put<double>(t, WaterBalance::RACINES_TAILLEC1, rootTailleC1);
+        bh->put<double>(t, WaterBalance::RACINES_TAILLEC2, rootTailleC2);
+        bh->put<double>(t, WaterBalance::RACINES_TAILLEC1MOINSVAP, rootTailleC1MVAP);
+        bh->put<double>(t, WaterBalance::RACINES_TAILLEVAP, rootTailleVAP);
         bh->put<double>(t, WaterBalance::ET0, meteo->get<double>(t, Meteo::ET0));
         bh->put<double>(t, WaterBalance::TREE_EI, ei);
         (*bh)(t);
@@ -630,11 +563,16 @@ public:
             }
         }
 
-        productionSpeed = max(MINIMAL_PRODUCTION_SPEED, (-DECREASE_OF_PRODUCTION_SPEED * t) + INITIAL_PRODUCTION_SPEED);
+        productionSpeed = max(MINIMAL_PRODUCTION_SPEED, (-DECREASE_OF_PRODUCTION_SPEED * (t - _parameters.beginDate) ) + INITIAL_PRODUCTION_SPEED);
 
         newPhytomerEmergence += TEff * productionSpeed * pow(ic,VITESSE_SENSITIVITY) * ( ftsw > SEUIL_ORGANO ? 1 : ftsw / SEUIL_ORGANO);
         update_organs(t, newPhytomerEmergence);
         (*racines)(t);
+        rootTailleC = racines->get<double>(t, Racines::TAILLEC);
+        rootTailleC1 = racines->get<double>(t, Racines::TAILLEC1);
+        rootTailleC2 = racines->get<double>(t, Racines::TAILLEC2);
+        rootTailleC1MVAP = racines->get<double>(t, Racines::TAILLEC1MOINSVAP);
+        rootTailleVAP = racines->get<double>(t, Racines::TAILLEVAP);
 
         //Compute results
         //reset vars

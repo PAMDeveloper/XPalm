@@ -14,7 +14,7 @@ class Internode : public AtomicModel < Internode >
 {
 public:
     enum internals { AGE,
-                     LENGTH_MAX_INCREASE,
+                     LENGTH_INCREASE_POT,
                      DEMAND,
                      MAX_LENGTH,
                      LENGTH,
@@ -26,9 +26,11 @@ public:
 
     enum externals { TEFF,
                      PRODUCTIONSPEED,
-                     FR_RESTE };
+                     FR_RESTE,
+                     PHYTOMER_NUMBER };
 
 private:
+     const xpalm::ModelParameters _parameters;
 
     //      parameters
     double STEM_RAYON;
@@ -40,10 +42,11 @@ private:
     double FIN_CROISSANCE_EN;
     double LENGHT_ADULTE;
     double PLASTICITY_INTERNODE_IC;
+    double RANG_D_ABLATION;
 
     //     internals
     double age;
-    double length_max_increase;
+    double length_increase_pot;
     double demand;
     double max_length;
     double length;
@@ -57,6 +60,7 @@ private:
     double TEff;
     double productionSpeed;
     double fr_reste;
+    double phytomer_number;
 
 public:
 
@@ -64,7 +68,7 @@ public:
     {
         //         internals
         Internal(AGE, &Internode::age);
-        Internal(LENGTH_MAX_INCREASE, &Internode::length_max_increase);
+        Internal(LENGTH_INCREASE_POT, &Internode::length_increase_pot);
         Internal(DEMAND, &Internode::demand);
         Internal(MAX_LENGTH, &Internode::max_length);
         Internal(LENGTH, &Internode::length);
@@ -78,7 +82,7 @@ public:
         External(TEFF, &Internode::TEff);
         External(PRODUCTIONSPEED, &Internode::productionSpeed);
         External(FR_RESTE, &Internode::fr_reste);
-
+        External(PHYTOMER_NUMBER, &Internode::phytomer_number);
     }
 
     virtual ~Internode()
@@ -92,53 +96,85 @@ public:
         duree_allongement = 1 / productionSpeed;
 
         if (TT_corrige < duree_allongement) {
-            //compute final length
-            double age_actuel = AGE_PARAM + t/365;
-            if  (age_actuel < DEBUT_CROISSANCE_EN)
-                max_length = EN_LENGHT_INI;
-            else {
-                if (age_actuel < FIN_CROISSANCE_EN)
-                    max_length = (LENGHT_ADULTE - EN_LENGHT_INI) / (FIN_CROISSANCE_EN - DEBUT_CROISSANCE_EN) * (age_actuel - DEBUT_CROISSANCE_EN) +  EN_LENGHT_INI;
-                else
-                    max_length = LENGHT_ADULTE;
-            }
-            max_length = max_length / 100;
+            max_length = compute_length(t - _parameters.beginDate);
         }
 
         //compute_length_max_increase
-        if (TT_corrige < duree_allongement)
-            length_max_increase = max_length * TEff * 1 / duree_allongement;
-        else
-            length_max_increase = 0;
+        if (TT_corrige < duree_allongement) {
+            length_increase_pot = ( max_length * TEff ) / duree_allongement;
+        } else {
+            length_increase_pot = 0;
+        }
 
-        double volume = _PI * pow( STEM_RAYON, 2) * length_max_increase;
-        demand =  STEM_APPARENT_DENSITY * volume * COUT_RESPI_INTERNODE * 1000;
+        double volume_pot = _PI * pow( STEM_RAYON, 2) * length_increase_pot;
+        demand =  volume_pot * STEM_APPARENT_DENSITY * COUT_RESPI_INTERNODE * 1000;
     }
+
 
     void growth() {
-        assimilate_supply = demand   * fr_reste;
-        length += length_max_increase  * fr_reste;
-        biomass += assimilate_supply * (1 / COUT_RESPI_INTERNODE);
-        TT_corrige +=  pow( fr_reste, PLASTICITY_INTERNODE_IC ) * gain_TEff_jour;
+        assimilate_supply = demand   * fr_reste; //compute_assimilate_supply
+        length += length_increase_pot  * fr_reste; //compute_length
+        biomass += assimilate_supply * (1 / COUT_RESPI_INTERNODE); //compute_biomass
+        TT_corrige +=  pow( fr_reste, PLASTICITY_INTERNODE_IC ) * gain_TEff_jour; //compute_TT_new
     }
 
 
-    void init(double /*t*/, const xpalm::ModelParameters& parameters)
+
+    double compute_length(double days) {
+        double age_actuel = AGE_PARAM + (days / 365);
+        double l;
+        if  (age_actuel < DEBUT_CROISSANCE_EN) {
+            l = EN_LENGHT_INI;
+        } else {
+            if (age_actuel < FIN_CROISSANCE_EN) {
+                double growth_speed = (LENGHT_ADULTE - EN_LENGHT_INI) / (FIN_CROISSANCE_EN - DEBUT_CROISSANCE_EN); // m.an-1
+                double phytomer_age = age_actuel - DEBUT_CROISSANCE_EN;
+                l =  ( growth_speed * phytomer_age ) +  EN_LENGHT_INI;
+            } else {
+                l = LENGHT_ADULTE;
+            }
+        }
+        return l;
+    }
+
+    void init_structure(double t) {
+        //internode
+        duree_allongement = 1 / productionSpeed;
+        double date_d_appar =  (RANG_D_ABLATION - phytomer_number) / (10 * productionSpeed ); // 10 days per rank
+
+        if (TT_corrige < duree_allongement) {
+            length = compute_length( -date_d_appar );  // 10Cj en moyenne
+        } else {
+            length = compute_length( -date_d_appar ) * TT_corrige / duree_allongement;
+        }
+
+        double volume = _PI * pow( STEM_RAYON, 2) * length;
+        biomass = 1000 * volume * STEM_APPARENT_DENSITY;
+    }
+
+
+    void init(double t, const xpalm::ModelParameters& parameters)
     {
+        //default init
+        last_time = t-1;
+       _parameters = parameters;
+
         //        parameters
-        STEM_RAYON = parameters.get("STEM_RAYON");
+        RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
         STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
         COUT_RESPI_INTERNODE = parameters.get("COUT_RESPI_INTERNODE");
         AGE_PARAM = parameters.get("AGE");
         DEBUT_CROISSANCE_EN = parameters.get("DEBUT_CROISSANCE_EN");
-        EN_LENGHT_INI = parameters.get("EN_LENGHT_INI");
         FIN_CROISSANCE_EN = parameters.get("FIN_CROISSANCE_EN");
-        LENGHT_ADULTE = parameters.get("LENGHT_ADULTE");
         PLASTICITY_INTERNODE_IC = parameters.get("PLASTICITY_INTERNODE_IC");
+        STEM_RAYON = parameters.get("STEM_RAYON");
+        LENGHT_ADULTE = parameters.get("LENGHT_ADULTE") / 100; //from cm to m
+        EN_LENGHT_INI = parameters.get("EN_LENGHT_INI") / 100; //from cm to m
+
 
         //        internals
         age = 0;
-        length_max_increase = 0;
+        length_increase_pot = 0;
         demand = 0;
         max_length = 0;
         length = 0;
@@ -151,9 +187,6 @@ public:
 
     void compute(double t, bool /* update */)
     {
-        //default init
-        last_time = t-1;
-
         growth();
         growth_demand(t);
     }

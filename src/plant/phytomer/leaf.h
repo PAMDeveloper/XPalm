@@ -36,7 +36,7 @@ public:
                      DECLIN_PHOTOSYNTHESE_STRESS,
                      BIOMASSE_PROD,
                      RAYONNEMENT_INTERCEPTE_FEUILLE,
-                     TT_SINCE_APP};
+                     TT_SINCE_APP };
 
     enum externals { TEFF,
                      PHYTOMER_RANK,
@@ -46,7 +46,7 @@ public:
                      BUNCH_STATUT,
                      PHYTOMER_STATE,
                      FR_RESTE,
-                     FRACTION_NON_STR_BIOMASSE_ALLOUEE, //externe
+                     FRACTION_NON_STR_BIOMASSE_ALLOUEE,
                      DELTA_BIOMASSE_RESERVE_LEAF };
 
 private:
@@ -179,8 +179,37 @@ public:
     }
 
 
+    void init_structure(double t) {
+        //leaf
+        //            phytomers[phytomer.name].leaf.thermalTimeSinceAppearance = TTfeuille
+        //            phytomers[phytomer.name].leaf.TT_corrige = TTfeuille
+        //            phytomers[phytomer.name].internode.TT_corrige = TTfeuille
+        //            SF = min(GlobalVariables.INCREASE_OF_LEAF_AREA * ( - nb_jour_depuis_l_appari ) + GlobalVariables.INITIAL_SFIND, GlobalVariables.MAXIMAL_SFIND)
+
+
+        //            phytomers[phytomer.name].leaf.leafArea = phytomer.leaf.computeSF_ind_finale(SF , TTfeuille)
+
+        //            phytomers[phytomer.name].leaf.structural_biomass = phytomers[phytomer.name].leaf.leafArea * GlobalVariables.SLW_min * 10 / GlobalVariables.POURC_FOLIOLE
+        //            phytomers[phytomer.name].leaf.non_structural_biomass = phytomers[phytomer.name].leaf.leafArea * (GlobalVariables.SLW_ini - GlobalVariables.SLW_min) * 10 / GlobalVariables.POURC_FOLIOLE
+
+        //            if phytomers[phytomer.name].bunch.statut == "RECOLTE" :
+        //                if phytomers[phytomer.name].bunch.avort == "NON_AVORTE" :
+        //                    if phytomers[phytomer.name].bunch.sexe == "FEMELLE" :
+        //                        phytomers[phytomer.name].leaf.leafArea = 0
+        //                        phytomers[phytomer.name].leaf.structural_biomass = 0
+        //                        phytomers[phytomer.name].leaf.non_structural_biomass = 0
+        //            phytomers[phytomer.name].leaf.potLeafArea = phytomers[phytomer.name].leaf.leafArea
+
+        //            if phytomers[phytomer.name].leaf.leafArea != 0 :
+        //                phytomers[phytomer.name].leaf.SLW = (phytomers[phytomer.name].leaf.structural_biomass + phytomers[phytomer.name].leaf.non_structural_biomass) * GlobalVariables.POURC_FOLIOLE / phytomers[phytomer.name].leaf.leafArea / 10
+
+        //            #print "STRUCTURE_INI", "sexe",phytomers[phytomer.name].bunch.sexe,  "avort", phytomers[phytomer.name].bunch.avort,  "statut", phytomers[phytomer.name].bunch.statut, "leafarea", phytomers[phytomer.name].leaf.leafArea, "structural_biomass", phytomers[phytomer.name].leaf.structural_biomass, "non_structural_biomass", phytomers[phytomer.name].leaf.non_structural_biomass, "SLW",phytomers[phytomer.name].leaf.SLW
+
+    }
+
     void init(double t, const xpalm::ModelParameters& parameters)
     {
+        last_time = t-1;
 
         //        parameters
         SLW_min = parameters.get("SLW_min");
@@ -345,6 +374,9 @@ public:
             niveau_d_eclairement_loi_beta = 0;
         else if(bunch_statut.is(bunch::NON_ABLATED) && phytomer_state == phytomer::ACTIVE)
             niveau_d_eclairement_loi_beta = pow((crown_position - 0.5 )/ (nombre_max_crown_position), a-1) * pow(1-(crown_position - 0.5 )/ (nombre_max_crown_position), b-1);
+
+
+
 
         if (REMANENCE_STRESS == 1.)
             compute_declin_photo();
