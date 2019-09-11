@@ -326,8 +326,8 @@ public:
         SENSIVITY_IC_SPIKELET = parameters.get("SENSIVITY_IC_SPIKELET");
         SEUIL_ORGANO = parameters.get("SEUIL_ORGANO");
         SEUIL_PHOTO = parameters.get("SEUIL_PHOTO");
-        SLW_ini = parameters.get("SLW_ini");
-        SLW_min = parameters.get("SLW_min");
+        SLW_ini = parameters.get("SLW_ini") * 10; //kg.m-2
+        SLW_min = parameters.get("SLW_min") * 10; //kg.m-2
         STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
         STEM_RAYON = parameters.get("STEM_RAYON");
         Seuil_IC_abort = parameters.get("Seuil_IC_abort");
@@ -379,12 +379,14 @@ public:
         fraction_pour_croissance = 0; // c est la fraction qui reste pour la croissance une fois que le stockage de biomasse dans les reserves a ete effectuee;
         offre_fruits = 0; // offre pour les fruits;
         offre_reste = 0; // offre pour le reste;
-        trunk_biomass = 1000 * INITIAL_HEIGHT * STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2);
-        leaf_structural_biomass = totalLeafArea  * SLW_min * 10 / POURC_FOLIOLE  ;
-        leaf_non_structural_biomass= totalLeafArea * (SLW_ini - SLW_min) * 10 / POURC_FOLIOLE;
+        trunk_biomass = 1000  * STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * INITIAL_HEIGHT; //TODO vérifier l'unité dans les calculs de masse x1000
+
+
+        leaf_structural_biomass = totalLeafArea  * SLW_min / POURC_FOLIOLE  ;
+        leaf_non_structural_biomass= totalLeafArea * (SLW_ini - SLW_min) / POURC_FOLIOLE;
         total_leaf_biomass = leaf_structural_biomass + leaf_non_structural_biomass;
 //        biomass = leaf_structural_biomass + leaf_non_structural_biomass + reserve->get < double >(t, Reserve::BIOMASS) + trunk_biomass + female_bunch_biomass + male_biomass ;
-        slw = (((leaf_non_structural_biomass + leaf_structural_biomass) * POURC_FOLIOLE) / totalLeafArea) / 10;
+        slw = (((leaf_non_structural_biomass + leaf_structural_biomass) * POURC_FOLIOLE) / totalLeafArea);
         biomasse_prod = 0;
 
     }

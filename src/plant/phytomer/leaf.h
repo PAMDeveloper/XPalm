@@ -81,7 +81,7 @@ private:
     //     internals
     leaf::leaf_state ablation;
 
-    double leafArea;
+    double leafArea; //m²
     double vitesse_exp;
     double SFMax;
     double demand;
@@ -212,8 +212,8 @@ public:
         last_time = t-1;
 
         //        parameters
-        SLW_min = parameters.get("SLW_min");
-        SLW_max = parameters.get("SLW_max");
+        SLW_min = parameters.get("SLW_min") * 10; //kg.m-2
+        SLW_max = parameters.get("SLW_max") * 10; //kg.m-2
         COUT_RESPI_FEUILLE = parameters.get("COUT_RESPI_FEUILLE");
         POURC_FOLIOLE = parameters.get("POURC_FOLIOLE");
         SEUIL_DUREE = parameters.get("SEUIL_DUREE");
@@ -310,9 +310,9 @@ public:
             if (phytomer_rank != 1)
                 demand = 0;
             else
-                demand = pot_increase_leafArea*(SLW_min * 10 * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE;
+                demand = pot_increase_leafArea*(SLW_min * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE;
         } else
-            demand = pot_increase_leafArea*(SLW_min * 10 * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE;
+            demand = pot_increase_leafArea*(SLW_min * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE;
     }
 
 
@@ -350,13 +350,12 @@ public:
         total_biomass = structural_biomass + non_structural_biomass;
 
         //        compute_capacite_reserve_max()
-        capacite_reserve_max = (SLW_max - SLW_min) * 10 * leafArea / POURC_FOLIOLE;
+        capacite_reserve_max = (SLW_max - SLW_min) * leafArea / POURC_FOLIOLE;
 
         //        compute_SLW()
-        if (leafArea != 0)
-            slw = (structural_biomass + non_structural_biomass) * POURC_FOLIOLE / leafArea / 10;
-        else
-            slw = 0;
+        slw = ( leafArea == 0 )
+                ? 0
+                : (structural_biomass + non_structural_biomass) * POURC_FOLIOLE / leafArea;
 
         //        compute_TT_new()
         TT_corrige +=  pow( fr_reste, PLASTICITY_LEAF_IC ) * gain_TEff_jour;

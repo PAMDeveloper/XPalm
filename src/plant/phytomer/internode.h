@@ -30,7 +30,7 @@ public:
                      PHYTOMER_NUMBER };
 
 private:
-     const xpalm::ModelParameters _parameters;
+     xpalm::ModelParameters _parameters;
 
     //      parameters
     double STEM_RAYON;
@@ -121,14 +121,14 @@ public:
 
 
     double compute_length(double days) {
-        double age_actuel = AGE_PARAM + (days / 365);
+        double tree_age = AGE_PARAM + (days / 365);
         double l;
-        if  (age_actuel < DEBUT_CROISSANCE_EN) {
+        if  (tree_age < DEBUT_CROISSANCE_EN) {
             l = EN_LENGHT_INI;
         } else {
-            if (age_actuel < FIN_CROISSANCE_EN) {
+            if (tree_age < FIN_CROISSANCE_EN) {
                 double growth_speed = (LENGHT_ADULTE - EN_LENGHT_INI) / (FIN_CROISSANCE_EN - DEBUT_CROISSANCE_EN); // m.an-1
-                double phytomer_age = age_actuel - DEBUT_CROISSANCE_EN;
+                double phytomer_age = tree_age - DEBUT_CROISSANCE_EN;
                 l =  ( growth_speed * phytomer_age ) +  EN_LENGHT_INI;
             } else {
                 l = LENGHT_ADULTE;
@@ -161,13 +161,13 @@ public:
 
         //        parameters
         RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
-        STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
         COUT_RESPI_INTERNODE = parameters.get("COUT_RESPI_INTERNODE");
         AGE_PARAM = parameters.get("AGE");
         DEBUT_CROISSANCE_EN = parameters.get("DEBUT_CROISSANCE_EN");
         FIN_CROISSANCE_EN = parameters.get("FIN_CROISSANCE_EN");
         PLASTICITY_INTERNODE_IC = parameters.get("PLASTICITY_INTERNODE_IC");
         STEM_RAYON = parameters.get("STEM_RAYON");
+        STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
         LENGHT_ADULTE = parameters.get("LENGHT_ADULTE") / 100; //from cm to m
         EN_LENGHT_INI = parameters.get("EN_LENGHT_INI") / 100; //from cm to m
 

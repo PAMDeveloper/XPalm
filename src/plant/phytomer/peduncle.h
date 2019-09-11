@@ -164,8 +164,9 @@ public:
         test_biomass += assimilate_supply * (1 / COUT_STRUCTURE_REGIME);
     }
 
-    void init(double /*t*/, const xpalm::ModelParameters& parameters)
+    void init(double t, const xpalm::ModelParameters& parameters)
     {
+        last_time = t-1;
 
         //        parameters
         RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
@@ -206,7 +207,6 @@ public:
 
     void compute(double t, bool /* update */)
     {
-        last_time = t-1;
         growth();
         growth_demand();
     }
