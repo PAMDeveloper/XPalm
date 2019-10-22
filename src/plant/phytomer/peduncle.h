@@ -50,8 +50,8 @@ public:
                       TT_CORRIGE,
                       THERMALTIMESINCEAPPEARANCE,
                       FR_RESTE,
-                      INI_HARVEST_DATE,
-                      INI_FLOWERING_DATE
+//                      INI_HARVEST_DATE,
+//                      INI_FLOWERING_DATE
                    };
 
 private:
@@ -61,7 +61,9 @@ private:
     double SENSIVITY_IC_SPIKELET;
     double MASSE_MEAN_PEDUNCULE_ADULTE;
     double COUT_STRUCTURE_REGIME;
-    double INITIAL_PRODUCTION_SPEED;
+    double PRODUCTION_SPEED_INITIAL;
+    double TT_FLO;
+    double TT_HARVEST;
 
     //     internals
     double demand;
@@ -72,13 +74,13 @@ private:
     double test_biomass;
 
     //     externals
-    bunch::bunch_states ablation_statut;
-    bunch::bunch_states bunch_statut;
-    bunch::bunch_states bunch_pot_statut;
+    inflo::inflo_states ablation_statut;
+    inflo::inflo_states inflo_status;
+    inflo::inflo_states inflo_pot_statut;
     double estimated_flowering_date;
     double facteur_age_regimes;
     double IC_spikelet;
-    double tree_production_speed;
+    double production_speed;
     double Teff;
     double TT_corrige;
     double thermalTimeSinceAppearance;
@@ -100,12 +102,12 @@ public:
 
         //          externals
         External(ABLATION_STATUS, &Peduncle::ablation_statut);
-        External(BUNCH_STATUS, &Peduncle::bunch_statut);
-        External(BUNCH_POT_STATUS, &Peduncle::bunch_statut);
+        External(BUNCH_STATUS, &Peduncle::inflo_status);
+        External(BUNCH_POT_STATUS, &Peduncle::inflo_status);
         External(ESTIMATED_FLOWERING_DATE, &Peduncle::estimated_flowering_date);
         External(FACTEUR_AGE_REGIMES, &Peduncle::facteur_age_regimes);
         External(IC_SPIKELET, &Peduncle::IC_spikelet);
-        External(TREE_PRODUCTION_SPEED, &Peduncle::tree_production_speed);
+        External(TREE_PRODUCTION_SPEED, &Peduncle::production_speed);
         External(TEFF, &Peduncle::Teff);
         External(TT_CORRIGE, &Peduncle::TT_corrige);
         External(THERMALTIMESINCEAPPEARANCE, &Peduncle::thermalTimeSinceAppearance);
@@ -120,8 +122,48 @@ public:
     {
     }
 
+    void init(double t, const xpalm::ModelParameters& parameters)
+    {
+        last_time = t-1;
+
+        //        parameters
+        RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
+        SENSIVITY_IC_SPIKELET = parameters.get("SENSIVITY_IC_SPIKELET");
+        MASSE_MEAN_PEDUNCULE_ADULTE = parameters.get("MASSE_MEAN_PEDUNCULE_ADULTE");
+        COUT_STRUCTURE_REGIME = parameters.get("COUT_STRUCTURE_REGIME");
+        PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL");
+        TT_FLO = parameters.get("TT_FLO");
+        TT_HARVEST = parameters.get("TT_HARVEST");
+
+        //internals
+        demand = 0;
+        assimilate_supply = 0;
+        demand_pot = 0;
+        test_biomass = 0;
+
+
+        //init structure
+        if (thermalTimeSinceAppearance < TT_FLO - RANG_DEBUT_CROISSANCE_PEDUNCULE / production_speed) {
+            biomass = 0 ;
+        } else {
+            if (thermalTimeSinceAppearance > TT_HARVEST)
+                biomass = 0;
+            else {
+                if ( thermalTimeSinceAppearance > TT_FLO )
+                    biomass = facteur_age_regimes * MASSE_MEAN_PEDUNCULE_ADULTE;
+                else
+                    biomass = facteur_age_regimes * MASSE_MEAN_PEDUNCULE_ADULTE /
+                            ( RANG_DEBUT_CROISSANCE_PEDUNCULE / PRODUCTION_SPEED_INITIAL  ) *
+                            ( thermalTimeSinceAppearance - ( TT_FLO - RANG_DEBUT_CROISSANCE_PEDUNCULE /
+                                                             PRODUCTION_SPEED_INITIAL ) );
+            }
+        }
+        potential_biomass = biomass;
+    }
+
+
     void growth_demand() {
-        if (ablation_statut.is(bunch::ABLATED)) {
+        if (ablation_statut.is(inflo::ABLATED)) {
             demand = 0;
             demand_pot = 0;
         } else {
@@ -129,21 +171,21 @@ public:
             potential_biomass = facteur_age_regimes * (pow(IC_spikelet, SENSIVITY_IC_SPIKELET)) * MASSE_MEAN_PEDUNCULE_ADULTE;
 
             //compute_demand
-            if (bunch_statut.is(bunch::APPARITION_FLORAISON))
+            if (inflo_status.is(inflo::APPARITION_FLORAISON))
                 demand = 0;
             else {
-                if (TT_corrige > estimated_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE/tree_production_speed)
-                    demand = facteur_age_regimes * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/tree_production_speed) * Teff;
+                if (TT_corrige > estimated_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
+                    demand = facteur_age_regimes * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed) * Teff;
                 else
                     demand = 0;
             }
 
             //compute_pot_demand
-            if (bunch_pot_statut.is(bunch::APPARITION_FLORAISON))
+            if (inflo_pot_statut.is(inflo::APPARITION_FLORAISON))
                 demand_pot = 0;
             else {
-                if (thermalTimeSinceAppearance > estimated_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE/tree_production_speed)
-                    demand_pot = facteur_age_regimes * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/tree_production_speed) * Teff;
+                if (thermalTimeSinceAppearance > estimated_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
+                    demand_pot = facteur_age_regimes * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed) * Teff;
                 else
                     demand_pot = 0;
             }
@@ -155,7 +197,7 @@ public:
         assimilate_supply = demand * fr_reste;
 
         //compute biomass
-        if (bunch_statut.is(bunch::RECOLTE) || ablation_statut.is(bunch::ABLATED))
+        if (inflo_status.is(inflo::RECOLTE) || ablation_statut.is(inflo::ABLATED))
             biomass = 0;
         else
             biomass = assimilate_supply * (1 / COUT_STRUCTURE_REGIME);
@@ -164,45 +206,8 @@ public:
         test_biomass += assimilate_supply * (1 / COUT_STRUCTURE_REGIME);
     }
 
-    void init(double t, const xpalm::ModelParameters& parameters)
-    {
-        last_time = t-1;
 
-        //        parameters
-        RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
-        SENSIVITY_IC_SPIKELET = parameters.get("SENSIVITY_IC_SPIKELET");
-        MASSE_MEAN_PEDUNCULE_ADULTE = parameters.get("MASSE_MEAN_PEDUNCULE_ADULTE");
-        COUT_STRUCTURE_REGIME = parameters.get("COUT_STRUCTURE_REGIME");
-        INITIAL_PRODUCTION_SPEED = parameters.get("INITIAL_PRODUCTION_SPEED");
 
-        //internals
-        demand = 0;
-        assimilate_supply = 0;
-        biomass  = 0;
-        potential_biomass  = 0;
-        demand_pot = 0;
-        test_biomass = 0;
-        potential_biomass = 0;
-    }
-
-    void init_structure() {
-        if (thermalTimeSinceAppearance < ini_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE/tree_production_speed) {
-            biomass = 0 ;
-        } else {
-            if (thermalTimeSinceAppearance > ini_harvest_date)
-                biomass = 0;
-            else {
-                if ( thermalTimeSinceAppearance > ini_flowering_date )
-                    biomass = facteur_age_regimes * MASSE_MEAN_PEDUNCULE_ADULTE;
-                else
-                    biomass = facteur_age_regimes * MASSE_MEAN_PEDUNCULE_ADULTE /
-                            ( RANG_DEBUT_CROISSANCE_PEDUNCULE / INITIAL_PRODUCTION_SPEED  ) *
-                            ( thermalTimeSinceAppearance - ( ini_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE /
-                                                             INITIAL_PRODUCTION_SPEED ) );
-            }
-        }
-        potential_biomass = biomass;
-    }
 
 
     void compute(double t, bool /* update */)

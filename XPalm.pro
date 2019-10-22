@@ -81,8 +81,8 @@ HEADERS += \
     $$R_SRC_/observer/PlantView.hpp \
     $$R_SRC_/plant/processes/reserve.h \
     $$R_SRC_/plant/root.h \
+    $$R_SRC_/plant/phytomer/inflo.h \
     $$R_SRC_/plant/phytomer/bunch.h \
-    $$R_SRC_/plant/phytomer/fruit.h \
     $$R_SRC_/plant/phytomer/internode.h \
     $$R_SRC_/plant/phytomer/leaf.h \
     $$R_SRC_/plant/phytomer/male_inflo.h \
@@ -100,7 +100,8 @@ SOURCES += \
     $$SRC_/qtapp/view.cpp \
     $$SRC_/qtapp/callout.cpp \
     $$SRC_/qtapp/tracemodel.cpp \
-    $$SRC_/main.cpp
+    $$SRC_/main.cpp \
+    $$SRC_/parameters/XPalm_parameters.txt
 
 FORMS += \
     $$SRC_/qtapp/mainwindow.ui

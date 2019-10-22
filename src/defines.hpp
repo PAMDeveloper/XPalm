@@ -14,11 +14,10 @@ const double _PI = 3.141592653589793238462643383280;
 struct GlobalParameters {
 };
 
-
 #ifdef UNSAFE_RUN
 
-namespace bunch {
-typedef int bunch_status;
+namespace inflo {
+typedef int inflo_status;
 static const unsigned int APPARITION_FLORAISON = 0;
 static const unsigned int FLORAISON_RECOLTE = 1;
 }
@@ -173,13 +172,6 @@ template < class T > using TraceElements = std::vector < TraceElement <T>>;
 
 
 
-namespace phytomer {
-enum phytomer_state {  ACTIVE = 0,
-                       INACTIVE = 1,
-                       DEAD = 2
-                    };
-}
-
 //namespace peduncle {
 //enum peduncle_phase {   INITIAL = 0,
 //                        TRANSITION = 1,
@@ -201,13 +193,6 @@ enum phytomer_state {  ACTIVE = 0,
 //                     };
 //}
 
-namespace leaf {
-enum leaf_state   { COUPE = 0,
-                    NON_COUPE = 1,
-                    LIG = 2,
-                    DEAD = 3
-                  };
-}
 
 //namespace culm {
 //enum culm_phase {   INITIAL = 0,
@@ -224,36 +209,62 @@ enum leaf_state   { COUPE = 0,
 
 //}
 
-namespace oil {
-enum oil_state   { PAS_DE_FRUITS = 0,
-                   APPARITION_FLORAISON = 1,
-                   RECOLTE = 2,
-                   OLEOSYNTHESE = 3,
-                   AVANT_OLEOSYNTHESE = 4,
-                   UNKNOWN = 5
-                 };
+
+
+namespace leaf {
+enum leaf_state   { COUPE = 0,
+                    NON_COUPE = 1,
+                    LIG = 2,
+                    DEAD = 3
+                  };
 }
 
 
-namespace bunch {
-enum bunch_sex {
+namespace phytomer {
+enum phytomer_state {  ACTIVE = 0,
+                       INACTIVE = 1,
+                       DEAD = 2
+                    };
+}
+
+
+
+//namespace oil {
+//enum oil_state   { PAS_DE_FRUITS = 0,
+//                   APPARITION_FLORAISON = 1,
+//                   RECOLTE = 2,
+//                   OLEOSYNTHESE = 3,
+//                   AVANT_OLEOSYNTHESE = 4,
+//                   UNKNOWN = 5
+//                 };
+//}
+
+
+//namespace bunch {
+//enum bunch_state {
+//    OLEOSYNTHESE = 0,
+//    AVANT_OLEOSYNTHESE = 1,
+//    RECOLTE = 2,
+//    ABORTED = 3,
+//    ABLATED = 4
+//};
+//}
+
+namespace inflo {
+
+enum inflo_sex {
     FEMALE = 0,
     MALE = 1,
-    NO_SEX = 2,
-    ABORTED = 4,
-    NON_ABORTED = 8
+    UNKNOWN_SEX = 2
 };
 
-enum bunch_state {    APPARITION_FLORAISON = 0
-                      , FLORAISON_RECOLTE = 1
-                      , ABLATED = 2
-                      , OLEOSYNTHESE = 4
-                      , AVANT_OLEOSYNTHESE = 8
-                      , PAS_DE_FRUITS = 8
-                      , RECOLTE = 16
-                      , UNKNOWN = 32
-                      , NON_ABLATED = 64
-                      , INITIE = 128
+
+enum inflo_state {      APPARITION_FLORAISON = 1
+                      , FLORAISON_RECOLTE = 2
+                      , PAS_DE_FRUITS = 4
+                      , UNKNOWN = 8
+                      , NON_ABLATED = 16
+                      , INITIE = 32
                  };
 
 
@@ -296,16 +307,16 @@ public:
     }
 };
 
-typedef States <bunch_state> bunch_states;
+typedef States <inflo_state> inflo_states;
 
-inline bool operator&(bunch_state a, bunch_state b) {
+inline bool operator&(inflo_state a, inflo_state b) {
     return (static_cast<int>(a) & static_cast<int>(b)) != 0;
 }
-inline void operator<<(bunch_state& a, bunch_state b) {
-    a = static_cast<bunch_state>(static_cast<int>(a) | static_cast<int>(b));
+inline void operator<<(inflo_state& a, inflo_state b) {
+    a = static_cast<inflo_state>(static_cast<int>(a) | static_cast<int>(b));
 }
-inline void operator>>(bunch_state& a, bunch_state b) {
-    a = static_cast<bunch_state>(static_cast<int>(a) & !static_cast<int>(b));
+inline void operator>>(inflo_state& a, inflo_state b) {
+    a = static_cast<inflo_state>(static_cast<int>(a) & !static_cast<int>(b));
 }
 }
 

@@ -112,9 +112,9 @@ private:
     double thermalTimeSinceAppearance;
 
     //     externals
-    bunch::bunch_sex bunch_sexe;
-    bunch::bunch_sex bunch_avort;
-    bunch::bunch_states bunch_statut;
+    inflo::inflo_sex bunch_sexe;
+    inflo::inflo_sex bunch_avort;
+    inflo::inflo_states bunch_statut;
     phytomer::phytomer_state phytomer_state;
 
     double TEff;
@@ -274,7 +274,7 @@ public:
 
     void growth_demand(double t) {
         //        compute_coupe_feuille_recolte
-        if (bunch_sexe == bunch::FEMALE && bunch_avort == bunch::NON_ABORTED && bunch_statut.is(bunch::RECOLTE))
+        if (bunch_sexe == inflo::FEMALE && bunch_avort == inflo::NON_ABORTED && bunch_statut.is(inflo::RECOLTE))
             ablation = leaf::COUPE;
 
         double correctedTEff = TEff * (ftsw > SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
@@ -364,16 +364,19 @@ public:
 
     void compute(double t, bool /* update */)
     {
-        crown_position = int((phytomer_rank - 1)/3) + 1;
-        double a = A_LOI_INTERC;
-        double b = B_LOI_INTERC;
-        double nombre_max_crown_position = int((RANG_D_ABLATION-1)/3) + 1;
+        growth();
+        growth_demand();
 
-        if (phytomer_state == phytomer::DEAD || bunch_statut.is(bunch::ABLATED))
-            niveau_d_eclairement_loi_beta = 0;
-        else if(bunch_statut.is(bunch::NON_ABLATED) && phytomer_state == phytomer::ACTIVE)
-            niveau_d_eclairement_loi_beta = pow((crown_position - 0.5 )/ (nombre_max_crown_position), a-1) * pow(1-(crown_position - 0.5 )/ (nombre_max_crown_position), b-1);
+//        crown_position = int( (phytomer_rank - 1) / 3 ) + 1;
 
+//        double a = A_LOI_INTERC;
+//        double b = B_LOI_INTERC;
+//        double nombre_max_crown_position = int( (RANG_D_ABLATION-1) / 3 ) + 1;
+
+//        if (phytomer_state == phytomer::DEAD || bunch_statut.is(inflo::ABLATED))
+//            niveau_d_eclairement_loi_beta = 0;
+//        else if(bunch_statut.is(inflo::NON_ABLATED) && phytomer_state == phytomer::ACTIVE)
+//            niveau_d_eclairement_loi_beta = pow((crown_position - 0.5 )/ (nombre_max_crown_position), a-1) * pow(1-(crown_position - 0.5 )/ (nombre_max_crown_position), b-1);
 
 
 

@@ -123,7 +123,8 @@ public:
         TailleC = TailleC2 + TailleC1moinsVap;
     }
 
-    void growth() {
+    void compute(double t, bool /* update */) {
+        //growth
         double red;
         if (ftsw > FTSW_RACINES)
             red = 1;
@@ -136,10 +137,6 @@ public:
             z += red * VITESSE_RACINES * TEff;
 
         compute_compartment_size();
-    }
-
-    void compute(double t, bool /* update */) {
-        growth();
     }
 
 };

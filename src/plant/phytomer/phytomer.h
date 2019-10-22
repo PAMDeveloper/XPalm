@@ -9,14 +9,14 @@
 #include <defines.hpp>
 #include <plant/phytomer/leaf.h>
 #include <plant/phytomer/internode.h>
-#include <plant/phytomer/bunch.h>
+#include <plant/phytomer/inflo.h>
 
 namespace model {
 
 class Phytomer : public CoupledModel < Phytomer >
 {
 public:
-    enum submodels { LEAF, BUNCH, INTERNODE };
+    enum submodels { LEAF, INFLO, INTERNODE };
 
     enum internals { RANK,
                      STATE,
@@ -28,7 +28,7 @@ private:
 //     submodels
     std::unique_ptr < Leaf > leaf;
     std::unique_ptr < Internode > internode;
-    std::unique_ptr < Bunch > bunch;
+    std::unique_ptr < Inflo > inflo;
 
 //     internals
     double rank;
@@ -44,12 +44,12 @@ public:
         date(date),
         leaf(new Leaf()),
         internode(new Internode()),
-        bunch(new Bunch())
+        inflo(new Inflo())
     {
 //         submodels
         setsubmodel(LEAF, leaf.get());
         setsubmodel(INTERNODE, internode.get());
-        setsubmodel(BUNCH, bunch.get());
+        setsubmodel(INFLO, inflo.get());
 
 //         internals
         Internal(RANK, &Phytomer::rank);
@@ -64,13 +64,13 @@ public:
     {
         leaf.reset(nullptr);
         internode.reset(nullptr);
-        bunch.reset(nullptr);
+        inflo.reset(nullptr);
     }
 
     void init_structure(double t) {
         leaf->init_structure(t);
         internode->init_structure(t);
-        bunch->init_structure(t);
+        inflo->init_structure(t);
     }
 
     void init(double t, const xpalm::ModelParameters& parameters)
@@ -78,13 +78,14 @@ public:
 //        parameters
         double INACTIVE_PHYTOMER_NUMBER = parameters.get("INACTIVE_PHYTOMER_NUMBER");
         double RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
-        double INITIAL_PRODUCTION_SPEED = parameters.get("INITIAL_PRODUCTION_SPEED");
-        step_apparition = t - (INACTIVE_PHYTOMER_NUMBER + RANG_D_ABLATION - number) * (1.0/ (10.0 * INITIAL_PRODUCTION_SPEED));
+        double PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL");
+
+        step_apparition = (t - parameters.beginDate) - (INACTIVE_PHYTOMER_NUMBER + RANG_D_ABLATION - number) / (10.0 * PRODUCTION_SPEED_INITIAL);
 
 //         submodels
         leaf->init(t, parameters);
         internode->init(t, parameters);
-        bunch->init(t, parameters);
+        inflo->init(t, parameters);
     }
 
     void compute(double t, bool /* update */)
@@ -92,24 +93,24 @@ public:
 
         leaf->put(t, Leaf::PHYTOMER_RANK, rank);
         leaf->put(t, Leaf::PHYTOMER_STATE, state);
-        leaf->put(t, Leaf::BUNCH_SEXE, bunch->get<bunch::bunch_sex, Bunch>(t, Bunch::SEX));
-        leaf->put(t, Leaf::BUNCH_AVORT, bunch->get<bunch::bunch_sex, Bunch>(t, Bunch::AVORT));
-        leaf->put(t, Leaf::BUNCH_STATUT, bunch->get<bunch::bunch_states, Bunch>(t, Bunch::STATUS));
+        leaf->put(t, Leaf::BUNCH_SEXE, inflo->get<inflo::inflo_sex, Inflo>(t, Inflo::SEX));
+        leaf->put(t, Leaf::BUNCH_AVORT, inflo->get<inflo::inflo_sex, Inflo>(t, Inflo::AVORT));
+        leaf->put(t, Leaf::BUNCH_STATUT, inflo->get<inflo::inflo_states, Inflo>(t, Inflo::STATUS));
         (*leaf)(t);
 
         internode->put(t, Internode::PHYTOMER_NUMBER, number);
         (*internode)(t);
 
-        bunch::bunch_states bunch_statut = bunch.get()->get< bunch::bunch_states, Bunch >(t, Bunch::STATUS);
-        if(!bunch_statut.is(bunch::RECOLTE)) {
-            bunch->put(t, Bunch::PHYTOMER_RANK, rank);
-            (*bunch)(t);
+        inflo::inflo_states bunch_statut = inflo.get()->get< inflo::inflo_states, Inflo >(t, Inflo::STATUS);
+        if(!bunch_statut.is(inflo::RECOLTE)) {
+            inflo->put(t, Inflo::PHYTOMER_RANK, rank);
+            (*inflo)(t);
         }
     }
 
 
     Leaf * leaf_model() const { return leaf.get(); }
-    Bunch * bunch_model() const { return bunch.get(); }
+    Inflo * bunch_model() const { return inflo.get(); }
     Internode * internode_model() const { return internode.get(); }
 
 };

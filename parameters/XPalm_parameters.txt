@@ -5,6 +5,44 @@ OUTPUTDIRECTORYNAME = '/Outputs/'
 NUMBER_OF_TREES = 2
 NUMBER_OF_SIMULATION_STEP = 12 # 6847
 
+
+
+
+
+##### PRODUCTION PARAMS ########
+PRODUCTION_SPEED_INITIAL = 0.0141 ### 0.0063 ## MINIMAL_PRODUCTION_SPEED - adulte  - (DD-1)
+PRODUCTION_SPEED_ADULT = 0.0063 # (DD-1)
+#MINIMAL_PRODUCTION_SPEED = 0.0063  # l appeler plutot adulte  -  (Cd-1)  ### 
+#DECREASE_OF_PRODUCTION_SPEED = 0.00000329  ## (Cd-1)
+
+#####  AGE PARAMS #########
+AGE = 8   ### 8 - adulte | 3 - normal
+AGE_ADULT = 8
+AGE_PLANTING = 3
+## FACTEUR_AGE_INI = float(AGE) / float(AGE_ADULTE)  #### 1 il est adulte
+## INCREASE_TAILLE_REGIMES =  (1-0) * 1 / (float(AGE_ADULTE) * 365)   
+
+
+
+
+
+
+
+
+AF_FRUITS = 1.5 # coefficient d affinite pour les fruits
+
+
+
+
+
+
+
+
+
+
+
+
+
 #### mode interception localisee
 
 LOCAL_LIGHT_INTERCEPTION = 0  ## 1 pour mettre le mode actif
@@ -62,13 +100,16 @@ H_PF_Z1 = 0.05 # 0.5*HPF_EVAP si pas de plante de surface 0.10 si plante de surf
 ##caracteristique plantation en debut de simulation
 DENS = 143
 
-AGE = 8   ### 8 - adulte | 3 - normal
+
 
 INI_SEX_RATIO = 0.8
 INI_TAUX_D_AVORTEMENT = 0.2
 
+## PHOTOSYNTHESE
 EFFICIENCE_BIOLOGIQUE = 4.8
-SEUIL_PHOTO = 0.6
+SEUIL_PHOTO = 0.6  # seuil à partir duquel perte de conductance (assimilation réduite)
+
+
 K = 0.5
 KC = 1
 INACTIVE_PHYTOMER_NUMBER = 60
@@ -82,13 +123,11 @@ T_LIM =  40
 ### parametre genotypique_regimes
 ### 3.5
 
-AGE_ADULTE = 8  
-## FACTEUR_AGE_INI = float(AGE) / float(AGE_ADULTE)  #### 1 il est adulte
-## INCREASE_TAILLE_REGIMES =  (1-0) * 1 / (float(AGE_ADULTE) * 365)   
+
 
 MASSE_MEAN_PEDUNCULE_ADULTE = 2.1 
 MEAN_FRUIT_NUMBER_ADULTE = 1600
-IND_FRUIT_WEIGHT = float(6.5) 
+
 
 # if TYPE == 'ADULTE' :
 #     MASSE_REGIME_INI = MASSE_REGIMES_ADULTE
@@ -100,6 +139,7 @@ MASSE_INFLO_MALE_ADULTE = 1.2
 # POURC_FRUIT_REGIME = 0.85
 # MASSE_REGIMES_ADULTE = (MEAN_FRUIT_NUMBER_ADULTE * IND_FRUIT_WEIGHT * 1/POURC_FRUIT_REGIME ) / 1000
 OIL_CONTENT = 0.73 
+IND_FRUIT_WEIGHT = 6.5 
 
 COUT_STRUCTURE_REGIME = 1.44
 COUT_OIL = 3.2
@@ -115,14 +155,10 @@ RATIO_DUREE_JEUNES_HARVEST = 1
 RATIO_DUREE_JEUNES_OLEO = 1
 
 ### parametre_genotypique_feuilles
-#### 0.0141
-MINIMAL_PRODUCTION_SPEED = 0.0063  # l appeler plutot adulte  -  (Cd-1)
-## if TYPE == 'ADULTE' :
-INITIAL_PRODUCTION_SPEED = 0.0141 ### 0.0063 ## MINIMAL_PRODUCTION_SPEED - adulte  - (Cd-1)
-## else :    
-## INITIAL_PRODUCTION_SPEED =       
 
-DECREASE_OF_PRODUCTION_SPEED = 0.00000329  ## (Cd-1)
+
+
+
 RANG_D_ABLATION = 50   #l appeler rang de mort
 
 MAXIMAL_SFIND = 12    
@@ -221,7 +257,7 @@ PLASTICITY_BUNCH_IC_APRES_FLORAISON = 0.2
 SEUIL_MEDIAN_FTSW = 0.75
 SENS_FTSW = 0
 
-AF_FRUITS = 1.5 # coefficient d affinite pour les fruits
+
 
 
 

@@ -82,8 +82,8 @@ class GlobalVariables(object):
     COUT_STRUCTURE_REGIME = 1.44
     COUT_OIL = 3.2
     
-    TT_FLOWERING_ADULTE = 2640          # 2950
-    TT_HARVEST_ADULTE = 2640 + 1455       # 2700 1600
+    #ªTT_FLOWERING_ADULTE = 2640          # 2950
+    #TT_HARVEST_ADULTE = 2640 + 1455       # 2700 1600
     DUREE_OLEO = (28-24)/ 0.0063  # recolte au rang 28 a peu pres et debut au rang 24 
     RANG_DEBUT_CROISSANCE_PEDUNCULE = 8  # nombre de rangs avant floraison # 11.5
     COUT_RESPI_MAINTENANCE_BUNCH  =  0.0044
@@ -91,6 +91,11 @@ class GlobalVariables(object):
     RATIO_DUREE_JEUNES_FLOWERING = 1
     RATIO_DUREE_JEUNES_HARVEST = 1
     RATIO_DUREE_JEUNES_OLEO = 1
+
+
+    TT_FLO = 2680
+    TT_HARVEST = 4095
+
     
     ### parametre_genotypique_feuilles
     INITIAL_PRODUCTION_SPEED = 0.0062  #### 0.0141
@@ -150,7 +155,7 @@ class GlobalVariables(object):
     POURCENT_NSC_FE_INI = 0.10
     COUT_RESERVE = 0.75 # cout de la mise en reserve % du CH20 qui peut etre mis en reserve
     MOB_RATE_MAX = 0.025 # % max de la biomasse dans les reserves qui peut etre destockee 
-    REALL_COST = 0.60
+    REALL_COST = 0.60 # %
     
     ## Variables relatives a la sensibilite a IC
     ICsex_RANG_DEBUT = -28

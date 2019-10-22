@@ -153,7 +153,7 @@ class Leaf(Organ):
         self.compute_TT_new()
     
     def compute_assimilate_supply(self) :
-        self.assimilate_supply = self.demand   * (self.phytomer.tree.fr_reste)
+        self.assimilate_supply = self.demand * (self.phytomer.tree.fr_reste)
     
     def compute_leafArea(self) :      
         if self.phytomer.state == "ACTIVE" :

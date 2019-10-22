@@ -28,7 +28,7 @@ public:
 private:
 //      parameters
     double RANG_DEBUT_CROISSANCE_PEDUNCULE;
-    double INITIAL_PRODUCTION_SPEED;
+    double PRODUCTION_SPEED_INITIAL;
     double MASSE_INFLO_MALE_ADULTE;
     double COUT_STRUCTURE_REGIME;
 
@@ -45,7 +45,7 @@ private:
     double facteur_age_regimes;
     double productionSpeed;// (bunch.phytomer.tree)
     double fr_reste; //bunch.phytomer.tree.fr_reste
-    bunch::bunch_states bunch_status;
+    inflo::inflo_states bunch_status;
     double Teff;
 
 public:
@@ -81,8 +81,8 @@ public:
                 if (thermalTimeSinceAppearance > ini_flowering_date)
                     biomass = MASSE_INFLO_MALE_ADULTE * facteur_age_regimes;
                 else
-                    biomass = MASSE_INFLO_MALE_ADULTE * facteur_age_regimes / ( RANG_DEBUT_CROISSANCE_PEDUNCULE / INITIAL_PRODUCTION_SPEED  ) *
-                                     ( thermalTimeSinceAppearance - ( ini_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE / INITIAL_PRODUCTION_SPEED ) );
+                    biomass = MASSE_INFLO_MALE_ADULTE * facteur_age_regimes / ( RANG_DEBUT_CROISSANCE_PEDUNCULE / PRODUCTION_SPEED_INITIAL  ) *
+                                     ( thermalTimeSinceAppearance - ( ini_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE / PRODUCTION_SPEED_INITIAL ) );
             }
         }
         potential_biomass= biomass;
@@ -91,7 +91,7 @@ public:
 
 
     void growth_demand() {
-        if (!bunch_status.is(bunch::APPARITION_FLORAISON))
+        if (!bunch_status.is(inflo::APPARITION_FLORAISON))
             demand = 0;
         else {
             if ( thermalTimeSinceAppearance > estimated_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE/productionSpeed )
@@ -104,7 +104,7 @@ public:
 
     void growth() {
         assimilate_supply = demand   * fr_reste;
-        if (bunch_status == bunch::FLORAISON_RECOLTE) {
+        if (bunch_status == inflo::FLORAISON_RECOLTE) {
             biomass = 0;
             potential_biomass = 0;
         } else {
@@ -118,7 +118,7 @@ public:
 
 //        parameters
         RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
-        INITIAL_PRODUCTION_SPEED = parameters.get("INITIAL_PRODUCTION_SPEED");
+        PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL");
         MASSE_INFLO_MALE_ADULTE = parameters.get("MASSE_INFLO_MALE_ADULTE");
         COUT_STRUCTURE_REGIME = parameters.get("COUT_STRUCTURE_REGIME");
 
