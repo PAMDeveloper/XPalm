@@ -1,0 +1,31 @@
+Done:
+-----
+Meteo
+Phytomer
+Internode
+Peduncle > transform IC in vector 
+Male Inflo
+-> put phytomer age for init
+Bunch
+Reserve 
+	Remettre les internals et virer les variables inutiles
+Root
+Leaf
+Inflo
+
+
+En cours:
+---------
+
+Tree
+
+
+A faire par raf:
+----------------
+WB
+
+
+TODO:
+-----
+
+

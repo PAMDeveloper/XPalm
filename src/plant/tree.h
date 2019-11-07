@@ -99,7 +99,7 @@ private:
     double AGE;
     double AGE_ADULT;
     double AGE_PLANTING;
-    double PRODUCTION_DECREASE_PER_DAY;
+    double PRODUCTION_DAILY_DECREMENT;
 
 
     double AF_FRUITS;
@@ -157,9 +157,8 @@ private:
     std::unique_ptr < Meteo > meteo;
 
     //     internals
+    std::vector<double> ics;
     double age;
-
-
     double activephytomerNumber;
     double Assim;
     double biomass;
@@ -186,7 +185,6 @@ private:
     double male_biomass;
     double male_demand;
     double newPhytomerEmergence;
-    double nf;
     double offre_fruits;
     double offre_nette;
     double offre_pour_croissance;
@@ -194,7 +192,7 @@ private:
     double offre_reste;
     double peduncule_demand;
     double phytomerNumber;
-    double productionSpeed;
+    double production_speed;
     double production_decrease;
     double respirable_bunch_biomass;
     double simulation;
@@ -255,7 +253,6 @@ public:
         Internal(MALE_BIOMASS, &Tree::male_biomass);
         Internal(MALE_DEMAND, &Tree::male_demand);
         Internal(NEWPHYTOMEREMERGENCE, &Tree::newPhytomerEmergence);
-        Internal(NF, &Tree::nf);
         Internal(OFFRE_FRUITS, &Tree::offre_fruits);
         Internal(OFFRE_NETTE, &Tree::offre_nette);
         Internal(OFFRE_POUR_CROISSANCE, &Tree::offre_pour_croissance);
@@ -263,7 +260,7 @@ public:
         Internal(OFFRE_RESTE, &Tree::offre_reste);
         Internal(PEDUNCULE_DEMAND, &Tree::peduncule_demand);
         Internal(PHYTOMERNUMBER, &Tree::phytomerNumber);
-        Internal(PRODUCTIONSPEED, &Tree::productionSpeed);
+        Internal(PRODUCTIONSPEED, &Tree::production_speed);
         Internal(PRODUCTION_DECREASE, &Tree::production_decrease);
         Internal(RESPIRABLE_BUNCH_BIOMASS, &Tree::respirable_bunch_biomass);
         Internal(SIMULATION, &Tree::simulation);
@@ -303,7 +300,7 @@ public:
         PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL");
         AGE_ADULT = parameters.get("AGE_ADULT") * 365; // days
         AGE_PLANTING = parameters.get("AGE_PLANTING") * 365; // days (age when production speed starts to decrease
-        PRODUCTION_DECREASE_PER_DAY = ( PRODUCTION_SPEED_ADULT - PRODUCTION_SPEED_INITIAL ) / ( AGE_ADULT - AGE_PLANTING );
+        PRODUCTION_DAILY_DECREMENT = ( PRODUCTION_SPEED_ADULT - PRODUCTION_SPEED_INITIAL ) / ( AGE_ADULT - AGE_PLANTING );
 
         AF_FRUITS = parameters.get("AF_FRUITS");
         COUT_RESPI_MAINTENANCE_BUNCH = parameters.get("COUT_RESPI_MAINTENANCE_BUNCH");
@@ -352,18 +349,20 @@ public:
         VITESSE_SENSITIVITY = parameters.get("VITESSE_SENSITIVITY");
 
         //        internals
-        phytomerNumber = INACTIVE_PHYTOMER_NUMBER + RANG_D_ABLATION;
+        phytomerNumber = 0;
+        newPhytomerEmergence = 0;
         inactivephytomerNumber = INACTIVE_PHYTOMER_NUMBER;
         activephytomerNumber = RANG_D_ABLATION;
-        date_plus_jeune_feuille = 0         ;
-        nf = 0 ;
-        newPhytomerEmergence = 0;
-        productionSpeed = PRODUCTION_SPEED_INITIAL;
+
+        production_speed = PRODUCTION_SPEED_INITIAL;
         trunk_height = INITIAL_HEIGHT;
         inflo_biomass = 0;
         respirable_bunch_biomass = 0;
         female_bunch_biomass = 0;
         male_biomass = 0 ;
+
+
+        production_speed = age_relative_var(age, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
 
         meteo->init(t, parameters);
         reserve->init(t, parameters);
@@ -406,37 +405,56 @@ public:
         slw = (((leaf_non_structural_biomass + leaf_structural_biomass) * POURC_FOLIOLE) / totalLeafArea);
         biomasse_prod = 0;
 
+
+        //init structure
+        double TTEff_init = parameters.get("T_EFF_INI");
+        double age_at_creation = age;
+        for ( int number = INACTIVE_PHYTOMER_NUMBER + RANG_D_ABLATION - 1; number == 0 ; --number ) {
+            create_phytomer(number, age_at_creation);
+            age_at_creation -= 1 / (TTEff_init * production_speed);
+        }
+
     }
 
-    void init_structure(double t) { //TODO fill
-        Phytomer * first_phytomer = new Phytomer(RANG_D_ABLATION, 1, phytomer::ACTIVE, t);
-        setsubmodel(PHYTOMERS, first_phytomer);
-        first_phytomer->init(t, _parameters);
-        phytomers.push_back(first_phytomer);
-        date_plus_jeune_feuille =  first_phytomer->get < double, Phytomer >(t, Phytomer::STEP_APP); //TODO remettre
-
-        for (int key = 0; key < INACTIVE_PHYTOMER_NUMBER + 1; ++key) {
-            Phytomer * phytomer = new Phytomer(key + RANG_D_ABLATION, -key + 1, phytomer::INACTIVE, t);
-            setsubmodel(PHYTOMERS, phytomer);
-            phytomer->init(t, _parameters);
-            phytomers.push_back(phytomer);
-            phytomer->init_structure(t);
-
-//            phytomer.compute_facteur_age()
-//            if phytomers[phytomer.name].rank > GlobalVariables.ICsex_RANG_FIN :
-//                phytomers[phytomer.name].bunch.sexe = phytomer.bunch.sexe_decision(GlobalVariables.INI_SEX_RATIO)
+    static double age_relative_var(double age, double age_ini, double age_fin, double val_ini, double val_fin) {
+        if ( age > age_fin ) {
+            return val_fin;
+        } else if (age < age_ini ) {
+            return val_ini;
+        } else {
+            double age_relative = age - age_ini;
+            double inc = (val_fin - val_ini) / (age_fin - age_ini);
+            return val_ini + age_relative * inc;
         }
+    }
 
-        for (int key = 0; key < RANG_D_ABLATION; ++key) {
-            double nb_jour_depuis_l_appari = ((RANG_D_ABLATION) - key)/( 10 * PRODUCTION_SPEED_INITIAL); // rang d'ablation = nbre ini
-            double TTfeuille = nb_jour_depuis_l_appari * 10; // 10 temps thermique moyen a calculer
-            Phytomer * phytomer = new Phytomer(key,RANG_D_ABLATION -key + 1, phytomer::INACTIVE, t);
-            setsubmodel(PHYTOMERS, phytomer);
-            phytomer->init(t, _parameters);
-            phytomers.push_back(phytomer);
-            phytomer->init_structure(t);
-        }
 
+    void create_phytomer(double number, double age_at_creation) {
+        int rank = RANG_D_ABLATION - number + 1;
+
+        double production_speed = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
+        double TT_ini_flowering = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_FLOWERING_INITIAL, TT_FLOWERING_ADULT);
+        double TT_ini_harvest = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_HARVEST_INITIAL, TT_HARVEST_ADULT);
+        double inflo_dev_factor = age_relative_var(age_at_creation, AGE_START_PROD, AGE_ADULT, 0, 1);
+//        double TT_ini_oleo = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_HARVEST_INITIAL, TT_HARVEST_ADULT);
+
+        Phytomer * phytomer = new Phytomer(number,
+                                           rank,
+                                           number > RANG_D_ABLATION
+                                               ? phytomer::INACTIVE
+                                               : phytomer::ACTIVE,
+                                           age_at_creation,
+                                           age,
+                                           production_speed,
+                                           TT_ini_flowering,
+                                           TT_ini_harvest,
+                                           inflo_dev_factor
+                                           );
+
+        setsubmodel(PHYTOMERS, phytomer);
+        phytomer->init(t, _parameters);
+        phytomers.push_back(phytomer);
+        phytomerNumber += 1;
     }
 
     void compute_SF( double t ){
@@ -463,7 +481,7 @@ public:
         biomasse_prod = factor * 10 * ei * EFFICIENCE_BIOLOGIQUE * 0.48 * Rg / DENS;//  # on multiplie par 10 pour passer en kg
     }
 
-    void update_organs(double t, double newPhytomerEmergence) {
+    void update_organs(double t) {
         //       #### defiolation le jour de la mise en place des traitements
         if (t == DEBUT_DEFOLIATON ) {
             auto it = phytomers.begin();
@@ -483,9 +501,9 @@ public:
             while (it != phytomers.end()) {
                 Phytomer* phytomer = (*it);
                 int rank = phytomer->get < double, Phytomer >(t, Phytomer::RANK);
-                inflo::inflo_states bunch_state = phytomer->bunch_model()->get <inflo::inflo_states, Inflo >(t, Inflo::STATUS);
-                inflo::inflo_sex sex = phytomer->bunch_model()->get <inflo::inflo_sex, Inflo >(t, Inflo::SEX);
-                inflo::inflo_sex avort = phytomer->bunch_model()->get <inflo::inflo_sex, Inflo >(t, Inflo::AVORT);
+                inflo::inflo_states bunch_state = phytomer->inflo_model()->get <inflo::inflo_states, Inflo >(t, Inflo::STATUS);
+                inflo::inflo_sex sex = phytomer->inflo_model()->get <inflo::inflo_sex, Inflo >(t, Inflo::SEX);
+                inflo::inflo_sex avort = phytomer->inflo_model()->get <inflo::inflo_sex, Inflo >(t, Inflo::AVORT);
                 if(rank >= RANG_D_ABLATION_REGIME
                         && bunch_state.is(inflo::RECOLTE)
                         && sex ==  inflo::FEMALE
@@ -496,33 +514,14 @@ public:
         }
 
         if (newPhytomerEmergence >= 1) {
-            Phytomer* phytomer = new Phytomer(phytomerNumber + 1, -INACTIVE_PHYTOMER_NUMBER, phytomer::INACTIVE, t);
-            phytomer->init(t, _parameters);
-            phytomers.push_back(phytomer);
-            phytomerNumber += 1;
-            nf += 1;
+            create_phytomer(phytomerNumber + 1, age);
+            newPhytomerEmergence -= 1;
         }
     }
 
     void compute(double t, bool /* update */)
     {
         age = age + 1 ;
-        if ( age > AGE_ADULT )
-            productionSpeed = PRODUCTION_SPEED_ADULT;
-        else if (age < AGE_PLANTING )
-            productionSpeed = PRODUCTION_SPEED_INITIAL;
-        else {
-            double days_since_planting = age - AGE_PLANTING;
-            productionSpeed = PRODUCTION_SPEED_INITIAL + days_since_planting * PRODUCTION_DECREASE_PER_DAY;
-        }
-
-
-
-        std::cout << t << std::endl;
-        if(t == 0) {
-            init_structure(t);
-            return;
-        }
 
         (*meteo)(t);
 
@@ -546,25 +545,27 @@ public:
         auto it = phytomers.begin();
         while (it != phytomers.end()) {
             Phytomer* phytomer = (*it);
-            if(phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) == phytomer::ACTIVE) {
-                phytomer->leaf_model()->put(t, Leaf::TEFF, TEff);
-                phytomer->leaf_model()->put(t, Leaf::FTSW, ftsw);
-                phytomer->leaf_model()->put(t, Leaf::FR_RESTE, fr_reste);
-                phytomer->leaf_model()->put(t, Leaf::DELTA_BIOMASSE_RESERVE_LEAF, reserve->get<double>(t-1, Reserve::DELTA_BIOMASSE_RESERVE_LEAF));
+            phytomer->put(t, Phytomer::YOUNG_PHYTO_NB, phytomers.size());
 
-                phytomer->internode_model()->put(t, Internode::TEFF, TEff);
-                phytomer->internode_model()->put(t, Internode::PRODUCTIONSPEED, productionSpeed);
-                phytomer->internode_model()->put(t, Internode::FR_RESTE, fr_reste);
+//            if(phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) == phytomer::ACTIVE) {
+//                phytomer->leaf_model()->put(t, Leaf::TEFF, TEff);
+//                phytomer->leaf_model()->put(t, Leaf::FTSW, ftsw);
+//                phytomer->leaf_model()->put(t, Leaf::FR_RESTE, fr_reste);
+//                phytomer->leaf_model()->put(t, Leaf::DELTA_BIOMASSE_RESERVE_LEAF, reserve->get<double>(t-1, Reserve::DELTA_BIOMASSE_RESERVE_LEAF));
 
-                phytomer->bunch_model()->put(t, Inflo::TEFF, TEff);
-                phytomer->bunch_model()->put(t, Inflo::FTSW, ftsw);
-                phytomer->bunch_model()->put(t, Inflo::FR_FRUITS, fr_fruits);
-                phytomer->bunch_model()->put(t, Inflo::DATE_PLUS_JEUNE_FEUILLE, date_plus_jeune_feuille);
-                phytomer->bunch_model()->put(t, Inflo::TREE_PRODUCTIONSPEED, productionSpeed);
-                phytomer->bunch_model()->put(t, Inflo::TREE_IC, ic);
+//                phytomer->internode_model()->put(t, Internode::TEFF, TEff);
+//                phytomer->internode_model()->put(t, Internode::PRODUCTIONSPEED, production_speed);
+//                phytomer->internode_model()->put(t, Internode::FR_RESTE, fr_reste);
 
-                (*phytomer)(t);
-            }
+//                phytomer->inflo_model()->put(t, Inflo::TEFF, TEff);
+//                phytomer->inflo_model()->put(t, Inflo::FTSW, ftsw);
+//                phytomer->inflo_model()->put(t, Inflo::FR_FRUITS, fr_fruits);
+//                phytomer->inflo_model()->put(t, Inflo::FR_RESTE, fr_reste);
+//                phytomer->inflo_model()->put(t, Inflo::DATE_PLUS_JEUNE_FEUILLE, date_plus_jeune_feuille);
+//                phytomer->inflo_model()->put(t, Inflo::TREE_PRODUCTIONSPEED, production_speed);
+//                phytomer->inflo_model()->put(t, Inflo::TREE_IC, ic);
+//            }
+            (*phytomer)(t);
         }
 
 
@@ -572,10 +573,10 @@ public:
 
 
 
-//        productionSpeed = max(MINIMAL_PRODUCTION_SPEED, (-DECREASE_OF_PRODUCTION_SPEED * (t - _parameters.beginDate) ) + PRODUCTION_SPEED_INITIAL); //DD.rang-1
+//        production_speed = max(MINIMAL_PRODUCTION_SPEED, (-DECREASE_OF_PRODUCTION_SPEED * (t - _parameters.beginDate) ) + PRODUCTION_SPEED_INITIAL); //DD.rang-1
 
-        newPhytomerEmergence += TEff * productionSpeed * pow(ic,VITESSE_SENSITIVITY) * ( ftsw > SEUIL_ORGANO ? 1 : ftsw / SEUIL_ORGANO);
-        update_organs(t, newPhytomerEmergence);
+        newPhytomerEmergence += TEff * production_speed * pow(ic,VITESSE_SENSITIVITY) * ( ftsw > SEUIL_ORGANO ? 1 : ftsw / SEUIL_ORGANO);
+        update_organs(t);
         (*racines)(t);
         rootTailleC = racines->get<double>(t, Racines::TAILLEC);
         rootTailleC1 = racines->get<double>(t, Racines::TAILLEC1);
@@ -602,19 +603,19 @@ public:
 
                 leaf_structural_biomass += phytomer->leaf_model()->get <double>(t, Leaf::STRUCTURAL_BIOMASS);
                 leaf_non_structural_biomass += phytomer->leaf_model()->get <double>(t, Leaf::NON_STRUCTURAL_BIOMASS);
-                inflo_biomass += phytomer->bunch_model()->get <double, Inflo>(t, Inflo::BIOMASS); //## attention pour la respi de maintenance !!!
-                respirable_bunch_biomass += phytomer->bunch_model()->get <double, Inflo>(t, Inflo::RESPIRABLE_BIOMASS);
-                female_bunch_biomass += phytomer->bunch_model()->get <double, Inflo>(t, Inflo::FEMELLE_BIOMASS);
-                male_biomass += phytomer->bunch_model()->get <double, Inflo>(t, Inflo::MALE_BIOMASS);
+                inflo_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::BIOMASS); //## attention pour la respi de maintenance !!!
+                respirable_bunch_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::RESPIRABLE_BIOMASS);
+                female_bunch_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::FEMELLE_BIOMASS);
+                male_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_BIOMASS);
 
                 trunk_height += phytomer->internode_model()->get <double>(t, Internode::LENGTH);
 
                 internode_demand +=  phytomer->internode_model()->get <double>(t, Internode::DEMAND);
                 leaf_demand += phytomer->leaf_model()->get <double>(t, Leaf::DEMAND);
-                inflo_demand += phytomer->bunch_model()->get <double, Inflo>(t, Inflo::DEMAND);
-                bunch_demand += phytomer->bunch_model()->fruit_model()->get <double>(t, Bunch::DEMAND);
-                male_demand += phytomer->bunch_model()->male_model()->get <double>(t, MaleInflo::DEMAND);
-                peduncule_demand += phytomer->bunch_model()->peduncle_model()->get <double>(t, Peduncle::DEMAND);
+                inflo_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::DEMAND);
+                bunch_demand += phytomer->inflo_model()->bunch_model()->get <double>(t, Bunch::DEMAND);
+                male_demand += phytomer->inflo_model()->male_model()->get <double>(t, MaleInflo::DEMAND);
+                peduncule_demand += phytomer->inflo_model()->peduncle_model()->get <double>(t, Peduncle::DEMAND);
             }
             trunk_biomass += phytomer->internode_model()->get <double>(t, Internode::BIOMASS);
             biomass = leaf_structural_biomass + leaf_non_structural_biomass +  female_bunch_biomass + trunk_biomass + reserve->get <double>(t, Reserve::BIOMASS) + male_biomass;
@@ -635,6 +636,8 @@ public:
         double demand = internode_demand + leaf_demand + respi_maintenance + inflo_demand;
         growth_demand =  internode_demand +   leaf_demand  +  inflo_demand;
         ic = Assim/demand;
+        ics.push_back(ic);
+
         Assim = biomasse_prod;
 
 

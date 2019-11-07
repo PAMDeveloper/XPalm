@@ -39,16 +39,17 @@ public:
                      TEST_BIOMASS
                    };
 
-    enum externals {  ABLATION_STATUS,
-                      BUNCH_STATUS,
-                      BUNCH_POT_STATUS,
-                      ESTIMATED_FLOWERING_DATE,
-                      FACTEUR_AGE_REGIMES,
+    enum externals {
+                      INFLO_STATUS,
+                      INFLO_POT_STATUS,
+                      FLOWERING_TT,
+                      HARVEST_TT,
+                      INFLO_DEV_FACTOR,
                       IC_SPIKELET,
                       TREE_PRODUCTION_SPEED,
                       TEFF,
                       TT_CORRIGE,
-                      THERMALTIMESINCEAPPEARANCE,
+                      TT_SINCE_RANK1,
                       FR_RESTE,
 //                      INI_HARVEST_DATE,
 //                      INI_FLOWERING_DATE
@@ -61,9 +62,9 @@ private:
     double SENSIVITY_IC_SPIKELET;
     double MASSE_MEAN_PEDUNCULE_ADULTE;
     double COUT_STRUCTURE_REGIME;
-    double PRODUCTION_SPEED_INITIAL;
-    double TT_FLO;
-    double TT_HARVEST;
+//    double PRODUCTION_SPEED_INITIAL;
+//    double TT_FLO;
+//    double TT_HARVEST;
 
     //     internals
     double demand;
@@ -73,24 +74,27 @@ private:
     double demand_pot;
     double test_biomass;
 
-    //     externals
-    inflo::inflo_states ablation_statut;
-    inflo::inflo_states inflo_status;
-    inflo::inflo_states inflo_pot_statut;
-    double estimated_flowering_date;
-    double facteur_age_regimes;
-    double IC_spikelet;
+    double TT_ini_flowering;
+    double TT_ini_harvest;
+    double inflo_dev_factor;
     double production_speed;
+
+    //     externals
+    inflo::inflo_states inflo_status;
+    inflo::inflo_states inflo_pot_status;
+    double IC_spikelet;
     double Teff;
     double TT_corrige;
-    double thermalTimeSinceAppearance;
+    double TT_since_rank1;
     double fr_reste;
-    double ini_harvest_date;
-    double ini_flowering_date;
 
 public:
 
-    Peduncle()
+    Peduncle(double prod_speed, double flo_tt, double harv_tt, double inflo_factor):
+        TT_ini_flowering(flo_tt),
+        TT_ini_harvest(harv_tt),
+        inflo_dev_factor(inflo_factor),
+        production_speed(prod_speed)
     {
         //         internals
         Internal(DEMAND, &Peduncle::demand);
@@ -101,21 +105,11 @@ public:
         Internal(TEST_BIOMASS, &Peduncle::test_biomass);
 
         //          externals
-        External(ABLATION_STATUS, &Peduncle::ablation_statut);
-        External(BUNCH_STATUS, &Peduncle::inflo_status);
-        External(BUNCH_POT_STATUS, &Peduncle::inflo_status);
-        External(ESTIMATED_FLOWERING_DATE, &Peduncle::estimated_flowering_date);
-        External(FACTEUR_AGE_REGIMES, &Peduncle::facteur_age_regimes);
         External(IC_SPIKELET, &Peduncle::IC_spikelet);
-        External(TREE_PRODUCTION_SPEED, &Peduncle::production_speed);
         External(TEFF, &Peduncle::Teff);
         External(TT_CORRIGE, &Peduncle::TT_corrige);
-        External(THERMALTIMESINCEAPPEARANCE, &Peduncle::thermalTimeSinceAppearance);
+        External(TT_SINCE_RANK1, &Peduncle::TT_since_rank1);
         External(FR_RESTE, &Peduncle::fr_reste);
-        External(INI_HARVEST_DATE, &Peduncle::ini_harvest_date);
-        External(INI_FLOWERING_DATE, &Peduncle::ini_flowering_date);
-
-
     }
 
     virtual ~Peduncle()
@@ -127,93 +121,59 @@ public:
         last_time = t-1;
 
         //        parameters
-        RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
         SENSIVITY_IC_SPIKELET = parameters.get("SENSIVITY_IC_SPIKELET");
         MASSE_MEAN_PEDUNCULE_ADULTE = parameters.get("MASSE_MEAN_PEDUNCULE_ADULTE");
+        RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
         COUT_STRUCTURE_REGIME = parameters.get("COUT_STRUCTURE_REGIME");
-        PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL");
-        TT_FLO = parameters.get("TT_FLO");
-        TT_HARVEST = parameters.get("TT_HARVEST");
+        double PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL");
 
         //internals
         demand = 0;
         assimilate_supply = 0;
         demand_pot = 0;
-        test_biomass = 0;
-
 
         //init structure
-        if (thermalTimeSinceAppearance < TT_FLO - RANG_DEBUT_CROISSANCE_PEDUNCULE / production_speed) {
+        if (TT_since_rank1 < TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE / production_speed) {
             biomass = 0 ;
         } else {
-            if (thermalTimeSinceAppearance > TT_HARVEST)
+            if (TT_since_rank1 > TT_ini_harvest)
                 biomass = 0;
             else {
-                if ( thermalTimeSinceAppearance > TT_FLO )
-                    biomass = facteur_age_regimes * MASSE_MEAN_PEDUNCULE_ADULTE;
-                else
-                    biomass = facteur_age_regimes * MASSE_MEAN_PEDUNCULE_ADULTE /
-                            ( RANG_DEBUT_CROISSANCE_PEDUNCULE / PRODUCTION_SPEED_INITIAL  ) *
-                            ( thermalTimeSinceAppearance - ( TT_FLO - RANG_DEBUT_CROISSANCE_PEDUNCULE /
-                                                             PRODUCTION_SPEED_INITIAL ) );
+                double coeff = 1;
+                if ( TT_since_rank1 <= TT_ini_flowering ) {
+                    double TT_since_growth = RANG_DEBUT_CROISSANCE_PEDUNCULE / PRODUCTION_SPEED_INITIAL;
+                    coeff = ( TT_since_rank1 - (TT_ini_flowering - TT_since_growth)) / TT_since_growth;
+                }
+
+                biomass = inflo_dev_factor * MASSE_MEAN_PEDUNCULE_ADULTE * coeff;
             }
         }
         potential_biomass = biomass;
     }
 
 
-    void growth_demand() {
-        if (ablation_statut.is(inflo::ABLATED)) {
-            demand = 0;
-            demand_pot = 0;
-        } else {
-            //compute potential biomass
-            potential_biomass = facteur_age_regimes * (pow(IC_spikelet, SENSIVITY_IC_SPIKELET)) * MASSE_MEAN_PEDUNCULE_ADULTE;
-
-            //compute_demand
-            if (inflo_status.is(inflo::APPARITION_FLORAISON))
-                demand = 0;
-            else {
-                if (TT_corrige > estimated_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
-                    demand = facteur_age_regimes * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed) * Teff;
-                else
-                    demand = 0;
-            }
-
-            //compute_pot_demand
-            if (inflo_pot_statut.is(inflo::APPARITION_FLORAISON))
-                demand_pot = 0;
-            else {
-                if (thermalTimeSinceAppearance > estimated_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
-                    demand_pot = facteur_age_regimes * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed) * Teff;
-                else
-                    demand_pot = 0;
-            }
-        }
-    }
-
-    void growth() {
-        //compute assimilate supply
-        assimilate_supply = demand * fr_reste;
-
-        //compute biomass
-        if (inflo_status.is(inflo::RECOLTE) || ablation_statut.is(inflo::ABLATED))
-            biomass = 0;
-        else
-            biomass = assimilate_supply * (1 / COUT_STRUCTURE_REGIME);
-
-        potential_biomass += demand_pot *(1 / COUT_STRUCTURE_REGIME);
-        test_biomass += assimilate_supply * (1 / COUT_STRUCTURE_REGIME);
-    }
-
-
-
-
-
     void compute(double t, bool /* update */)
     {
-        growth();
-        growth_demand();
+//        growth();
+        //compute assimilate supply
+        assimilate_supply = demand * fr_reste;
+        biomass += assimilate_supply / COUT_STRUCTURE_REGIME;
+
+//        growth_demand();
+        //compute potential biomass
+        potential_biomass = inflo_dev_factor * pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * MASSE_MEAN_PEDUNCULE_ADULTE;
+
+        //compute_demand
+        if (TT_corrige > TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
+            demand = inflo_dev_factor * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed) * Teff;
+        else
+            demand = 0;
+
+        //compute_pot_demand
+        if (TT_since_rank1 > TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
+            demand_pot = inflo_dev_factor * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed) * Teff;
+        else
+            demand_pot = 0;
     }
 
 

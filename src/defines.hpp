@@ -14,6 +14,22 @@ const double _PI = 3.141592653589793238462643383280;
 struct GlobalParameters {
 };
 
+
+//static double age_relative_var(double age, double age_ini, double age_fin, double val_ini, double val_fin) {
+//    if ( age > age_fin ) {
+//        return val_fin;
+//    } else if (age < age_ini ) {
+//        return val_ini;
+//    } else {
+//        double age_relative = age - age_ini;
+//        double inc = (val_fin - val_ini) / (age_fin - age_ini);
+//        return val_ini + age_relative * inc;
+//    }
+//}
+
+//coeffIC(ics, rank, IC_spikelet_RANG_DEBUT, IC_spikelet_RANG_FIN);
+
+
 #ifdef UNSAFE_RUN
 
 namespace inflo {
@@ -240,32 +256,48 @@ enum phytomer_state {  ACTIVE = 0,
 //}
 
 
-//namespace bunch {
-//enum bunch_state {
-//    OLEOSYNTHESE = 0,
-//    AVANT_OLEOSYNTHESE = 1,
-//    RECOLTE = 2,
-//    ABORTED = 3,
-//    ABLATED = 4
-//};
-//}
+namespace bunch {
+enum bunch_state {
+    OLEOSYNTHESE = 0,
+    AVANT_OLEOSYNTHESE = 1,
+    RECOLTE = 2,
+    ABORTED = 3,
+    ABLATED = 4
+};
+}
+
+
 
 namespace inflo {
 
-enum inflo_sex {
-    FEMALE = 0,
-    MALE = 1,
-    UNKNOWN_SEX = 2
+//enum inflo_sex {
+//    FEMALE = 0,
+//    MALE = 1,
+//    ABORTED = 2,
+//    UNKNOWN = 3
+//};
+
+
+//enum inflo_state {      APPARITION_FLORAISON = 1
+//                      , FLORAISON_RECOLTE = 2
+//                      , PAS_DE_FRUITS = 4
+//                      , UNKNOWN = 8
+//                      , NON_ABLATED = 16
+//                      , INITIE = 32
+//                      , RECOLTE = 64
+//                 };
+
+enum inflo_state {
+      ABORTED = 1
+    , INITIATED = 2
+    , MALE = 4
+    , FEMALE = 8
+    , FLOWERING = 16
+    , OLEOSYNTHESIS = 32
+    , HARVEST = 64
+    , DEAD = 128
+    , SENESCENCE = 256
 };
-
-
-enum inflo_state {      APPARITION_FLORAISON = 1
-                      , FLORAISON_RECOLTE = 2
-                      , PAS_DE_FRUITS = 4
-                      , UNKNOWN = 8
-                      , NON_ABLATED = 16
-                      , INITIE = 32
-                 };
 
 
 template <typename E, typename std::enable_if<std::is_enum<E>::value>::type* = nullptr>

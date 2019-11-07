@@ -100,8 +100,7 @@ SOURCES += \
     $$SRC_/qtapp/view.cpp \
     $$SRC_/qtapp/callout.cpp \
     $$SRC_/qtapp/tracemodel.cpp \
-    $$SRC_/main.cpp \
-    $$SRC_/parameters/XPalm_parameters.txt
+    $$SRC_/main.cpp
 
 FORMS += \
     $$SRC_/qtapp/mainwindow.ui

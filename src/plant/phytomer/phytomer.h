@@ -19,45 +19,59 @@ public:
     enum submodels { LEAF, INFLO, INTERNODE };
 
     enum internals { RANK,
-                     STATE,
-                     DEMAND,
                      NUMBER,
-                     DATE,
-                     STEP_APP};
+                     STATE,
+                     AGE_AT_CREATION
+//                     DEMAND
+                   };
+
+    enum external { YOUNG_PHYTO_NB };
+
 private:
-//     submodels
+    //     submodels
     std::unique_ptr < Leaf > leaf;
     std::unique_ptr < Internode > internode;
     std::unique_ptr < Inflo > inflo;
 
-//     internals
-    double rank;
+    //parameters
+    double INACTIVE_PHYTOMER_NUMBER;
+
+    //     internals
     phytomer::phytomer_state state;
-    double demand;
+    double rank;
     double number;
-    double date;
-    double step_apparition;
+    double tree_age_at_creation;
+    double age;
+
+    //   externals
+    int youngest_phytomer_number;
 
 public:
-    Phytomer(int rank, int number, phytomer::phytomer_state state, double date) :
-        rank(rank), state(state), number(number),
-        date(date),
-        leaf(new Leaf()),
-        internode(new Internode()),
-        inflo(new Inflo())
+    Phytomer(int number, int rank, phytomer::phytomer_state state, double tree_age_at_creation,
+             double tree_age, double prod_speed, double flo_tt, double harv_tt, double inflo_factor) :
+        number(number),
+        rank(rank),
+        state(state),
+        age(tree_age - tree_age_at_creation),
+        tree_age_at_creation(tree_age_at_creation),
+        internode(new Internode(prod_speed, number, tree_age_at_creation)),
+        leaf(new Leaf(prod_speed, flo_tt, harv_tt, inflo_factor)),
+        inflo(new Inflo(prod_speed, flo_tt, harv_tt, inflo_factor))
     {
-//         submodels
+
+        //         submodels
         setsubmodel(LEAF, leaf.get());
         setsubmodel(INTERNODE, internode.get());
         setsubmodel(INFLO, inflo.get());
 
-//         internals
+        //         internals
         Internal(RANK, &Phytomer::rank);
         Internal(STATE, &Phytomer::state);
-        Internal(DEMAND, &Phytomer::demand);
         Internal(NUMBER, &Phytomer::number);
-        Internal(DATE, &Phytomer::date);
-        Internal(STEP_APP, &Phytomer::step_apparition);
+        Internal(AGE_AT_CREATION, &Phytomer::tree_age_at_creation);
+
+        // externals
+        Internal(YOUNG_PHYTO_NB, &Phytomer::youngest_phytomer_number);
     }
 
     virtual ~Phytomer()
@@ -67,51 +81,73 @@ public:
         inflo.reset(nullptr);
     }
 
-    void init_structure(double t) {
-        leaf->init_structure(t);
-        internode->init_structure(t);
-        inflo->init_structure(t);
-    }
+    Leaf * leaf_model() const { return leaf.get(); }
+    Inflo * inflo_model() const { return inflo.get(); }
+    Internode * internode_model() const { return internode.get(); }
 
     void init(double t, const xpalm::ModelParameters& parameters)
     {
-//        parameters
-        double INACTIVE_PHYTOMER_NUMBER = parameters.get("INACTIVE_PHYTOMER_NUMBER");
-        double RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
-        double PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL");
+        //parameters
+        INACTIVE_PHYTOMER_NUMBER = parameters.get("INACTIVE_PHYTOMER_NUMBER");
 
-        step_apparition = (t - parameters.beginDate) - (INACTIVE_PHYTOMER_NUMBER + RANG_D_ABLATION - number) / (10.0 * PRODUCTION_SPEED_INITIAL);
-
-//         submodels
+        //submodels
         leaf->init(t, parameters);
         internode->init(t, parameters);
         inflo->init(t, parameters);
     }
 
+
+//    double TT_since_rank1 = TEff_ini * phytomer_age; //AGE
+
     void compute(double t, bool /* update */)
     {
+        if(state == phytomer::DEAD) //TODO remove to include leaf/internode in demand when inactive
+            return;
 
-        leaf->put(t, Leaf::PHYTOMER_RANK, rank);
-        leaf->put(t, Leaf::PHYTOMER_STATE, state);
-        leaf->put(t, Leaf::BUNCH_SEXE, inflo->get<inflo::inflo_sex, Inflo>(t, Inflo::SEX));
-        leaf->put(t, Leaf::BUNCH_AVORT, inflo->get<inflo::inflo_sex, Inflo>(t, Inflo::AVORT));
-        leaf->put(t, Leaf::BUNCH_STATUT, inflo->get<inflo::inflo_states, Inflo>(t, Inflo::STATUS));
+        age++;
+        rank = youngest_phytomer_number - number - INACTIVE_PHYTOMER_NUMBER + 1;
+        if(rank == 1 && state == phytomer::INACTIVE)
+            state = phytomer::ACTIVE;
+
+
+        if(state != phytomer::ACTIVE) //TODO remove to include leaf/internode in demand when inactive
+            return;
+
         (*leaf)(t);
-
-        internode->put(t, Internode::PHYTOMER_NUMBER, number);
         (*internode)(t);
+        (*inflo)(t);
 
-        inflo::inflo_states bunch_statut = inflo.get()->get< inflo::inflo_states, Inflo >(t, Inflo::STATUS);
-        if(!bunch_statut.is(inflo::RECOLTE)) {
-            inflo->put(t, Inflo::PHYTOMER_RANK, rank);
-            (*inflo)(t);
-        }
+        compute_IC();
     }
 
 
-    Leaf * leaf_model() const { return leaf.get(); }
-    Inflo * bunch_model() const { return inflo.get(); }
-    Internode * internode_model() const { return internode.get(); }
+    void compute_IC(){
+        if (rank > ICsex_RANG_DEBUT && rank < ICsex_RANG_FIN ) {
+            nb_joursICsex += 1;
+            ICsex_tot += tree_IC;
+            ICsex = ICsex_tot / nb_joursICsex;
+        }
+
+        if (rank > ICabort_RANG_DEBUT && rank < ICabort_RANG_FIN) {
+            nb_joursICabort += 1;
+            ICabort_tot += tree_IC;
+            ICabort = ICabort_tot / nb_joursICabort;
+        }
+
+        if (rank > IC_spikelet_RANG_DEBUT && rank < IC_spikelet_RANG_FIN){
+            nb_joursIC_spikelet += 1;
+            IC_spikelet_tot += tree_IC;
+            IC_spikelet = IC_spikelet_tot / nb_joursIC_spikelet;
+        }
+
+        if (TT_corrige > TT_ini_flowering - DEBUT_RANG_SENSITIVITY_NOUAISON / production_speed &&
+                TT_corrige < TT_ini_flowering - FIN_RANG_SENSITIVITY_NOUAISON / production_speed &&
+                TT_corrige < TT_ini_flowering) {
+            nb_joursIC_setting += 1;
+            IC_setting_tot += tree_IC;
+            IC_setting = (IC_setting_tot) / nb_joursIC_setting;
+        }
+    }
 
 };
 

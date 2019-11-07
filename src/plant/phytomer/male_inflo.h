@@ -38,18 +38,22 @@ private:
     double assimilate_supply;
     double demand;
 
+    int TT_ini_flowering;
+    double inflo_dev_factor;
+    double production_speed;
+    double TT_flowering_duration;
+
 //     externals
-    double thermalTimeSinceAppearance;
-//    int ini_flowering_date;
-    int estimated_flowering_date;
-    double facteur_age_regimes;
-    double productionSpeed;// (bunch.phytomer.tree)
-    double fr_reste; //bunch.phytomer.tree.fr_reste
-    inflo::inflo_states bunch_status;
+    double TT_since_rank1;
+    inflo::inflo_states inflo_status;
+    double fr_reste;
     double Teff;
 
 public:
-    MaleInflo()
+    MaleInflo(double prod_speed, double flo_tt, double inflo_factor):
+        TT_ini_flowering(flo_tt),
+        inflo_dev_factor(inflo_factor),
+        production_speed(prod_speed)
     {
 //         internals
         Internal(BIOMASS, &MaleInflo::biomass);
@@ -58,60 +62,19 @@ public:
         Internal(DEMAND, &MaleInflo::demand);
 
 //          externals
-        External(TT_SINCE_APPEARANCE, &MaleInflo::thermalTimeSinceAppearance);
+        External(TT_SINCE_APPEARANCE, &MaleInflo::TT_since_rank1);
 //        External(INI_FLO_DATE, &MaleInflo::ini_flowering_date);
-        External(ESTIM_FLO_DATE, &MaleInflo::estimated_flowering_date);
-        External(FACTEUR_AGE_REGIME, &MaleInflo::facteur_age_regimes);
-        External(PROD_SPEED, &MaleInflo::productionSpeed);
+        External(ESTIM_FLO_DATE, &MaleInflo::TT_ini_flowering);
+        External(FACTEUR_AGE_REGIME, &MaleInflo::inflo_dev_factor);
+        External(PROD_SPEED, &MaleInflo::production_speed);
         External(FR_RESTE, &MaleInflo::fr_reste);
-        External(BUNCH_STATUS, &MaleInflo::bunch_status);
+        External(BUNCH_STATUS, &MaleInflo::inflo_status);
         External(TEFF, &MaleInflo::Teff);
     }
 
     virtual ~MaleInflo() {}
 
 
-    void init_structure(double thermalTimeSinceAppearance, double ini_flowering_date, double facteur_age_regimes ) {
-        if (thermalTimeSinceAppearance < ini_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE / productionSpeed)
-            biomass = 0;
-        else {
-            if (thermalTimeSinceAppearance > ini_flowering_date)
-                biomass = 0;
-            else {
-                if (thermalTimeSinceAppearance > ini_flowering_date)
-                    biomass = MASSE_INFLO_MALE_ADULTE * facteur_age_regimes;
-                else
-                    biomass = MASSE_INFLO_MALE_ADULTE * facteur_age_regimes / ( RANG_DEBUT_CROISSANCE_PEDUNCULE / PRODUCTION_SPEED_INITIAL  ) *
-                                     ( thermalTimeSinceAppearance - ( ini_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE / PRODUCTION_SPEED_INITIAL ) );
-            }
-        }
-        potential_biomass= biomass;
-    }
-
-
-
-    void growth_demand() {
-        if (!bunch_status.is(inflo::APPARITION_FLORAISON))
-            demand = 0;
-        else {
-            if ( thermalTimeSinceAppearance > estimated_flowering_date - RANG_DEBUT_CROISSANCE_PEDUNCULE/productionSpeed )
-                demand = MASSE_INFLO_MALE_ADULTE * facteur_age_regimes / (RANG_DEBUT_CROISSANCE_PEDUNCULE/productionSpeed) * Teff;
-            else
-                demand = 0;
-        }
-    }
-
-
-    void growth() {
-        assimilate_supply = demand   * fr_reste;
-        if (bunch_status == inflo::FLORAISON_RECOLTE) {
-            biomass = 0;
-            potential_biomass = 0;
-        } else {
-            biomass += assimilate_supply * (1 / COUT_STRUCTURE_REGIME);
-            potential_biomass += demand * (1 / COUT_STRUCTURE_REGIME);
-        }
-    }
     void init(double t, const xpalm::ModelParameters& parameters)
     {
         last_time = t-1;
@@ -128,14 +91,30 @@ public:
         assimilate_supply = 0;
         potential_biomass = 0;
 
-//        init_structure();//todo
+        TT_flowering_duration = RANG_DEBUT_CROISSANCE_PEDUNCULE / production_speed;
+        double TEff_ini = parameters.get("T_EFF_INI");
+        double TT_since_rank1 = TEff_ini * phytomer_age;
+
+        //init structure
+        if (TT_since_rank1 <= TT_ini_flowering) { // !inflo_status.is(inflo::FLOWERING)
+            biomass = 0;
+            demand = 0;
+        } else {
+            double fr_growth = min(1, (TT_ini_flowering - TT_since_rank1) / TT_flowering_duration );
+            biomass = MASSE_INFLO_MALE_ADULTE * inflo_dev_factor * fr_growth / COUT_STRUCTURE_REGIME;
+            demand = MASSE_INFLO_MALE_ADULTE * inflo_dev_factor * ( TEff_ini / TT_flowering_duration );
+        }
+        potential_biomass = biomass;
     }
 
     void compute(double t, bool /* update */)
     {
         last_time = t-1;
-        growth();
-        growth_demand();
+
+        demand = MASSE_INFLO_MALE_ADULTE * inflo_dev_factor * ( Teff / TT_flowering_duration );
+        assimilate_supply = demand * fr_reste;
+        biomass += assimilate_supply / COUT_STRUCTURE_REGIME;
+        potential_biomass += demand / COUT_STRUCTURE_REGIME;
     }
 };
 
