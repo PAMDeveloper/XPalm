@@ -457,20 +457,6 @@ public:
         phytomerNumber += 1;
     }
 
-    void compute_SF( double t ){
-        totalLeafArea = 0;
-
-        //surface
-//        auto it = phytomers.begin();
-//        while (it != phytomers.end()) {
-//            Phytomer* phytomer = (*it);
-//            if (phytomer->get< phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) != phytomer::DEAD)
-//                totalLeafArea += phytomer->leaf_model()->get < double >(t, Leaf::LEAFAREA);
-
-//        }
-    }
-
-
 
     void compute_biomasse_prod(double t) {
         double Rg = meteo->get<double>(t, Meteo::RG);
@@ -481,43 +467,6 @@ public:
         biomasse_prod = factor * 10 * ei * EFFICIENCE_BIOLOGIQUE * 0.48 * Rg / DENS;//  # on multiplie par 10 pour passer en kg
     }
 
-    void update_organs(double t) {
-        //       #### defiolation le jour de la mise en place des traitements
-        if (t == DEBUT_DEFOLIATON ) {
-            auto it = phytomers.begin();
-            while (it != phytomers.end()) {
-                Phytomer* phytomer = (*it);
-                int rank = phytomer->get< double, Phytomer >(t, Phytomer::RANK);
-                phytomer::phytomer_state state = phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE);
-                if(rank > RANG_DEFOLIATON && state == phytomer::ACTIVE) {
-                    ;//TODO ABLATION  phytomers[key].leaf.ablation = phytomers[key].leaf.defoliation_decision(POURC_DEFOLIATON)
-                }
-            }
-        }
-
-        // ### ablation des regimes le jour de la mise en place des traitements
-        if (t == DEBUT_ABLATION_REGIME ) {
-            auto it = phytomers.begin();
-            while (it != phytomers.end()) {
-                Phytomer* phytomer = (*it);
-                int rank = phytomer->get < double, Phytomer >(t, Phytomer::RANK);
-                inflo::inflo_states bunch_state = phytomer->inflo_model()->get <inflo::inflo_states, Inflo >(t, Inflo::STATUS);
-                inflo::inflo_sex sex = phytomer->inflo_model()->get <inflo::inflo_sex, Inflo >(t, Inflo::SEX);
-                inflo::inflo_sex avort = phytomer->inflo_model()->get <inflo::inflo_sex, Inflo >(t, Inflo::AVORT);
-                if(rank >= RANG_D_ABLATION_REGIME
-                        && bunch_state.is(inflo::RECOLTE)
-                        && sex ==  inflo::FEMALE
-                        && avort == inflo::NON_ABORTED)
-                    ;//TODO ABLATION  phytomers[key].leaf.ablation = phytomers[key].leaf.defoliation_decision(POURC_DEFOLIATON)
-
-            }
-        }
-
-        if (newPhytomerEmergence >= 1) {
-            create_phytomer(phytomerNumber + 1, age);
-            newPhytomerEmergence -= 1;
-        }
-    }
 
     void compute(double t, bool /* update */)
     {
@@ -529,13 +478,14 @@ public:
         //            pluie = simulation.meteo.Rain + simulation.meteo.irrigation[simulation.meteo.jour_julien]
         //        else :
         //            pluie = simulation.meteo.Rain
-        bh->put<double>(t, WaterBalance::RACINES_TAILLEC, rootTailleC);
-        bh->put<double>(t, WaterBalance::RACINES_TAILLEC1, rootTailleC1);
-        bh->put<double>(t, WaterBalance::RACINES_TAILLEC2, rootTailleC2);
-        bh->put<double>(t, WaterBalance::RACINES_TAILLEC1MOINSVAP, rootTailleC1MVAP);
-        bh->put<double>(t, WaterBalance::RACINES_TAILLEVAP, rootTailleVAP);
-        bh->put<double>(t, WaterBalance::ET0, meteo->get<double>(t, Meteo::ET0));
-        bh->put<double>(t, WaterBalance::TREE_EI, ei);
+
+//        bh->put<double>(t, WaterBalance::RACINES_TAILLEC, rootTailleC);
+//        bh->put<double>(t, WaterBalance::RACINES_TAILLEC1, rootTailleC1);
+//        bh->put<double>(t, WaterBalance::RACINES_TAILLEC2, rootTailleC2);
+//        bh->put<double>(t, WaterBalance::RACINES_TAILLEC1MOINSVAP, rootTailleC1MVAP);
+//        bh->put<double>(t, WaterBalance::RACINES_TAILLEVAP, rootTailleVAP);
+//        bh->put<double>(t, WaterBalance::ET0, meteo->get<double>(t, Meteo::ET0));
+//        bh->put<double>(t, WaterBalance::TREE_EI, ei);
         (*bh)(t);
 
         double TEff = meteo->get<double>(t, Meteo::TEFF);
@@ -568,21 +518,20 @@ public:
             (*phytomer)(t);
         }
 
-
-
-
-
-
 //        production_speed = max(MINIMAL_PRODUCTION_SPEED, (-DECREASE_OF_PRODUCTION_SPEED * (t - _parameters.beginDate) ) + PRODUCTION_SPEED_INITIAL); //DD.rang-1
 
         newPhytomerEmergence += TEff * production_speed * pow(ic,VITESSE_SENSITIVITY) * ( ftsw > SEUIL_ORGANO ? 1 : ftsw / SEUIL_ORGANO);
-        update_organs(t);
+        if (newPhytomerEmergence >= 1) {
+            create_phytomer(phytomerNumber + 1, age);
+            newPhytomerEmergence -= 1;
+        }
+
         (*racines)(t);
-        rootTailleC = racines->get<double>(t, Racines::TAILLEC);
-        rootTailleC1 = racines->get<double>(t, Racines::TAILLEC1);
-        rootTailleC2 = racines->get<double>(t, Racines::TAILLEC2);
-        rootTailleC1MVAP = racines->get<double>(t, Racines::TAILLEC1MOINSVAP);
-        rootTailleVAP = racines->get<double>(t, Racines::TAILLEVAP);
+//        rootTailleC = racines->get<double>(t, Racines::TAILLEC);
+//        rootTailleC1 = racines->get<double>(t, Racines::TAILLEC1);
+//        rootTailleC2 = racines->get<double>(t, Racines::TAILLEC2);
+//        rootTailleC1MVAP = racines->get<double>(t, Racines::TAILLEC1MOINSVAP);
+//        rootTailleVAP = racines->get<double>(t, Racines::TAILLEVAP);
 
         //Compute results
         //reset vars
@@ -599,7 +548,7 @@ public:
         it = phytomers.begin();
         while (it != phytomers.end()) {
             Phytomer* phytomer = (*it);
-            if(phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) == phytomer::ACTIVE) {
+//            if(phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) == phytomer::ACTIVE) { //
 
                 leaf_structural_biomass += phytomer->leaf_model()->get <double>(t, Leaf::STRUCTURAL_BIOMASS);
                 leaf_non_structural_biomass += phytomer->leaf_model()->get <double>(t, Leaf::NON_STRUCTURAL_BIOMASS);
@@ -616,7 +565,8 @@ public:
                 bunch_demand += phytomer->inflo_model()->bunch_model()->get <double>(t, Bunch::DEMAND);
                 male_demand += phytomer->inflo_model()->male_model()->get <double>(t, MaleInflo::DEMAND);
                 peduncule_demand += phytomer->inflo_model()->peduncle_model()->get <double>(t, Peduncle::DEMAND);
-            }
+
+//            }
             trunk_biomass += phytomer->internode_model()->get <double>(t, Internode::BIOMASS);
             biomass = leaf_structural_biomass + leaf_non_structural_biomass +  female_bunch_biomass + trunk_biomass + reserve->get <double>(t, Reserve::BIOMASS) + male_biomass;
 
@@ -628,7 +578,7 @@ public:
 
         double TMoy = (_parameters.get(t).TMax + _parameters.get(t).TMin) / 2;
         double Q10 = pow(2, (TMoy - 25)/10);
-        double respi_maintenance = Q10* (
+        double respi_maintenance = Q10 * (
                     trunk_biomass * COUT_RESPI_MAINTENANCE_STIPE +
                     respirable_bunch_biomass * COUT_RESPI_MAINTENANCE_BUNCH +
                     leaf_structural_biomass * COUT_RESPI_MAINTENANCE_LEAF);
@@ -638,7 +588,7 @@ public:
         ic = Assim/demand;
         ics.push_back(ic);
 
-        Assim = biomasse_prod;
+        Assim = compute_biomasse_prod(t);
 
 
         // compute etat reserve
@@ -672,31 +622,11 @@ public:
             offre_reste = offre_nette - offre_fruits;
             fr_reste = offre_reste / sum_organs_demand;
         }
-//        } else {
-
-//            offre_reste = min( sum_organs_demand * ( offre_reste / demand_growth_corrected ),
-//                               sum_organs_demand);
-
-//            fr_reste = offre_reste / sum_organs_demand;
-//            offre_fruits = offre_nette - offre_reste;
-//            fr_fruits = offre_fruits/ fruit_demand;
-//        }
 
         compute_biomasse_non_structurale_allouee_aux_feuilles(t);
 
     }
 
-
-    //    void compute_growth(double t) {
-    //        trunk_biomass = 0;
-    //        bunch_biomass = 0;
-    //        leaf_non_structural_biomass = 0;
-    //        leaf_structural_biomass = 0;
-    //        respirable_bunch_biomass = 0;
-    //        male_biomass = 0;
-
-
-    //    }
 
 
     void compute_biomasse_non_structurale_allouee_aux_feuilles(double t) {
@@ -764,4 +694,41 @@ public:
 
 };
 
+//    void update_organs(double t) {
+//        //       #### defiolation le jour de la mise en place des traitements
+//        if (t == DEBUT_DEFOLIATON ) {
+//            auto it = phytomers.begin();
+//            while (it != phytomers.end()) {
+//                Phytomer* phytomer = (*it);
+//                int rank = phytomer->get< double, Phytomer >(t, Phytomer::RANK);
+//                phytomer::phytomer_state state = phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE);
+//                if(rank > RANG_DEFOLIATON && state == phytomer::ACTIVE) {
+//                    ;//TODO ABLATION  phytomers[key].leaf.ablation = phytomers[key].leaf.defoliation_decision(POURC_DEFOLIATON)
+//                }
+//            }
+//        }
+
+//        // ### ablation des regimes le jour de la mise en place des traitements
+//        if (t == DEBUT_ABLATION_REGIME ) {
+//            auto it = phytomers.begin();
+//            while (it != phytomers.end()) {
+//                Phytomer* phytomer = (*it);
+//                int rank = phytomer->get < double, Phytomer >(t, Phytomer::RANK);
+//                inflo::inflo_states bunch_state = phytomer->inflo_model()->get <inflo::inflo_states, Inflo >(t, Inflo::STATUS);
+//                inflo::inflo_sex sex = phytomer->inflo_model()->get <inflo::inflo_sex, Inflo >(t, Inflo::SEX);
+//                inflo::inflo_sex avort = phytomer->inflo_model()->get <inflo::inflo_sex, Inflo >(t, Inflo::AVORT);
+//                if(rank >= RANG_D_ABLATION_REGIME
+//                        && bunch_state.is(inflo::RECOLTE)
+//                        && sex ==  inflo::FEMALE
+//                        && avort == inflo::NON_ABORTED)
+//                    ;//TODO ABLATION  phytomers[key].leaf.ablation = phytomers[key].leaf.defoliation_decision(POURC_DEFOLIATON)
+
+//            }
+//        }
+
+//        if (newPhytomerEmergence >= 1) {
+//            create_phytomer(phytomerNumber + 1, age);
+//            newPhytomerEmergence -= 1;
+//        }
+//    }
 #endif // TREE_H

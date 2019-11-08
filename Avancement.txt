@@ -12,20 +12,10 @@ Reserve
 Root
 Leaf
 Inflo
-
-
-En cours:
----------
-
 Tree
-
 
 A faire par raf:
 ----------------
 WB
-
-
-TODO:
------
 
 
