@@ -245,6 +245,7 @@ public:
         newPhytomerEmergence = 0;
         phytomerNumber = 0;
         ic = 1;
+        ei = 0;
 
         totalLeafArea = slw = trunk_height = biomass = total_leaf_biomass = trunk_biomass = leaf_non_structural_biomass =
                 leaf_structural_biomass = inflo_biomass = respirable_bunch_biomass = female_bunch_biomass = Assim =

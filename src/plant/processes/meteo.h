@@ -166,6 +166,7 @@ public:
         TLim = parameters.get("T_LIM");
 
         //       internals
+        tt = Tmax = Tmin = RHmax = RHmin = windspeed = Rg = Rain = TEff = Et0 = 0;
         lat_rad = LATITUDE  * _PI/180;
     }
 
