@@ -226,7 +226,7 @@ public:
         FractionC2Racine = 0;
         ftsw = 0   ;
         FractionC1moinsVapRacine =  0;
-        compute_fraction();
+//        compute_fraction();
         EvapMax = 0;
         Transp_Max = 0;
         pluie_efficace = 0;
@@ -255,7 +255,8 @@ public:
     }
 
 
-    void compute_FTSW(double t) {
+    void compute(double t, bool /* update */)
+    {
         double pluie = _parameters.get(t).Rain;
 
         EvapMax = ( 1 - tree_ei ) * Et0 * KC;
@@ -369,12 +370,6 @@ public:
         qte_H2O_C1 = qte_H2O_Vap + qte_H2O_C1moinsVap;
 
         compute_fraction();
-    }
-
-
-    void compute(double t, bool /* update */)
-    {
-        compute_FTSW(t);
     }
 
 };
