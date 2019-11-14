@@ -15,17 +15,17 @@ struct GlobalParameters {
 };
 
 
-//static double age_relative_var(double age, double age_ini, double age_fin, double val_ini, double val_fin) {
-//    if ( age > age_fin ) {
-//        return val_fin;
-//    } else if (age < age_ini ) {
-//        return val_ini;
-//    } else {
-//        double age_relative = age - age_ini;
-//        double inc = (val_fin - val_ini) / (age_fin - age_ini);
-//        return val_ini + age_relative * inc;
-//    }
-//}
+static double age_relative_var(double age, double age_ini, double age_fin, double val_ini, double val_fin) {
+    if ( age > age_fin ) {
+        return val_fin;
+    } else if (age < age_ini ) {
+        return val_ini;
+    } else {
+        double age_relative = age - age_ini;
+        double inc = (val_fin - val_ini) / (age_fin - age_ini);
+        return val_ini + age_relative * inc;
+    }
+}
 
 //coeffIC(ics, rank, IC_spikelet_RANG_DEBUT, IC_spikelet_RANG_FIN);
 

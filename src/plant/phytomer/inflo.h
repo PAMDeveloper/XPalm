@@ -23,115 +23,44 @@ class Inflo : public CoupledModel < Inflo >
 public:
     enum submodels { PEDUNCLE, FRUIT, MALEINFLO };
 
-    enum internals { BIOMASS,
-                     DEMAND,
-                     ESTIMATED_FLOWERING_DATE,
-                     ESTIMATED_HARVEST_DATE,
-                     BUNCH_DEV_FACTOR,
+    enum internals { STATUS,
+                     STATUS_POT,
+                     TT_OLEO_DURATION,
+                     TT_INI_FLOWERING,
+                     TT_INI_HARVEST,
+                     TT_INI_SENESCENCE,
+                     BIOMASS,
                      FEMELLE_BIOMASS,
-                     FLOWERING_DATE,
-                     FRUIT_NUMBER,
-                     GAIN_TEFF_JOUR,
-                     HARVEST_DATE,
-                     ICABORT,
-                     ICABORT_TOT,
-                     ICSEX,
-                     ICSEX_TOT,
-                     IC_SETTING,
-                     IC_SETTING_TOT,
-                     IC_SPIKELET,
-                     IC_SPIKELET_TOT,
-                     INDEX,
-                     INI_FLOWERING_DATE,
-                     INI_HARVEST_DATE,
                      MALE_BIOMASS,
-                     MASSE_MAX_REGIME,
-                     MASSE_POT_REGIME,
-                     NB_JOURSICABORT,
-                     NB_JOURSICSEX,
-                     NB_JOURSIC_SETTING,
-                     NB_JOURSIC_SPIKELET,
-                     POTENTIAL_BIOMASS,
-                     POT_FRUITS_NUMBER,
                      RED_VITESSE_FTSW,
                      RESPIRABLE_BIOMASS,
-                     STATUS, POT_STATUS, SEX, AVORT,
-                     TEST_BIOMASS,
-                     TT_SINCE_RANK1,
-                     TT_CORRIGE
+                     GAIN_TEFF_JOUR,
+                     TT_CORRIGE,
+                     DEMAND,
+                     IC_SETTING
                    };
 
-    enum externals { DATE_PLUS_JEUNE_FEUILLE,
-                     TREE_PRODUCTIONSPEED,
-                     PHYTOMER_RANK,
+    enum externals { FTSW,
+                     RANK,
                      TEFF,
+                     FR_RESTE,
                      FR_FRUITS,
-                     TREE_IC,
-                     FTSW,
-                     FR_RESTE
+                     TT_SINCE_RANK1,
+                     IC_SPIKELET,
+                     TREE_IC
                    };
 
 private:
 
-    //     externals
-    //    double age;
-    //    double date_plus_jeune_feuille;
-    double rank;
-
-    double TT_ini_flowering;
-    double TT_ini_harvest;
-    double TT_ini_oleo;
-
-    double inflo_dev_factor;
-    double production_speed;
-
-    double fr_fruits;
-    double fr_reste;
-    double tree_IC;
-
-    double TEff;
-    double ftsw;
-
-
-
     //      parameters
+    double PLASTICITY_BUNCH_IC_APRES_FLORAISON;
+    double PLASTICITY_BUNCH_IC_AVANT_FLORAISON;
+    double SENS_FTSW;
+    double SEUIL_MEDIAN_FTSW;
     double DEBUT_RANG_SENSITIVITY_NOUAISON;
-    double FACTEUR_AGE_INI;
     double FIN_RANG_SENSITIVITY_NOUAISON;
     double IC_spikelet_RANG_DEBUT;
     double IC_spikelet_RANG_FIN;
-    double ICabort_RANG_DEBUT;
-    double ICabort_RANG_FIN;
-    double ICsex_RANG_DEBUT;
-    double ICsex_RANG_FIN;
-    //    double INCREASE_OF_BUNCH_MASS;
-    double INCREASE_TAILLE_REGIMES;
-    double PRODUCTION_SPEED_INITIAL;
-    //    double MASSE_REGIMES_ADULTE;
-    //    double MASSE_REGIME_INI;
-    double MEAN_FRUIT_NUMBER_ADULTE;
-    double MINIMAL_PRODUCTION_SPEED;
-    double PLASTICITY_BUNCH_IC_APRES_FLORAISON;
-    double PLASTICITY_BUNCH_IC_AVANT_FLORAISON;
-    double RATIO_DUREE_JEUNES_FLOWERING;
-    double RATIO_DUREE_JEUNES_HARVEST;
-    double SENSIVITY_IC_SETTING;
-    double SENSIVITY_IC_SPIKELET;
-    double SENS_FTSW;
-    double SEUIL_MEDIAN_FTSW;
-    //    double TT_FLOWERING_ADULTE;
-    //    double TT_HARVEST_ADULTE;
-
-    double AGE_ADULT;
-    double AGE_PLANTING;
-    double AGE_START_PROD;
-
-    double TT_FLOWERING_DAILY_INCREMENT;
-    double TT_HARVEST_DAILY_INCREMENT;
-    double TT_FLOWERING_ADULT;
-    double TT_HARVEST_ADULT;
-    double TT_FLOWERING_INITIAL;
-    double TT_HARVEST_INITIAL;
 
     //     submodels
     std::unique_ptr < Peduncle > peduncle;
@@ -141,53 +70,44 @@ private:
     //     internals
     inflo::inflo_states status;
     inflo::inflo_states status_pot;
+
+    //predim
     double TT_oleo_duration;
-
-
-    //    inflo::inflo_sex sex;
-
-    double IC_setting;
-    double IC_setting_tot;
-    double IC_spikelet;
-    double IC_spikelet_tot;
-    double ICabort;
-    double ICabort_tot;
-    double ICsex;
-    double ICsex_tot;
-    double TT_corrige;
+    double TT_ini_flowering;
+    double TT_ini_harvest;
+    double TT_ini_senescence;
+    double production_speed;
+    //var
     double biomass;
-    double demand;
-
     double femelle_biomass;
-    double flowering_date;
-    double fruit_number;
-    double gain_TEff_jour;
-    double harvest_date;
-    double index;
-    double ini_flowering_date;
-    double ini_harvest_date;
     double male_biomass;
-    double masse_max_regime;
-    double masse_pot_regime;
-    double nb_joursIC_setting;
-    double nb_joursIC_spikelet;
-    double nb_joursICabort;
-    double nb_joursICsex;
-    double pot_fruits_number;
-    double potential_biomass;
     double red_vitesse_FTSW;
     double respirable_biomass;
-    double test_biomass;
-    double TT_since_rank1;
+    double gain_TEff_jour;
+    double TT_corrige;
+    double demand;
 
+    //ic
+    double nb_joursIC_setting;
+    double IC_setting_tot;
+    double IC_setting;
+    double nb_joursIC_spikelet;
+    double IC_spikelet_tot;
+    double IC_spikelet;
+
+
+    //     externals
+    double ftsw;
+    double rank;
+    double TEff;
+    double fr_reste;
+    double fr_fruits;
+    double TT_since_rank1;
+    double tree_IC;
 
 public:
 
-    Inflo(double prod_speed, double flo_tt, double harv_tt, double inflo_factor):
-        TT_ini_flowering(flo_tt),
-        TT_ini_harvest(harv_tt),
-        inflo_dev_factor(inflo_factor),
-        production_speed(prod_speed),
+    Inflo():
         peduncle(new Peduncle()),
         bunch(new Bunch()),
         male(new MaleInflo())
@@ -199,54 +119,30 @@ public:
 
         //         internals
         Internal(STATUS, &Inflo::status);
-        Internal(POT_STATUS, &Inflo::status_pot);
-        Internal(SEX, &Inflo::sex);
-        Internal(AVORT, &Inflo::avort);
-        Internal(ESTIMATED_FLOWERING_DATE, &Inflo::TT_ini_flowering);
-        Internal(ESTIMATED_HARVEST_DATE, &Inflo::TT_ini_harvest);
-        Internal(TT_CORRIGE, &Inflo::TT_corrige);
-        Internal(DEMAND, &Inflo::demand);
-        Internal(MASSE_POT_REGIME, &Inflo::masse_pot_regime);
-        Internal(ICSEX, &Inflo::ICsex);
-        Internal(NB_JOURSICSEX, &Inflo::nb_joursICsex);
-        Internal(ICSEX_TOT, &Inflo::ICsex_tot);
-        Internal(ICABORT, &Inflo::ICabort);
-        Internal(NB_JOURSICABORT, &Inflo::nb_joursICabort);
-        Internal(ICABORT_TOT, &Inflo::ICabort_tot);
-        Internal(NB_JOURSIC_SPIKELET, &Inflo::nb_joursIC_spikelet);
-        Internal(IC_SPIKELET_TOT, &Inflo::IC_spikelet_tot);
-        Internal(IC_SPIKELET, &Inflo::IC_spikelet);
+        Internal(STATUS_POT, &Inflo::status_pot);
+        Internal(TT_OLEO_DURATION, &Inflo::TT_oleo_duration);
+        Internal(TT_INI_FLOWERING, &Inflo::TT_ini_flowering);
+        Internal(TT_INI_HARVEST, &Inflo::TT_ini_harvest);
+        Internal(TT_INI_SENESCENCE, &Inflo::TT_ini_senescence);
         Internal(BIOMASS, &Inflo::biomass);
         Internal(FEMELLE_BIOMASS, &Inflo::femelle_biomass);
-        Internal(RESPIRABLE_BIOMASS, &Inflo::respirable_biomass);
-        Internal(INI_FLOWERING_DATE, &Inflo::ini_flowering_date);
-        Internal(MASSE_MAX_REGIME, &Inflo::masse_max_regime);
-        Internal(NB_JOURSIC_SETTING, &Inflo::nb_joursIC_setting);
-        Internal(IC_SETTING_TOT, &Inflo::IC_setting_tot);
-        Internal(IC_SETTING, &Inflo::IC_setting);
-        Internal(INDEX, &Inflo::index);
-        Internal(RED_VITESSE_FTSW, &Inflo::red_vitesse_FTSW);
-        Internal(POTENTIAL_BIOMASS, &Inflo::potential_biomass);
-        Internal(TEST_BIOMASS, &Inflo::test_biomass);
-        Internal(GAIN_TEFF_JOUR, &Inflo::gain_TEff_jour);
-        Internal(FRUIT_NUMBER, &Inflo::fruit_number);
-        Internal(FLOWERING_DATE, &Inflo::flowering_date);
-        Internal(HARVEST_DATE, &Inflo::harvest_date);
-        Internal(BUNCH_DEV_FACTOR, &Inflo::inflo_dev_factor);
-        Internal(POT_FRUITS_NUMBER, &Inflo::pot_fruits_number);
         Internal(MALE_BIOMASS, &Inflo::male_biomass);
-        Internal(TT_SINCE_RANK1, &Inflo::TT_since_rank1);
-        Internal(INI_HARVEST_DATE, &Inflo::ini_harvest_date);
+        Internal(RED_VITESSE_FTSW, &Inflo::red_vitesse_FTSW);
+        Internal(RESPIRABLE_BIOMASS, &Inflo::respirable_biomass);
+        Internal(GAIN_TEFF_JOUR, &Inflo::gain_TEff_jour);
+        Internal(TT_CORRIGE, &Inflo::TT_corrige);
+        Internal(DEMAND, &Inflo::demand);
+        Internal(IC_SETTING, &Inflo::IC_setting);
+        Internal(IC_SPIKELET, &Inflo::IC_spikelet);
 
         //          externals
-        External(PHYTOMER_RANK, &Inflo::rank);
-        External(TEFF, &Inflo::TEff);
-        External(FR_FRUITS, &Inflo::fr_fruits);
-        External(FR_RESTE, &Inflo::fr_reste);
-        External(TREE_IC, &Inflo::tree_IC);
         External(FTSW, &Inflo::ftsw);
-
-        //        External(TREE_PRODUCTIONSPEED, &Inflo::production_speed);
+        External(RANK, &Inflo::rank);
+        External(TEFF, &Inflo::TEff);
+        External(FR_RESTE, &Inflo::fr_reste);
+        External(FR_FRUITS, &Inflo::fr_fruits);
+        External(TT_SINCE_RANK1, &Inflo::TT_since_rank1);
+        External(TREE_IC, &Inflo::tree_IC);
     }
 
     virtual ~Inflo()
@@ -281,91 +177,66 @@ public:
     //    }
 
 
-
-    void init(double t, double age, const xpalm::ModelParameters& parameters)
+    void init(double t, const xpalm::ModelParameters& parameters){}
+    void init(double t, const xpalm::ModelParameters& parameters, double phytomer_age, double rk, double prod_speed,
+              double TT_ini_flo, double TT_ini_harv, double TT_ini_senec, double inflo_dev_factor)
     {
         //        parameters
-        DEBUT_RANG_SENSITIVITY_NOUAISON = parameters.get("DEBUT_RANG_SENSITIVITY_NOUAISON");
-        FIN_RANG_SENSITIVITY_NOUAISON = parameters.get("FIN_RANG_SENSITIVITY_NOUAISON");
-        IC_spikelet_RANG_DEBUT = parameters.get("IC_spikelet_RANG_DEBUT");
-        IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
-        ICabort_RANG_DEBUT = parameters.get("ICabort_RANG_DEBUT");
-        ICabort_RANG_FIN = parameters.get("ICabort_RANG_FIN");
-        ICsex_RANG_DEBUT = parameters.get("ICsex_RANG_DEBUT");
-        ICsex_RANG_FIN = parameters.get("ICsex_RANG_FIN");
-        //        INCREASE_OF_BUNCH_MASS = parameters.get("INCREASE_OF_BUNCH_MASS");
-        FACTEUR_AGE_INI = parameters.get("AGE") / parameters.get("AGE_ADULTE");
-        INCREASE_TAILLE_REGIMES = 1 / (parameters.get("AGE_ADULTE") * 365);
-
-        TT_FLOWERING_DAILY_INCREMENT = ( TT_FLOWERING_ADULT - TT_FLOWERING_INITIAL ) / ( AGE_ADULT - AGE_PLANTING );
-        TT_HARVEST_DAILY_INCREMENT = ( TT_HARVEST_ADULT - TT_HARVEST_INITIAL ) / ( AGE_ADULT - AGE_PLANTING );
-
-
-        PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL");
-        //        MASSE_REGIMES_ADULTE = parameters.get("MASSE_REGIMES_ADULTE");
-        //        MASSE_REGIME_INI = parameters.get("MASSE_REGIME_INI");
-        MEAN_FRUIT_NUMBER_ADULTE = parameters.get("MEAN_FRUIT_NUMBER_ADULTE");
-        MINIMAL_PRODUCTION_SPEED = parameters.get("MINIMAL_PRODUCTION_SPEED");
         PLASTICITY_BUNCH_IC_APRES_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_APRES_FLORAISON");
         PLASTICITY_BUNCH_IC_AVANT_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_AVANT_FLORAISON");
-        RATIO_DUREE_JEUNES_FLOWERING = parameters.get("RATIO_DUREE_JEUNES_FLOWERING");
-        RATIO_DUREE_JEUNES_HARVEST = parameters.get("RATIO_DUREE_JEUNES_HARVEST");
-        SENSIVITY_IC_SETTING = parameters.get("SENSIVITY_IC_SETTING");
-        SENSIVITY_IC_SPIKELET = parameters.get("SENSIVITY_IC_SPIKELET");
         SENS_FTSW = parameters.get("SENS_FTSW");
         SEUIL_MEDIAN_FTSW = parameters.get("SEUIL_MEDIAN_FTSW");
+        DEBUT_RANG_SENSITIVITY_NOUAISON = parameters.get("DEBUT_RANG_SENSITIVITY_NOUAISON");
+        DEBUT_RANG_SENSITIVITY_NOUAISON = parameters.get("FIN_RANG_SENSITIVITY_NOUAISON");
+        IC_spikelet_RANG_DEBUT = parameters.get("IC_spikelet_RANG_DEBUT");
+        IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
 
-        TT_corrige = 0; //a set pour le state
+        //predim
+        TT_ini_flowering = TT_ini_flo;
+        TT_ini_harvest = TT_ini_harv;
+        TT_ini_senescence = TT_ini_senec;
+        rank = rk;
+        production_speed = prod_speed;
 
-
-
-        demand = 0 ;
-        masse_pot_regime = 0 ;
-        ICsex = 0;
-        nb_joursICsex = 0;
-        ICsex_tot = 0 ;
-        ICabort = 0;
-        nb_joursICabort = 0;
-        ICabort_tot = 0;
-        nb_joursIC_spikelet = 0;
-        IC_spikelet_tot = 0;
-        IC_spikelet = 1  ;
-        biomass =  0 ;
-        femelle_biomass = 0;
-        respirable_biomass = 0;
-        ini_flowering_date = 0 ;
-        masse_max_regime = 0;
+        //ic
         nb_joursIC_setting = 0;
         IC_setting_tot = 0;
-        IC_setting = 1;
-        index = 0;
-        red_vitesse_FTSW = 0 ;
-        potential_biomass = 0;
-        test_biomass = 0 ;
-        gain_TEff_jour = 0;
-        fruit_number = 0;
+        IC_setting = 0;
+//        nb_joursICsex = 0;
+//        ICsex_tot = 0;
+//        ICsex = 0;
+//        nb_joursICabort = 0;
+//        ICabort_tot = 0;
+//        ICabort = 0;
+        nb_joursIC_spikelet = 0;
+        IC_spikelet_tot = 0;
+        IC_spikelet = 0;
+
+        //var
+        biomass= 0;
+        femelle_biomass= 0;
+        male_biomass= 0;
+        red_vitesse_FTSW= 0;
+        respirable_biomass= 0;
+        gain_TEff_jour= 0;
+        demand= 0;
+
 
         double PRODUCTION_SPEED_ADULT = parameters.get("PRODUCTION_SPEED_ADULT");
         double DUREE_OLEO = parameters.get("DUREE_OLEO");
         double RATIO_DUREE_JEUNES_OLEO = parameters.get("RATIO_DUREE_JEUNES_OLEO");
         TT_oleo_duration = DUREE_OLEO * pow(PRODUCTION_SPEED_ADULT / production_speed, RATIO_DUREE_JEUNES_OLEO); //TODO filer depuis l'arbre à la création du phytomer
-        TT_ini_oleo = TT_ini_harvest - TT_oleo_duration;
-
-        male_biomass = 0;
-        TT_since_rank1 = 0;
-        ini_harvest_date = 0;
-
-        pot_fruits_number = inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE;
+        double TT_ini_oleo = TT_ini_harvest - TT_oleo_duration;
 
         double rd = ((double) rand() / (RAND_MAX)) + 1;
         if (rank > parameters.get("ICsex_RANG_FIN")) {
             if(rd < parameters.get("INI_SEX_RATIO")) {
                 status.add(inflo::FEMALE);
-                peduncle->init(t, parameters);
-                bunch->init(t, parameters);
+                peduncle->init(t, parameters, production_speed, TT_ini_flowering, TT_ini_harvest, inflo_dev_factor);
+                bunch->init(t, parameters, production_speed, TT_ini_flowering, TT_ini_harvest, TT_ini_oleo, inflo_dev_factor);
             } else {
                 status.add(inflo::MALE);
-                 male->init(t, parameters);
+                male->init(t, parameters, phytomer_age, production_speed, inflo_dev_factor, TT_ini_flowering);
             }
         }
 
@@ -414,14 +285,31 @@ public:
         step_state();
 
         if (status.is(inflo::FEMALE)) {
-            if(!status.is(inflo::HARVEST))
+            if(!status.is(inflo::HARVEST)) {
+                peduncle->put<double>(t, Peduncle::IC_SPIKELET, IC_spikelet);
+                peduncle->put<double>(t, Peduncle::TEFF, TEff);
+                peduncle->put<double>(t, Peduncle::TT_CORRIGE, TT_corrige);
+                peduncle->put<double>(t, Peduncle::TT_SINCE_RANK1, TT_since_rank1);
+                peduncle->put<double>(t, Peduncle::FR_RESTE, fr_reste);
                 (*peduncle)(t);
+            }
 
-            if (status.is(inflo::FLOWERING))
+            if (status.is(inflo::FLOWERING)) {
+                bunch->put<double>(t, Bunch::TEFF, TEff);
+                bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS_POT, status);
+                bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS, status_pot);
+                bunch->put<double>(t, Bunch::TT_SINCE_RANK1, TT_since_rank1);
+                bunch->put<double>(t, Bunch::FR_FRUITS, fr_fruits);
+                bunch->put<double>(t, Bunch::IC_SPIKELET, IC_spikelet);
+                bunch->put<double>(t, Bunch::IC_SETTING, IC_setting);
                 (*bunch)(t);
+            }
 
-        } else if (status.is(inflo::MALE) && status.is(inflo::INITIATED))
+        } else if (status.is(inflo::MALE) && status.is(inflo::INITIATED)) {
+            male->put<double>(t, MaleInflo::TEFF, TEff);
+            male->put<double>(t, MaleInflo::FR_RESTE, fr_reste);
             (*male)(t);
+        }
 
         //        compute_growth(t);
         if (!status.is(inflo::HARVEST)) {
@@ -470,7 +358,25 @@ public:
             TT_corrige += pow(fr_fruits, PLASTICITY_BUNCH_IC_AVANT_FLORAISON) * gain_TEff_jour;
         else if (status.is(inflo::FLOWERING))
             TT_corrige += pow(fr_fruits, PLASTICITY_BUNCH_IC_APRES_FLORAISON) * gain_TEff_jour;
+
+
+        //IC
+        if (TT_corrige > TT_ini_flowering - DEBUT_RANG_SENSITIVITY_NOUAISON / production_speed &&
+                TT_corrige < TT_ini_flowering - FIN_RANG_SENSITIVITY_NOUAISON / production_speed &&
+                TT_corrige < TT_ini_flowering) {
+            nb_joursIC_setting += 1;
+            IC_setting_tot += tree_IC;
+            IC_setting = (IC_setting_tot) / nb_joursIC_setting;
+        }
+
+        if (rank > IC_spikelet_RANG_DEBUT && rank < IC_spikelet_RANG_FIN){
+            nb_joursIC_spikelet += 1;
+            IC_spikelet_tot += tree_IC;
+            IC_spikelet = IC_spikelet_tot / nb_joursIC_spikelet;
+        }
     }
+
+
 
 };
 } //namespace model

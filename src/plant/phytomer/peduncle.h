@@ -35,24 +35,15 @@ public:
                      ASSIMILATE_SUPPLY,
                      BIOMASS ,
                      POTENTIAL_BIOMASS ,
-                     DEMAND_POT,
-                     TEST_BIOMASS
+                     DEMAND_POT
                    };
 
     enum externals {
-                      INFLO_STATUS,
-                      INFLO_POT_STATUS,
-                      FLOWERING_TT,
-                      HARVEST_TT,
-                      INFLO_DEV_FACTOR,
                       IC_SPIKELET,
-                      TREE_PRODUCTION_SPEED,
                       TEFF,
                       TT_CORRIGE,
                       TT_SINCE_RANK1,
-                      FR_RESTE,
-//                      INI_HARVEST_DATE,
-//                      INI_FLOWERING_DATE
+                      FR_RESTE
                    };
 
 private:
@@ -62,26 +53,21 @@ private:
     double SENSIVITY_IC_SPIKELET;
     double MASSE_MEAN_PEDUNCULE_ADULTE;
     double COUT_STRUCTURE_REGIME;
-//    double PRODUCTION_SPEED_INITIAL;
-//    double TT_FLO;
-//    double TT_HARVEST;
 
     //     internals
+    //predim
+    double TT_ini_flowering;
+    double inflo_dev_factor;
+    double production_speed;
+    //var
     double demand;
     double assimilate_supply;
     double biomass ;
     double potential_biomass;
     double demand_pot;
-    double test_biomass;
 
-    double TT_ini_flowering;
-    double TT_ini_harvest;
-    double inflo_dev_factor;
-    double production_speed;
 
     //     externals
-    inflo::inflo_states inflo_status;
-    inflo::inflo_states inflo_pot_status;
     double IC_spikelet;
     double Teff;
     double TT_corrige;
@@ -90,11 +76,7 @@ private:
 
 public:
 
-    Peduncle(double prod_speed, double flo_tt, double harv_tt, double inflo_factor):
-        TT_ini_flowering(flo_tt),
-        TT_ini_harvest(harv_tt),
-        inflo_dev_factor(inflo_factor),
-        production_speed(prod_speed)
+    Peduncle()
     {
         //         internals
         Internal(DEMAND, &Peduncle::demand);
@@ -102,7 +84,6 @@ public:
         Internal(BIOMASS , &Peduncle::biomass );
         Internal(POTENTIAL_BIOMASS , &Peduncle::potential_biomass );
         Internal(DEMAND_POT, &Peduncle::demand_pot);
-        Internal(TEST_BIOMASS, &Peduncle::test_biomass);
 
         //          externals
         External(IC_SPIKELET, &Peduncle::IC_spikelet);
@@ -116,15 +97,23 @@ public:
     {
     }
 
-    void init(double t, const xpalm::ModelParameters& parameters)
+    void init(double t, const xpalm::ModelParameters& parameters) {}
+    void init(double t, const xpalm::ModelParameters& parameters, double prod_speed, double flo_tt, double TT_ini_harvest, double inflo_factor)
     {
+        init(t, parameters);
+//        AtomicModel<Peduncle>::init(t, parameters);
         last_time = t-1;
+
+        TT_ini_flowering = flo_tt;
+        inflo_dev_factor = inflo_factor;
+        production_speed = prod_speed;
 
         //        parameters
         SENSIVITY_IC_SPIKELET = parameters.get("SENSIVITY_IC_SPIKELET");
         MASSE_MEAN_PEDUNCULE_ADULTE = parameters.get("MASSE_MEAN_PEDUNCULE_ADULTE");
         RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
         COUT_STRUCTURE_REGIME = parameters.get("COUT_STRUCTURE_REGIME");
+
         double PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL");
 
         //internals

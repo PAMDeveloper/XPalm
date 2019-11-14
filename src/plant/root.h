@@ -41,7 +41,7 @@ private:
     double H_PF;
 
 
-    //    internals - computed
+    //    internals
     double TailleC1;
     double TailleVap;
     double TailleC1moinsVap;
@@ -123,7 +123,7 @@ public:
         TailleC = TailleC2 + TailleC1moinsVap;
     }
 
-    void compute(double t, bool /* update */) {
+    void compute(double /*t*/, bool /* update */) {
         //growth
         double red;
         if (ftsw > FTSW_RACINES)

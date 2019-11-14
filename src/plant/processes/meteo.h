@@ -19,15 +19,13 @@ public:
                      TEFF,
                      ET0 };
 
-    enum externals { EXTERNAL_1, EXTERNAL_2 };
-
 private:
     xpalm::ModelParameters _parameters;
     //      parameters
     double LATITUDE;
     double ALTITUDE;
-    double IRRIGATION_DAY;
-    double IRRIGATION_QUANTITY;
+//    double IRRIGATION_DAY;
+//    double IRRIGATION_QUANTITY;
     double TBase;
     double TOpt1;
     double TOpt2;
@@ -160,25 +158,15 @@ public:
         //        parameters
         LATITUDE = parameters.get("LATITUDE");
         ALTITUDE = parameters.get("ALTITUDE");
-        IRRIGATION_DAY = parameters.get("IRRIGATION_DAY");
-        IRRIGATION_QUANTITY = parameters.get("IRRIGATION_QUANTITY");
+//        IRRIGATION_DAY = parameters.get("IRRIGATION_DAY");
+//        IRRIGATION_QUANTITY = parameters.get("IRRIGATION_QUANTITY");
         TBase = parameters.get("T_BASE");
         TOpt1 = parameters.get("T_OPT1");
         TOpt2 = parameters.get("T_OPT2");
         TLim = parameters.get("T_LIM");
 
         //       internals
-        tt = 0;
         lat_rad = LATITUDE  * _PI/180;
-        Tmax = 0;
-        Tmin = 0;
-        RHmax = 0;
-        RHmin = 0;
-        windspeed = 0;
-        Rg = 0;
-        Rain = 0;
-        TEff = 0;
-        Et0 = 0;
     }
 
     void compute(double t, bool /* update */)

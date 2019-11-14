@@ -7,114 +7,69 @@ namespace model {
 class Leaf : public AtomicModel < Leaf >
 {
 public:
-    enum internals { ABLATION,
-                     LEAFAREA,
-                     VITESSE_EXP,
+    enum internals { LEAFAREA,
                      SFMAX,
-                     DEMAND,
-                     POT_INCREASE_LEAFAREA,
                      STRUCTURAL_BIOMASS,
                      NON_STRUCTURAL_BIOMASS,
                      TOTAL_BIOMASS,
-                     CAPACITE_RESERVE_MAX,
-                     ATTRACTION_BIOMASSE,
-                     CAPACITE_RELAGARGE_BIOMASSE,
-                     ASSIMILATE_SUPPLY,
-                     POTLEAFAREA,
-                     BIOMASSE_STRUCTURALE_ALLOUEE,
                      SLW,
                      GAIN_TEFF_JOUR,
                      TT_CORRIGE,
-                     INCREASE_POTLEAFAREA,
-                     CROWN_POSITION,
-                     IRRADIANCE_FACTOR,
-                     NIVEAU_D_ECLAIREMENT_LOI_BETA,
-                     LIGHT_POURC_INTERCEPTION,
-                     ASSIM_MAX,
-                     NB_JOUR_DECLIN_PHOTOSYNTHESE,
-                     DECLIN_PHOTOSYNTHESE_AGE,
-                     DECLIN_PHOTOSYNTHESE_STRESS,
-                     BIOMASSE_PROD,
-                     RAYONNEMENT_INTERCEPTE_FEUILLE,
-                     TT_SINCE_APP };
+                     TT_SINCE_RANK1,
+                     VITESSE_EXP,
+                     DEMAND,
+                     CAPACITE_RESERVE_MAX,
+                     ASSIMILATE_SUPPLY,
+                     POTLEAFAREA,
+                     INCREASE_POTLEAFAREA };
 
     enum externals { TEFF,
                      PHYTOMER_RANK,
                      FTSW,
-                     BUNCH_SEXE,
-                     BUNCH_AVORT,
-                     BUNCH_STATUT,
+                     INFLO_STATUT,
                      PHYTOMER_STATE,
                      FR_RESTE,
                      FRACTION_NON_STR_BIOMASSE_ALLOUEE,
-                     DELTA_BIOMASSE_RESERVE_LEAF };
+                     LEAF_RES_AVAI };
 
 private:
 
     //      parameters
     double SLW_min;
-    double SLW_max;
-    double COUT_RESPI_FEUILLE;
-    double POURC_FOLIOLE;
-    double SEUIL_DUREE;
-    double SEUIL_EXPAN;
-    double INCREASE_OF_LEAF_AREA;
     double INITIAL_SFIND;
     double MAXIMAL_SFIND;
     double INFLEXION;
     double COURBURE;
+    double POURC_FOLIOLE;
+    double INCREASE_OF_LEAF_AREA;
+    double SLW_ini;
     double PLASTICITY_LEAF_IC;
-    double RANG_DEBUT_SENS_PN_LONG_TERMES;
-    double RANG_FIN_SENS_PN_LONG_TERMES;
-    double seuil_FTSW_pour_red_a_long_termes_de_Pn;
-    double SENS_REMANESCENCE;
-    double REMANENCE_STRESS;
-    double a_sigmoide_declin_pn;
-    double b_sigmoide_declin_pn;
-    double rang_chute_pn_age;
-    double rang_pn_50;
-    double EFFICIENCE_BIOLOGIQUE;
-    double A_LOI_INTERC;
-    double B_LOI_INTERC;
-    double RANG_D_ABLATION;
+    double SLW_max;
+    double COUT_RESPI_FEUILLE;
+    double SEUIL_DUREE;
+    double SEUIL_EXPAN;
 
     //     internals
-    leaf::leaf_state ablation;
-
     double leafArea; //m²
-    double vitesse_exp;
     double SFMax;
-    double demand;
-    double pot_increase_leafArea;
     double structural_biomass;
     double non_structural_biomass;
-    double total_biomass;
-    double capacite_reserve_max;
-    double attraction_biomasse;
-    double capacite_relagarge_biomasse;
-    double assimilate_supply;
-    double potLeafArea;
-    double biomasse_structurale_allouee;
     double slw;
     double gain_TEff_jour;
-    double TT_corrige;
-    double increase_potleafArea;
-    double crown_position;
-    double irradiance_factor;
-    double niveau_d_eclairement_loi_beta;
-    double light_pourc_interception;
-    double assim_max;
-    double nb_jour_declin_photosynthese;
-    double declin_photosynthese_age;
-    double declin_photosynthese_stress;
-    double biomasse_prod;
-    double rayonnement_intercepte_feuille;
     double TT_since_rank1;
+    double TT_corrige;
+    double vitesse_exp;
+    double demand;
+    double total_biomass;
+    double capacite_reserve_max;
+    double assimilate_supply;
+    double potLeafArea;
+    double increase_potleafArea;
+
 
     //     externals
     inflo::inflo_states inflo_status;
     phytomer::phytomer_state phytomer_state;
-
     double TEff;
     double phytomer_rank;
     double ftsw;
@@ -127,124 +82,76 @@ public:
     Leaf()
     {
         //         internals
-        //        Internal(ABLATION, &Leaf::ablation);
-        //        Internal(LEAFAREA, &Leaf::leafArea);
-        //        Internal(VITESSE_EXP, &Leaf::vitesse_exp);
-        //        Internal(SFMAX, &Leaf::SFMax);
-        //        Internal(DEMAND, &Leaf::demand);
-        //        Internal(POT_INCREASE_LEAFAREA, &Leaf::pot_increase_leafArea);
-        //        Internal(STRUCTURAL_BIOMASS, &Leaf::structural_biomass);
-        //        Internal(NON_STRUCTURAL_BIOMASS, &Leaf::non_structural_biomass);
-        //        Internal(TOTAL_BIOMASS, &Leaf::total_biomass);
-        //        Internal(CAPACITE_RESERVE_MAX, &Leaf::capacite_reserve_max);
-        //        Internal(ATTRACTION_BIOMASSE, &Leaf::attraction_biomasse);
-        //        Internal(CAPACITE_RELAGARGE_BIOMASSE, &Leaf::capacite_relagarge_biomasse);
-        //        Internal(ASSIMILATE_SUPPLY, &Leaf::assimilate_supply);
-        //        Internal(POTLEAFAREA, &Leaf::potLeafArea);
-        //        Internal(BIOMASSE_STRUCTURALE_ALLOUEE, &Leaf::biomasse_structurale_allouee);
-        //        Internal(SLW, &Leaf::slw);
-        //        Internal(GAIN_TEFF_JOUR, &Leaf::gain_TEff_jour);
-        //        Internal(TT_CORRIGE, &Leaf::TT_corrige);
-        //        Internal(INCREASE_POTLEAFAREA, &Leaf::increase_potleafArea);
-        //        Internal(CROWN_POSITION, &Leaf::crown_position);
-        //        Internal(IRRADIANCE_FACTOR, &Leaf::irradiance_factor);
-        //        Internal(NIVEAU_D_ECLAIREMENT_LOI_BETA, &Leaf::niveau_d_eclairement_loi_beta);
-        //        Internal(LIGHT_POURC_INTERCEPTION, &Leaf::light_pourc_interception);
-        //        Internal(ASSIM_MAX, &Leaf::assim_max);
-        //        Internal(NB_JOUR_DECLIN_PHOTOSYNTHESE, &Leaf::nb_jour_declin_photosynthese);
-        //        Internal(DECLIN_PHOTOSYNTHESE_AGE, &Leaf::declin_photosynthese_age);
-        //        Internal(DECLIN_PHOTOSYNTHESE_STRESS, &Leaf::declin_photosynthese_stress);
-        //        Internal(BIOMASSE_PROD, &Leaf::biomasse_prod);
-        //        Internal(RAYONNEMENT_INTERCEPTE_FEUILLE, &Leaf::rayonnement_intercepte_feuille);
-        //        Internal(TT_SINCE_APP, &Leaf::TT_since_rank1);
+        Internal(LEAFAREA, &Leaf::leafArea);
+        Internal(SFMAX, &Leaf::SFMax);
+        Internal(STRUCTURAL_BIOMASS, &Leaf::structural_biomass);
+        Internal(NON_STRUCTURAL_BIOMASS, &Leaf::non_structural_biomass);
+        Internal(TOTAL_BIOMASS, &Leaf::total_biomass);
+        Internal(SLW, &Leaf::slw);
+        Internal(GAIN_TEFF_JOUR, &Leaf::gain_TEff_jour);
+        Internal(TT_CORRIGE, &Leaf::TT_corrige);
+        Internal(TT_SINCE_RANK1, &Leaf::TT_since_rank1);
+        Internal(VITESSE_EXP, &Leaf::vitesse_exp);
+        Internal(DEMAND, &Leaf::demand);
+        Internal(CAPACITE_RESERVE_MAX, &Leaf::capacite_reserve_max);
+        Internal(ASSIMILATE_SUPPLY, &Leaf::assimilate_supply);
+        Internal(POTLEAFAREA, &Leaf::potLeafArea);
+        Internal(INCREASE_POTLEAFAREA, &Leaf::increase_potleafArea);
 
-        //        //          externals
-        //        External(TEFF, &Leaf::TEff);
-        //        External(PHYTOMER_RANK, &Leaf::phytomer_rank);
-        //        External(FTSW, &Leaf::ftsw);
-        //        External(BUNCH_SEXE, &Leaf::bunch_sexe);
-        //        External(BUNCH_AVORT, &Leaf::bunch_avort);
-        //        External(BUNCH_STATUT, &Leaf::inflo_status);
-        //        External(PHYTOMER_STATE, &Leaf::phytomer_state);
-        //        External(FR_RESTE, &Leaf::fr_reste);
-        //        External(FRACTION_NON_STR_BIOMASSE_ALLOUEE, &Leaf::fraction_non_str_biomasse_allouee);
-        //        External(DELTA_BIOMASSE_RESERVE_LEAF, &Leaf::delta_biomasse_reserve_leaf);
+        //          externals
+        External(INFLO_STATUT, &Leaf::inflo_status);
+        External(PHYTOMER_STATE, &Leaf::phytomer_state);
+        External(TEFF, &Leaf::TEff);
+        External(PHYTOMER_RANK, &Leaf::phytomer_rank);
+        External(FTSW, &Leaf::ftsw);
+        External(FR_RESTE, &Leaf::fr_reste);
+        External(LEAF_RES_AVAI, &Leaf::delta_biomasse_reserve_leaf);
+        External(FRACTION_NON_STR_BIOMASSE_ALLOUEE, &Leaf::fraction_non_str_biomasse_allouee);
 
     }
 
     virtual ~Leaf()
     {
     }
-
-
-
-    void init(double t, const xpalm::ModelParameters& parameters)
+    void init(double t, const xpalm::ModelParameters& parameters) {}
+    void init(double t, const xpalm::ModelParameters& parameters, double phytomer_age)
     {
+//        AtomicModel<Leaf>::init(t, parameters);
+
         last_time = t-1;
 
         //        parameters
         SLW_min = parameters.get("SLW_min") * 10; //kg.m-2
         SLW_max = parameters.get("SLW_max") * 10; //kg.m-2
-        COUT_RESPI_FEUILLE = parameters.get("COUT_RESPI_FEUILLE");
-        POURC_FOLIOLE = parameters.get("POURC_FOLIOLE");
-        SEUIL_DUREE = parameters.get("SEUIL_DUREE");
-        SEUIL_EXPAN = parameters.get("SEUIL_EXPAN");
-        INCREASE_OF_LEAF_AREA = parameters.get("INCREASE_OF_LEAF_AREA");
+        SLW_ini = parameters.get("SLW_ini") * 10; //kg.m-2
         INITIAL_SFIND = parameters.get("INITIAL_SFIND");
         MAXIMAL_SFIND = parameters.get("MAXIMAL_SFIND");
+        COUT_RESPI_FEUILLE = parameters.get("COUT_RESPI_FEUILLE");
+        POURC_FOLIOLE = parameters.get("POURC_FOLIOLE");
+        INCREASE_OF_LEAF_AREA = parameters.get("INCREASE_OF_LEAF_AREA");
+        SEUIL_DUREE = parameters.get("SEUIL_DUREE");
+        SEUIL_EXPAN = parameters.get("SEUIL_EXPAN");
         INFLEXION = parameters.get("INFLEXION");
         COURBURE = parameters.get("COURBURE");
         PLASTICITY_LEAF_IC = parameters.get("PLASTICITY_LEAF_IC");
-        RANG_DEBUT_SENS_PN_LONG_TERMES = parameters.get("RANG_DEBUT_SENS_PN_LONG_TERMES");
-        RANG_FIN_SENS_PN_LONG_TERMES = parameters.get("RANG_FIN_SENS_PN_LONG_TERMES");
-        seuil_FTSW_pour_red_a_long_termes_de_Pn = parameters.get("seuil_FTSW_pour_red_a_long_termes_de_Pn");
-        SENS_REMANESCENCE = parameters.get("SENS_REMANESCENCE");
-        a_sigmoide_declin_pn = parameters.get("a_sigmoide_declin_pn");
-        b_sigmoide_declin_pn = parameters.get("b_sigmoide_declin_pn");
-        rang_chute_pn_age = parameters.get("rang_chute_pn_age");
-        rang_pn_50 = parameters.get("rang_pn_50");
-        EFFICIENCE_BIOLOGIQUE = parameters.get("EFFICIENCE_BIOLOGIQUE");
-        A_LOI_INTERC = parameters.get("a_loi_beta_interception");
-        B_LOI_INTERC = parameters.get("b_loi_beta_interception");
-        RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
-        REMANENCE_STRESS = parameters.get("REMANENCE_STRESS");
+
 
         //        internals
-        ablation = leaf::NON_COUPE;
-        leafArea = 0;
+        gain_TEff_jour = 0;
+        TT_since_rank1 = 0;
+        TT_corrige = 0;
         vitesse_exp = 0;
-        SFMax = 0;
         demand = 0;
-        pot_increase_leafArea = 0;
-        structural_biomass = 0;
-        non_structural_biomass = 0;
         total_biomass = 0;
         capacite_reserve_max = 0;
-        attraction_biomasse = 0;
-        capacite_relagarge_biomasse = 0;
         assimilate_supply = 0;
         potLeafArea = 0;
-        biomasse_structurale_allouee = 0;
-        slw = 0;
-        gain_TEff_jour = 0;
-        TT_corrige = 0;
         increase_potleafArea = 0;
-        crown_position = 0;
-        irradiance_factor = 0;
-        niveau_d_eclairement_loi_beta = 0;
-        light_pourc_interception = 0;
-        assim_max = 0;
-        nb_jour_declin_photosynthese = 0;
-        declin_photosynthese_age = 0;
-        declin_photosynthese_stress = 0;
-        biomasse_prod = 0;
-        rayonnement_intercepte_feuille = 0;
 
-
-        //leaf
-        double TTfeuille = phytomer_age * parameters.get("TEff_ini");
-        SFMAX = min(INCREASE_OF_LEAF_AREA * phytomer_age + INITIAL_SFIND, MAXIMAL_SFIND);
-        leafArea = (SFMAX / (1 + exp(-(TTfeuille - INFLEXION) / COURBURE)));
+        // init structure
+        double TTfeuille = phytomer_age * parameters.get("T_EFF_INI");
+        SFMax = min(INCREASE_OF_LEAF_AREA * phytomer_age + INITIAL_SFIND, MAXIMAL_SFIND);
+        leafArea = (SFMax / (1 + exp(-(TTfeuille - INFLEXION) / COURBURE)));
         structural_biomass = leafArea * SLW_min * 10 / POURC_FOLIOLE;
         non_structural_biomass = leafArea * (SLW_ini - SLW_min) * 10 / POURC_FOLIOLE;
 
@@ -258,11 +165,11 @@ public:
         }
 
         if (leafArea != 0)
-            SLW = (structural_biomass + non_structural_biomass) * (POURC_FOLIOLE / leafArea) / 10;
+            slw = (structural_biomass + non_structural_biomass) * (POURC_FOLIOLE / leafArea) / 10;
     }
 
 
-    void growth_demand(double t) {
+    void growth_demand(double /*t*/) {
         //        compute_coupe_feuille_recolte
         double correctedTEff = TEff * (ftsw > SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
         gain_TEff_jour = TEff * ( ftsw >  SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
@@ -279,13 +186,11 @@ public:
                 (-exp(-(TT_corrige-INFLEXION)/COURBURE)/COURBURE)
                 / pow( (1+exp(-(TT_corrige-INFLEXION)/COURBURE)),2);
 
-        pot_increase_leafArea = correctedTEff * vitesse_exp * ( ftsw >  SEUIL_EXPAN ? 1 : ftsw / SEUIL_EXPAN );
-
         //           computevitesse_exp(TT_since_rank1);
         vitesse_exp = -SFMax * (-exp(-(TT_since_rank1-INFLEXION)/COURBURE)/COURBURE)/pow( (1+exp(-(TT_since_rank1-INFLEXION)/COURBURE)),2);
         increase_potleafArea = correctedTEff * vitesse_exp * ( ftsw >  SEUIL_EXPAN ? 1 : ftsw / SEUIL_EXPAN);
 
-        demand = (leafArea == 0 && phytomer_rank != 1) ? 0 : pot_increase_leafArea*(SLW_min * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE; //TODO check condition sur rang 1
+        demand = (leafArea == 0 && phytomer_rank != 1) ? 0 : increase_potleafArea*(SLW_min * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE; //TODO check condition sur rang 1
     }
 
 
@@ -294,8 +199,8 @@ public:
         assimilate_supply = demand * fr_reste;
 
         //        compute_leafArea()
-        if (phytomer_state.is(phytomer::ACTIVE)) {
-            leafArea += pot_increase_leafArea * fr_reste;
+        if (phytomer_state == phytomer::ACTIVE) {
+            leafArea += increase_potleafArea * fr_reste;
             potLeafArea += increase_potleafArea;
         } else
             leafArea = 0;
@@ -336,26 +241,38 @@ public:
         growth();
         growth_demand(t);
 
-        //        crown_position = int( (phytomer_rank - 1) / 3 ) + 1;
 
-        //        double a = A_LOI_INTERC;
-        //        double b = B_LOI_INTERC;
-        //        double nombre_max_crown_position = int( (RANG_D_ABLATION-1) / 3 ) + 1;
-
-        //        if (phytomer_state == phytomer::DEAD || bunch_statut.is(inflo::ABLATED))
-        //            niveau_d_eclairement_loi_beta = 0;
-        //        else if(bunch_statut.is(inflo::NON_ABLATED) && phytomer_state == phytomer::ACTIVE)
-        //            niveau_d_eclairement_loi_beta = pow((crown_position - 0.5 )/ (nombre_max_crown_position), a-1) * pow(1-(crown_position - 0.5 )/ (nombre_max_crown_position), b-1);
-
-
-
-        //        if (REMANENCE_STRESS == 1.)
-        //            compute_declin_photo();
-        //        else
-        //            assim_max =  EFFICIENCE_BIOLOGIQUE;
 
     }
 
+
+
+
+
+
+
+
+
+    //    compute() {
+    //    ...
+    //        crown_position = int( (phytomer_rank - 1) / 3 ) + 1;
+
+    //        double a = A_LOI_INTERC;
+    //        double b = B_LOI_INTERC;
+    //        double nombre_max_crown_position = int( (RANG_D_ABLATION-1) / 3 ) + 1;
+
+    //        if (phytomer_state == phytomer::DEAD || bunch_statut.is(inflo::ABLATED))
+    //            niveau_d_eclairement_loi_beta = 0;
+    //        else if(bunch_statut.is(inflo::NON_ABLATED) && phytomer_state == phytomer::ACTIVE)
+    //            niveau_d_eclairement_loi_beta = pow((crown_position - 0.5 )/ (nombre_max_crown_position), a-1) * pow(1-(crown_position - 0.5 )/ (nombre_max_crown_position), b-1);
+
+
+
+    //        if (REMANENCE_STRESS == 1.)
+    //            compute_declin_photo();
+    //        else
+    //            assim_max =  EFFICIENCE_BIOLOGIQUE;
+    //    }
 
     //    void compute_declin_photo(){
     //        if (phytomer_rank >  RANG_DEBUT_SENS_PN_LONG_TERMES && phytomer_rank < RANG_FIN_SENS_PN_LONG_TERMES) {
