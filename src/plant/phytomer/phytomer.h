@@ -174,10 +174,10 @@ public:
 
 
         if(state != phytomer::ACTIVE) //TODO remove to include leaf/internode in demand when inactive
-            return;
+//            return;
 
         leaf->put<double>(t, Leaf::PHYTOMER_RANK, rank);
-        leaf->put<double>(t, Leaf::PHYTOMER_STATE, state);
+        leaf->put<phytomer::phytomer_state>(t, Leaf::PHYTOMER_STATE, state);
         leaf->put<inflo::inflo_states>(t, Leaf::INFLO_STATUT, inflo_status);
         leaf->put<double>(t, Leaf::TEFF, TEff);
         //set by tree

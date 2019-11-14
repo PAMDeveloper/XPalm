@@ -106,6 +106,7 @@ public:
         Internal(RESERVE_MIN, &Reserve::reserve_min);
         Internal(RESERVE_POT, &Reserve::reserve_pot);
         Internal(RESERVE_AVAI, &Reserve::reserve_avai);
+        Internal(RESERVE, &Reserve::reserve);
 
         //          externals
         External(TOTALLEAFAREA, &Reserve::totalLeafArea);
