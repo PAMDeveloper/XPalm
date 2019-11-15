@@ -276,7 +276,7 @@ public:
         totalLeafArea = 0;
         while (it != phytomers.end()) {
             Phytomer* phytomer = (*it);
-            totalLeafArea += phytomer->leaf_model()->get<double>(t, Leaf::LEAFAREA);
+            totalLeafArea += phytomer->leaf_model()->get<double>(t-1, Leaf::LEAFAREA);
             ++it;
         }
         lai = totalLeafArea * DENS / 10000;
@@ -341,6 +341,9 @@ public:
     void compute(double t, bool /* update */)
     {
         age = age + 1 ;
+
+        compute_biomasse_non_structurale_allouee_aux_feuilles(t);
+
         std::cout << "Age:" << age << std::endl;
         (*meteo)(t);
 
@@ -372,7 +375,7 @@ public:
             phytomer->leaf_model()->put<double>(t, Leaf::FTSW, ftsw);
             phytomer->leaf_model()->put<double>(t, Leaf::FR_RESTE, fr_reste);
 //            phytomer->leaf_model()->put<double>(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, fraction_non_str_biomasse_allouee);//done in compute struct biom for leaves
-            phytomer->leaf_model()->put<double>(t, Leaf::LEAF_RES_AVAI, reserve->get<double>(t, Reserve::LEAF_RES_AVAI));
+            phytomer->leaf_model()->put<double>(t, Leaf::LEAF_RES_AVAI, reserve->get<double>(t-1, Reserve::LEAF_RES_AVAI));
 
             phytomer->internode_model()->put<double>(t, Internode::FR_RESTE, fr_reste);
 
@@ -428,9 +431,10 @@ public:
             female_bunch_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::FEMELLE_BIOMASS);
             male_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_BIOMASS);
             inflo_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::DEMAND);
-            bunch_demand += phytomer->inflo_model()->bunch_model()->get <double>(t, Bunch::DEMAND);
-            male_demand += phytomer->inflo_model()->male_model()->get <double>(t, MaleInflo::DEMAND);
-            peduncule_demand += phytomer->inflo_model()->peduncle_model()->get <double>(t, Peduncle::DEMAND);
+
+            bunch_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::BUNCH_DEMAND);
+            male_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_DEMAND);
+            peduncule_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::PEDUNCLE_DEMAND);
 
             //            }
             double reserve_biomass = reserve->get <double>(t-1, Reserve::RESERVE);
@@ -499,8 +503,6 @@ public:
             fr_reste = offre_reste / sum_organs_demand;
         }
 
-        compute_biomasse_non_structurale_allouee_aux_feuilles(t);
-
     }
 
 
@@ -509,18 +511,18 @@ public:
         double TOT = 0;
         double FRAC = 0;
 
-        double delta_biomasse_reserve_leaf = reserve->get<double>(t, Reserve::LEAF_RES_AVAI);
+        double delta_biomasse_reserve_leaf = reserve->get<double>(t-1, Reserve::LEAF_RES_AVAI);
         if  (delta_biomasse_reserve_leaf > 0) {
             auto it = phytomers.begin();
             while (it != phytomers.end()) {
                 Phytomer* phytomer = (*it);
-                if(!phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) == phytomer::ACTIVE) {
+                if(!phytomer->get < phytomer::phytomer_state, Phytomer >(t-1, Phytomer::STATE) == phytomer::ACTIVE) {
                     ++it;
                     continue;
                 }
 
-                double capacite_reserve_max = phytomer->leaf_model()->get <double>(t, Leaf::CAPACITE_RESERVE_MAX);
-                double non_structural_biomass = phytomer->leaf_model()->get <double>(t, Leaf::NON_STRUCTURAL_BIOMASS);
+                double capacite_reserve_max = phytomer->leaf_model()->get <double>(t-1, Leaf::CAPACITE_RESERVE_MAX);
+                double non_structural_biomass = phytomer->leaf_model()->get <double>(t-1, Leaf::NON_STRUCTURAL_BIOMASS);
                 if(capacite_reserve_max > non_structural_biomass)
                     TOT += capacite_reserve_max - non_structural_biomass;
                 ++it;
@@ -529,18 +531,21 @@ public:
             it = phytomers.begin();
             while (it != phytomers.end()) {
                 Phytomer* phytomer = (*it);
-                if(TOT <= 0 && phytomer->leaf_model()->get <double>(t, Leaf::LEAFAREA) > 0)
+                if(TOT <= 0 && phytomer->leaf_model()->get <double>(t-1, Leaf::LEAFAREA) > 0)
                     phytomer->leaf_model()->put<double>(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, 0);
 
-                else if(!phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) == phytomer::DEAD &&
-                        phytomer->leaf_model()->get <double>(t, Leaf::LEAFAREA) > 0) {
-                    double capacite_reserve_max = phytomer->leaf_model()->get <double>(t, Leaf::CAPACITE_RESERVE_MAX);
-                    double non_structural_biomass = phytomer->leaf_model()->get <double>(t, Leaf::NON_STRUCTURAL_BIOMASS);
+                else if(!phytomer->get < phytomer::phytomer_state, Phytomer >(t-1, Phytomer::STATE) == phytomer::DEAD &&
+                        phytomer->leaf_model()->get <double>(t-1, Leaf::LEAFAREA) > 0) {
+                    double capacite_reserve_max = phytomer->leaf_model()->get <double>(t-1, Leaf::CAPACITE_RESERVE_MAX);
+                    double non_structural_biomass = phytomer->leaf_model()->get <double>(t-1, Leaf::NON_STRUCTURAL_BIOMASS);
                     if(capacite_reserve_max > non_structural_biomass) {
                         double fraction_non_str_biomasse_allouee = (capacite_reserve_max - non_structural_biomass) / TOT;
                         phytomer->leaf_model()->put<double>(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, fraction_non_str_biomasse_allouee);
                         FRAC += fraction_non_str_biomasse_allouee;
-                    }
+                    } else
+                        phytomer->leaf_model()->put<double>(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, 0);
+                } else {
+                    phytomer->leaf_model()->put<double>(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, 0);
                 }
                 ++it;
             }
@@ -548,9 +553,11 @@ public:
             auto it = phytomers.begin();
             while (it != phytomers.end()) {
                 Phytomer* phytomer = (*it);
-                if(!phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) == phytomer::ACTIVE)
+                if(!phytomer->get < phytomer::phytomer_state, Phytomer >(t-1, Phytomer::STATE) == phytomer::ACTIVE) {
+                    ++it;
                     continue;
-                TOT += phytomer->leaf_model()->get <double>(t, Leaf::NON_STRUCTURAL_BIOMASS);
+                }
+                TOT += phytomer->leaf_model()->get <double>(t-1, Leaf::NON_STRUCTURAL_BIOMASS);
                 ++it;
             }
 
@@ -559,16 +566,19 @@ public:
                 Phytomer* phytomer = (*it);
 
 
-                if(TOT <= 0 && phytomer->leaf_model()->get <double>(t, Leaf::LEAFAREA) > 0)
+                if(TOT <= 0 && phytomer->leaf_model()->get <double>(t-1, Leaf::LEAFAREA) > 0)
                     phytomer->leaf_model()->put(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, 0);
-                else if(!phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) == phytomer::DEAD &&
-                        phytomer->leaf_model()->get <double>(t, Leaf::LEAFAREA) > 0) {
-                    double non_structural_biomass = phytomer->leaf_model()->get <double>(t, Leaf::NON_STRUCTURAL_BIOMASS);
+                else if(!phytomer->get < phytomer::phytomer_state, Phytomer >(t-1, Phytomer::STATE) == phytomer::DEAD &&
+                        phytomer->leaf_model()->get <double>(t-1, Leaf::LEAFAREA) > 0) {
+                    double non_structural_biomass = phytomer->leaf_model()->get <double>(t-1, Leaf::NON_STRUCTURAL_BIOMASS);
                     if(non_structural_biomass >= 0) {
                         double fraction_non_str_biomasse_allouee = non_structural_biomass / TOT;
                         phytomer->leaf_model()->put(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, fraction_non_str_biomasse_allouee);
                         FRAC += fraction_non_str_biomasse_allouee;
-                    }
+                    } else
+                        phytomer->leaf_model()->put(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, 0);
+                } else {
+                    phytomer->leaf_model()->put<double>(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, 0);
                 }
                 ++it;
             }

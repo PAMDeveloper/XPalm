@@ -147,6 +147,7 @@ public:
         assimilate_supply = 0;
         potLeafArea = 0;
         increase_potleafArea = 0;
+        fraction_non_str_biomasse_allouee = 1;
 
         // init structure
         double TTfeuille = phytomer_age * parameters.get("T_EFF_INI");
@@ -240,8 +241,6 @@ public:
 
         growth();
         growth_demand(t);
-
-
 
     }
 

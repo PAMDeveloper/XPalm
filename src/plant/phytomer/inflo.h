@@ -37,7 +37,11 @@ public:
                      GAIN_TEFF_JOUR,
                      TT_CORRIGE,
                      DEMAND,
-                     IC_SETTING
+                     IC_SETTING,
+                     IC_SPIKELET,
+                     MALE_DEMAND,
+                     PEDUNCLE_DEMAND,
+                     BUNCH_DEMAND
                    };
 
     enum externals { FTSW,
@@ -46,7 +50,6 @@ public:
                      FR_RESTE,
                      FR_FRUITS,
                      TT_SINCE_RANK1,
-                     IC_SPIKELET,
                      TREE_IC
                    };
 
@@ -86,6 +89,9 @@ private:
     double gain_TEff_jour;
     double TT_corrige;
     double demand;
+    double male_demand;
+    double bunch_demand;
+    double peduncle_demand;
 
     //ic
     double nb_joursIC_setting;
@@ -134,6 +140,9 @@ public:
         Internal(DEMAND, &Inflo::demand);
         Internal(IC_SETTING, &Inflo::IC_setting);
         Internal(IC_SPIKELET, &Inflo::IC_spikelet);
+        Internal(MALE_DEMAND, &Inflo::male_demand);
+        Internal(PEDUNCLE_DEMAND, &Inflo::peduncle_demand);
+        Internal(BUNCH_DEMAND, &Inflo::bunch_demand);
 
         //          externals
         External(FTSW, &Inflo::ftsw);
@@ -181,6 +190,8 @@ public:
     void init(double t, const xpalm::ModelParameters& parameters, double phytomer_age, double rk, double prod_speed,
               double TT_ini_flo, double TT_ini_harv, double TT_ini_senec, double inflo_dev_factor)
     {
+        last_time = t-1;
+
         //        parameters
         PLASTICITY_BUNCH_IC_APRES_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_APRES_FLORAISON");
         PLASTICITY_BUNCH_IC_AVANT_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_AVANT_FLORAISON");
@@ -313,7 +324,7 @@ public:
 
         //        compute_growth(t);
         if (!status.is(inflo::HARVEST)) {
-            double peduncle_biomass = peduncle->get< double >(t, Peduncle::BIOMASS);
+            double peduncle_biomass = status.is(inflo::FEMALE) ? peduncle->get< double >(t, Peduncle::BIOMASS): 0;
             double bunch_oil_biomass = status.is(inflo::FEMALE) && status.is(inflo::FLOWERING)? bunch->get< double >(t, Bunch::OIL_BIOMASS) : 0;
             double bunch_nonoil_biomass = status.is(inflo::FEMALE) && status.is(inflo::FLOWERING) ?  bunch->get< double >(t, Bunch::NONOIL_BIOMASS) : 0;
             male_biomass = status.is(inflo::MALE) ?
@@ -348,10 +359,14 @@ public:
         if(rank > 0)
             TT_since_rank1 += gain_TEff_jour;
 
-        demand = 0;
-        demand += status.is(inflo::FLOWERING) ? bunch->get< double >(t, Bunch::DEMAND) : 0;
-        demand += !status.is(inflo::HARVEST) ? peduncle->get< double >(t, Bunch::DEMAND) : 0;
-        demand += status.is(inflo::INITIATED) ? male->get< double >(t, MaleInflo::DEMAND) : 0;
+
+        male_demand = status.is(inflo::MALE) && status.is(inflo::INITIATED) ? male->get< double >(t, MaleInflo::DEMAND) : 0;
+        bunch_demand = status.is(inflo::FEMALE) && status.is(inflo::FLOWERING) ? bunch->get< double >(t, Bunch::DEMAND) : 0;
+        peduncle_demand = status.is(inflo::FEMALE) && !status.is(inflo::HARVEST) ? peduncle->get< double >(t, Bunch::DEMAND) : 0;
+        demand = male_demand + bunch_demand + peduncle_demand;
+//        demand +=  status.is(inflo::FEMALE) && status.is(inflo::FLOWERING) ? bunch->get< double >(t, Bunch::DEMAND) : 0;
+//        demand +=  status.is(inflo::FEMALE) && !status.is(inflo::HARVEST) ? peduncle->get< double >(t, Bunch::DEMAND) : 0;
+//        demand +=  status.is(inflo::MALE) && status.is(inflo::INITIATED) ? male->get< double >(t, MaleInflo::DEMAND) : 0;
 
         //        compute_TT_corrige() //TODO get from phytomer
         if (status.is(inflo::INITIATED))
