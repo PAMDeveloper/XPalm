@@ -8,12 +8,12 @@ using namespace std;
 
 //#ifdef WITH_TRACE
 
-namespace artis { namespace utils {
-enum TraceType { NONE = 0, CHECK = 1, CONSTRUCT, SUBMODEL_ADD, INTERNAL_DECL,
-                 EXTERNAL_DECL, INTERNAL_LINK, INIT, START, BEFORE_COMPUTE,
-                 COMPUTE, PUT, AFTER_COMPUTE, DESTRUCT, KERNEL};
-static const int DATE_FORMAT_YMD = 0;
-}}
+//namespace artis { namespace utils {
+//enum TraceType { NONE = 0, CHECK = 1, CONSTRUCT, SUBMODEL_ADD, INTERNAL_DECL,
+//                 EXTERNAL_DECL, INTERNAL_LINK, INIT, START, BEFORE_COMPUTE,
+//                 COMPUTE, PUT, AFTER_COMPUTE, DESTRUCT, KERNEL};
+//static const int DATE_FORMAT_YMD = 0;
+//}}
 
 static const std::vector <std::string> TraceTypesStr = {
     "none", "check", "construct", "submodel_add", "internal_decl",

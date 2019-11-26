@@ -6,7 +6,7 @@ TEMPLATE = app
 CONFIG += static
 #CONFIG += console
 
-DEFINES += UNSAFE_RUN
+#DEFINES += UNSAFE_RUN
 
 QMAKE_CXXFLAGS_RELEASE -= -O1
 QMAKE_CXXFLAGS_RELEASE -= -O2
@@ -25,8 +25,8 @@ NAME = XPalm
 SRC_ = src/
 R_SRC_ = src/
 ARTIS_SRC_ = ../artis/src
-3P_LIBS_ = ../../ext_libs
-LIBS_ = ../../libs
+3P_LIBS_ = ../ext_libs
+LIBS_ = ../libs
 
 
 ARCHI = x64
@@ -34,7 +34,7 @@ COMPILER = msvc14
 #COMPILER = mingw-4.9.3
 LIBS += -lSecur32 -lWs2_32 -lShell32 -lAdvapi32
 LIBS += -L$$3P_LIBS_/$$COMPILER/$$ARCHI/static
-LIBS += -L$$3P_LIBS_/$$COMPILER/$$ARCHI/static -llibpq
+#LIBS += -L$$3P_LIBS_/$$COMPILER/$$ARCHI/static -llibpq
 DEPENDPATH += -L$$3P_LIBS_/$$COMPILER/$$ARCHI/static
 
 DEFINES += WITH_TRACE FORCE_TRACE_ENUM

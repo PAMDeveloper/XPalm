@@ -432,9 +432,9 @@ public:
             male_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_BIOMASS);
             inflo_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::DEMAND);
 
-            bunch_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::BUNCH_DEMAND);
-            male_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_DEMAND);
-            peduncule_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::PEDUNCLE_DEMAND);
+            bunch_demand += phytomer->inflo_model()->bunch_model()->get <double>(t, Bunch::DEMAND);
+            male_demand += phytomer->inflo_model()->male_model()->get <double>(t, MaleInflo::DEMAND);
+            peduncule_demand += phytomer->inflo_model()->peduncle_model()->get <double>(t, Peduncle::DEMAND);
 
             //            }
             double reserve_biomass = reserve->get <double>(t-1, Reserve::RESERVE);
