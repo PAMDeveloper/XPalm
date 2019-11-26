@@ -152,7 +152,7 @@ public:
 
     void init(double t, const xpalm::ModelParameters& parameters)
     {
-        last_time = t;
+        last_time = t-1;
         _parameters = parameters;
 
         //        parameters

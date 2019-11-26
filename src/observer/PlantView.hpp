@@ -39,18 +39,20 @@ class PlantView : public View
 public:
     PlantView()
     {
-        //TREE
+        //METEO
+         selector("FTSW", artis::kernel::DOUBLE,{WaterBalance::FTSW});
 
+        //TREE
         selector("ASSIM", artis::kernel::DOUBLE,{Tree::ASSIM});
         selector("BIOMASS", artis::kernel::DOUBLE,{Tree::BIOMASS});
         selector("BUNCH_DEMAND", artis::kernel::DOUBLE,{Tree::BUNCH_DEMAND});
         selector("FEMALE_BUNCH_BIOMASS", artis::kernel::DOUBLE,{Tree::FEMALE_BUNCH_BIOMASS});
         selector("LEAF_NON_STRUCTURAL_BIOMASS", artis::kernel::DOUBLE,{Tree::LEAF_NON_STRUCTURAL_BIOMASS});
-//        selector("EI", artis::kernel::DOUBLE,{Tree::EI});
+        selector("EI", artis::kernel::DOUBLE,{Tree::EI});
 //        selector("FR_FRUITS", artis::kernel::DOUBLE,{Tree::FR_FRUITS});
 //        selector("FR_RESTE", artis::kernel::DOUBLE,{Tree::FR_RESTE});
 //        selector("GROWTH_DEMAND", artis::kernel::DOUBLE,{Tree::GROWTH_DEMAND});
-//        selector("IC", artis::kernel::DOUBLE,{Tree::IC});
+        selector("IC", artis::kernel::DOUBLE,{Tree::IC});
 //        selector("INTERNODE_DEMAND", artis::kernel::DOUBLE,{Tree::INTERNODE_DEMAND});
 //        selector("LEAF_DEMAND", artis::kernel::DOUBLE,{Tree::LEAF_DEMAND});
         selector("LEAF_STRUCTURAL_BIOMASS", artis::kernel::DOUBLE,{Tree::LEAF_STRUCTURAL_BIOMASS});
@@ -63,7 +65,7 @@ public:
 //        selector("PHYTOMERNUMBER", artis::kernel::DOUBLE,{Tree::PHYTOMERNUMBER});
         selector("RESPIRABLE_BUNCH_BIOMASS", artis::kernel::DOUBLE,{Tree::RESPIRABLE_BUNCH_BIOMASS});
 //        selector("SLW", artis::kernel::DOUBLE,{Tree::SLW});
-//        selector("TOTALLEAFAREA", artis::kernel::DOUBLE,{Tree::TOTALLEAFAREA});
+        selector("TOTALLEAFAREA", artis::kernel::DOUBLE,{Tree::TOTALLEAFAREA});
 //        selector("TOTAL_LEAF_BIOMASS", artis::kernel::DOUBLE,{Tree::TOTAL_LEAF_BIOMASS});
         selector("TRUNK_BIOMASS", artis::kernel::DOUBLE,{Tree::TRUNK_BIOMASS});
 //        selector("TRUNK_HEIGHT", artis::kernel::DOUBLE,{Tree::TRUNK_HEIGHT});
