@@ -6,6 +6,8 @@ TEMPLATE = app
 CONFIG += static
 #CONFIG += console
 
+DEFINES += UNSAFE_RUN
+
 QMAKE_CXXFLAGS_RELEASE -= -O1
 QMAKE_CXXFLAGS_RELEASE -= -O2
 ##MSVC OPTIM FLAGS
@@ -100,6 +102,7 @@ SOURCES += \
     $$SRC_/qtapp/view.cpp \
     $$SRC_/qtapp/callout.cpp \
     $$SRC_/qtapp/tracemodel.cpp \
+    $$SRC_/artis_lite/simpletrace.cpp \
     $$SRC_/main.cpp
 
 FORMS += \

@@ -22,7 +22,7 @@ class AbstractSimpleModel {
 public:
     vector< vector< AbstractSimpleModel * >> subModels;
     virtual void compute(double t, bool update = false) = 0;
-    virtual void init(double t, const ecomeristem::ModelParameters& parameters) = 0;
+    virtual void init(double t, const xpalm::ModelParameters& parameters) = 0;
     virtual const double getVal(unsigned int i) = 0;
 };
 

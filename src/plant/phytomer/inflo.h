@@ -181,6 +181,7 @@ public:
     void init(double t, const xpalm::ModelParameters& parameters, double phytomer_age, double rk, double prod_speed,
               double TT_ini_flo, double TT_ini_harv, double TT_ini_senec, double inflo_dev_factor)
     {
+        last_time = t - 1;
         //        parameters
         PLASTICITY_BUNCH_IC_APRES_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_APRES_FLORAISON");
         PLASTICITY_BUNCH_IC_AVANT_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_AVANT_FLORAISON");

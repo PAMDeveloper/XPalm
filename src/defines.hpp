@@ -31,12 +31,14 @@ static double age_relative_var(double age, double age_ini, double age_fin, doubl
 
 
 #ifdef UNSAFE_RUN
-
-namespace inflo {
-typedef int inflo_status;
-static const unsigned int APPARITION_FLORAISON = 0;
-static const unsigned int FLORAISON_RECOLTE = 1;
+namespace leaf {
+typedef int leaf_state;
+static const unsigned int COUPE = 0;
+static const unsigned int NON_COUPE = 1;
+static const unsigned int LIG = 2;
+static const unsigned int DEAD = 3;
 }
+
 
 namespace phytomer {
 typedef int phytomer_state;
@@ -45,47 +47,16 @@ static const unsigned int INACTIVE = 1;
 static const unsigned int DEAD = 2;
 }
 
-namespace peduncle {
-typedef int peduncle_phase;
-static const unsigned int INITIAL = 0;
-static const unsigned int TRANSITION = 1;
-static const unsigned int REALIZATION = 2;
-static const unsigned int FLO = 3;
-static const unsigned int END_FILLING = 4;
-static const unsigned int MATURITY = 5;
-static const unsigned int DEAD = 6;
+
+namespace bunch {
+typedef int bunch_state;
+static const unsigned int OLEOSYNTHESE = 0;
+static const unsigned int AVANT_OLEOSYNTHESE = 1;
+static const unsigned int RECOLTE = 2;
+static const unsigned int ABORTED = 3;
+static const unsigned int ABLATED = 4;
 }
 
-namespace internode {
-typedef int internode_phase;
-static const unsigned int INITIAL = 0;
-static const unsigned int VEGETATIVE = 1;
-static const unsigned int REALIZATION = 2;
-static const unsigned int MATURITY = 3;
-static const unsigned int DEAD = 4;
-}
-
-namespace leaf {
-typedef int leaf_phase;
-static const unsigned int INITIAL = 0;
-static const unsigned int VEGETATIVE = 1;
-static const unsigned int LIG = 2;
-static const unsigned int DEAD = 3;
-}
-
-namespace culm {
-typedef int culm_phase;
-static const unsigned int INITIAL = 0;
-static const unsigned int VEGETATIVE = 1;
-static const unsigned int ELONG = 2;
-static const unsigned int PRE_PI = 3;
-static const unsigned int PI = 4;
-static const unsigned int PRE_FLO = 5;
-static const unsigned int FLO = 6;
-static const unsigned int END_FILLING = 7;
-static const unsigned int MATURITY = 8;
-static const unsigned int DEAD = 9;
-}
 
 struct flag {
     flag() = default;
@@ -105,7 +76,25 @@ struct flag {
     inline explicit operator int* () const {
         return nullptr;
     }
+
+    bool is(const flag& b) {
+        return (val & b) != 0;
+    }
+
+    void add(const flag& b) {
+        val = val | b;
+    }
+
+    void del(const flag& b) {
+        val = val & !b;
+    }
+
+    void replace(const flag& from, const flag& to) {
+        del(from);
+        add(to);
+    }
 };
+
 inline bool operator&(const flag& a, const unsigned int& b) {
     return (a.val & b) != 0;
 }
@@ -117,26 +106,18 @@ inline void operator>>(flag& a, const unsigned int& b) {
 }
 
 // Plant enums
-namespace plant {
-typedef int plant_phase;
-static const unsigned int INITIAL = 0;
-static const unsigned int VEGETATIVE = 1;
-static const unsigned int ELONG = 2;
-static const unsigned int PI = 3;
-static const unsigned int PRE_FLO = 4;
-static const unsigned int FLO = 5;
-static const unsigned int END_FILLING = 6;
-static const unsigned int MATURITY = 7;
-static const unsigned int DEAD = 8;
-
-typedef flag plant_state;
-static const unsigned int NO_STATE = 0;
-static const unsigned int NOGROWTH = 1;
-static const unsigned int NEW_PHYTOMER_AVAILABLE = 2;
-static const unsigned int LIG = 4;
-static const unsigned int KILL = 8;
-
-}
+namespace inflo {
+typedef flag inflo_states;
+static const unsigned int ABORTED = 1;
+static const unsigned int INITIATED = 2;
+static const unsigned int MALE = 4;
+static const unsigned int FEMALE = 8;
+static const unsigned int FLOWERING = 16;
+static const unsigned int OLEOSYNTHESIS = 32;
+static const unsigned int HARVEST = 64;
+static const unsigned int DEAD = 128;
+static const unsigned int SENESCENCE = 256;
+};
 
 #include <utils/juliancalculator.h>
 #include <artis_lite/simplemodel.h>
@@ -165,7 +146,7 @@ using Model = SimpleModel < xpalm::ModelParameters >;
 template < typename T > using AtomicModel = SimpleModel < T >;
 template < typename T > using CoupledModel = SimpleModel < T >;
 
-typedef SimpleSimulator < PlantModel, GlobalParameters, xpalm::ModelParameters > XPalmSimulator;
+typedef SimpleSimulator < Tree, GlobalParameters, xpalm::ModelParameters > XPalmSimulator;
 typedef SimpleContext XPalmContext;
 typedef SimpleView View;
 typedef SimpleObserver Observer;
@@ -186,47 +167,6 @@ template < class T > using TraceElements = std::vector < TraceElement <T>>;
 #include <artis/utils/Trace.hpp>
 
 
-
-
-//namespace peduncle {
-//enum peduncle_phase {   INITIAL = 0,
-//                        TRANSITION = 1,
-//                        REALIZATION = 2,
-//                        FLO = 3,
-//                        END_FILLING = 4,
-//                        MATURITY = 5,
-//                        DEAD = 6
-//                    };
-
-//}
-
-//namespace internode {
-//enum internode_phase {  INITIAL = 0,
-//                        VEGETATIVE = 1,
-//                        REALIZATION = 2,
-//                        MATURITY = 3,
-//                        DEAD = 4
-//                     };
-//}
-
-
-//namespace culm {
-//enum culm_phase {   INITIAL = 0,
-//                    VEGETATIVE = 1,
-//                    ELONG = 2,
-//                    PRE_PI = 3,
-//                    PI = 4,
-//                    PRE_FLO = 5,
-//                    FLO = 6,
-//                    END_FILLING = 7,
-//                    MATURITY = 8,
-//                    DEAD = 9
-//                };
-
-//}
-
-
-
 namespace leaf {
 enum leaf_state   { COUPE = 0,
                     NON_COUPE = 1,
@@ -244,18 +184,6 @@ enum phytomer_state {  ACTIVE = 0,
 }
 
 
-
-//namespace oil {
-//enum oil_state   { PAS_DE_FRUITS = 0,
-//                   APPARITION_FLORAISON = 1,
-//                   RECOLTE = 2,
-//                   OLEOSYNTHESE = 3,
-//                   AVANT_OLEOSYNTHESE = 4,
-//                   UNKNOWN = 5
-//                 };
-//}
-
-
 namespace bunch {
 enum bunch_state {
     OLEOSYNTHESE = 0,
@@ -269,24 +197,6 @@ enum bunch_state {
 
 
 namespace inflo {
-
-//enum inflo_sex {
-//    FEMALE = 0,
-//    MALE = 1,
-//    ABORTED = 2,
-//    UNKNOWN = 3
-//};
-
-
-//enum inflo_state {      APPARITION_FLORAISON = 1
-//                      , FLORAISON_RECOLTE = 2
-//                      , PAS_DE_FRUITS = 4
-//                      , UNKNOWN = 8
-//                      , NON_ABLATED = 16
-//                      , INITIE = 32
-//                      , RECOLTE = 64
-//                 };
-
 enum inflo_state {
       ABORTED = 1
     , INITIATED = 2
@@ -352,39 +262,6 @@ inline void operator>>(inflo_state& a, inflo_state b) {
 }
 }
 
-
-//// Plant enums
-//namespace plant {
-//enum plant_state { NO_STATE = 0,
-//                   NOGROWTH = 1,
-//                   NEW_PHYTOMER_AVAILABLE = 2,
-//                   LIG = 4,
-//                   KILL = 8
-//                 };
-
-//enum plant_phase {  INITIAL = 0,
-//                    VEGETATIVE = 1,
-//                    ELONG = 2,
-//                    PI = 3,
-//                    PRE_FLO = 4,
-//                    FLO = 5,
-//                    END_FILLING = 6,
-//                    MATURITY = 7,
-//                    DEAD = 8
-//                 };
-
-//typedef States <plant_state> plant_states;
-
-//inline bool operator&(plant_state a, plant_state b) {
-//    return (static_cast<int>(a) & static_cast<int>(b)) != 0;
-//}
-//inline void operator<<(plant_state& a, plant_state b) {
-//    a = static_cast<plant_state>(static_cast<int>(a) | static_cast<int>(b));
-//}
-//inline void operator>>(plant_state& a, plant_state b) {
-//    a = static_cast<plant_state>(static_cast<int>(a) & !static_cast<int>(b));
-//}
-//}
 
 using Model = artis::kernel::AbstractModel < artis::utils::DoubleTime, xpalm::ModelParameters >;
 
