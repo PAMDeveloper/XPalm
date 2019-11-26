@@ -156,6 +156,8 @@ public:
         structural_biomass = leafArea * SLW_min * 10 / POURC_FOLIOLE;
         non_structural_biomass = leafArea * (SLW_ini - SLW_min) * 10 / POURC_FOLIOLE;
 
+
+
         if (inflo_status.is(inflo::FEMALE)
                 && !inflo_status.is(inflo::ABORTED)
                 && inflo_status.is(inflo::HARVEST)){
@@ -165,10 +167,9 @@ public:
             leafArea = 0;
         }
 
-        if (leafArea != 0)
+        if (leafArea > 0)
             slw = (structural_biomass + non_structural_biomass) * (POURC_FOLIOLE / leafArea) / 10;
     }
-
 
     void growth_demand(double /*t*/) {
         //        compute_coupe_feuille_recolte
@@ -192,6 +193,8 @@ public:
         increase_potleafArea = correctedTEff * vitesse_exp * ( ftsw >  SEUIL_EXPAN ? 1 : ftsw / SEUIL_EXPAN);
 
         demand = (leafArea == 0 && phytomer_rank != 1) ? 0 : increase_potleafArea*(SLW_min * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE; //TODO check condition sur rang 1
+//          demand = (leafArea == 0) ? 0 : increase_potleafArea*(SLW_min * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE;
+
     }
 
 

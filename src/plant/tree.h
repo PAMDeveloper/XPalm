@@ -234,6 +234,7 @@ public:
         COUT_RESPI_MAINTENANCE_STIPE = parameters.get("COUT_RESPI_MAINTENANCE_STIPE");
         ////        DECREASE_OF_PRODUCTION_SPEED = parameters.get("DECREASE_OF_PRODUCTION_SPEED");
         DENS = parameters.get("DENS");
+        K=parameters.get("K");
         EFFICIENCE_BIOLOGIQUE = parameters.get("EFFICIENCE_BIOLOGIQUE");
         INITIAL_HEIGHT = parameters.get("INITIAL_HEIGHT");
         RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
@@ -282,6 +283,8 @@ public:
         lai = totalLeafArea * DENS / 10000;
         ei = 1 - exp(- K * lai);
 
+//        bh->put<double>(t, WaterBalance::TREE_EI, ei);
+
         double STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
         double STEM_RAYON = parameters.get("STEM_RAYON");
         trunk_biomass = 1000  * STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * INITIAL_HEIGHT; //TODO vérifier l'unité dans les calculs de masse x1000
@@ -293,6 +296,7 @@ public:
         leaf_non_structural_biomass = totalLeafArea * (SLW_ini - SLW_min) / POURC_FOLIOLE;
         total_leaf_biomass = leaf_structural_biomass + leaf_non_structural_biomass;
         slw = ((leaf_non_structural_biomass + leaf_structural_biomass) * POURC_FOLIOLE) / totalLeafArea;
+
     }
 
     static double age_relative_var(double age, double age_ini, double age_fin, double val_ini, double val_fin) {
@@ -362,6 +366,7 @@ public:
         (*bh)(t);
 
         double TEff = meteo->get<double>(t, Meteo::TEFF);
+
         double ftsw = bh->get<double>(t, WaterBalance::FTSW);
 
         //Execution phythomers
@@ -456,13 +461,14 @@ public:
 
         double demand = internode_demand + leaf_demand + respi_maintenance + inflo_demand;
         growth_demand =  internode_demand +   leaf_demand  +  inflo_demand;
+
         ic = Assim/demand;
         ics.push_back(ic);
 
         double Rg = meteo->get<double>(t, Meteo::RG);
         lai = totalLeafArea * DENS / 10000;
         ei = 1 - exp(- K * lai);
-        double factor = ftsw > SEUIL_PHOTO ? 1 : ftsw / SEUIL_PHOTO;
+        double factor = ftsw > SEUIL_PHOTO ? 1 : ftsw / SEUIL_PHOTO; //reducing factor when FTSW < S
         Assim = factor * 10 * ei * EFFICIENCE_BIOLOGIQUE * 0.48 * Rg / DENS;//  # on multiplie par 10 pour passer en kg
 
         // compute etat reserve
@@ -486,23 +492,20 @@ public:
         //        if (AF_FRUITS >= 1) {
         offre_fruits = min( ( (AF_FRUITS * bunch_demand) * offre_nette / demand_growth_corrected ), bunch_demand );
 
-        if(bunch_demand==0) {
-            fr_reste = offre_nette / sum_organs_demand;
-            fr_fruits = 1;
-        } else {
+//        if(bunch_demand==0) {
+//            fr_reste = offre_nette / sum_organs_demand;
+//            fr_fruits = 1;
+//        } else {
 
-        }
+//        }
 
         if (bunch_demand==0) {
             fr_fruits = 1;
-            double offre_reste = offre_nette - offre_fruits;
-            fr_reste = offre_reste / sum_organs_demand;
         } else {
             fr_fruits = offre_fruits / bunch_demand;
-            double offre_reste = offre_nette - offre_fruits;
-            fr_reste = offre_reste / sum_organs_demand;
         }
-
+        double offre_reste = offre_nette - offre_fruits;
+        fr_reste = offre_reste / sum_organs_demand;
     }
 
 

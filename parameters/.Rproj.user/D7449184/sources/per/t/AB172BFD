@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1574332680930.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1998772592",
+    "id" : "AB172BFD",
+    "lastKnownWriteTime" : 1574338453,
+    "last_content_update" : 1574338453587,
+    "path" : "D:/PAMStudio/dev/git/XPalm/parameters/BH_shiny_v0.R",
+    "project_path" : "BH_shiny_v0.R",
+    "properties" : {
+        "cursorPosition" : "256,33",
+        "scrollLine" : "243"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
