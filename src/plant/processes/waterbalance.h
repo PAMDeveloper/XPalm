@@ -148,7 +148,7 @@ public:
         Internal(A_Vap, &WaterBalance::a_vap);
         Internal(A_C, &WaterBalance::a_C);
         Internal(A_C1moinsV, &WaterBalance::a_C1moinsV);
-       Internal(EVAP, &WaterBalance::Evap);
+        Internal(EVAP, &WaterBalance::Evap);
         Internal(EVAPC1MOINSVAP, &WaterBalance::EvapC1moinsVap);
         Internal(EVAPMAX, &WaterBalance::EvapMax);
         Internal(EVAPVAP, &WaterBalance::EvapVap);
@@ -240,7 +240,7 @@ public:
         FractionC2Racine = 0;
         ftsw = 0;
         FractionC1moinsVapRacine =  0;
-//        compute_fraction();
+        compute_fraction();
         EvapMax = 0;
         Transp_Max = 0;
         pluie_efficace = 0;
@@ -250,6 +250,8 @@ public:
         Transpi = 0 ;
         TranspiC2 = 0;
         TranspiC1moinsVap = 0;
+        a_C1moinsVap_Racines = 0;
+        a_Vap_Racines = 0;
     }
 
     void compute_fraction() {

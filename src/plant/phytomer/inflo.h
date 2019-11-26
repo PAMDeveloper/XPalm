@@ -37,7 +37,8 @@ public:
                      GAIN_TEFF_JOUR,
                      TT_CORRIGE,
                      DEMAND,
-                     IC_SETTING
+                     IC_SETTING,
+                     IC_SPIKELET
                    };
 
     enum externals { FTSW,
@@ -46,7 +47,6 @@ public:
                      FR_RESTE,
                      FR_FRUITS,
                      TT_SINCE_RANK1,
-                     IC_SPIKELET,
                      TREE_IC
                    };
 
@@ -181,14 +181,15 @@ public:
     void init(double t, const xpalm::ModelParameters& parameters, double phytomer_age, double rk, double prod_speed,
               double TT_ini_flo, double TT_ini_harv, double TT_ini_senec, double inflo_dev_factor)
     {
-        last_time = t - 1;
+        last_time = t-1;
+
         //        parameters
         PLASTICITY_BUNCH_IC_APRES_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_APRES_FLORAISON");
         PLASTICITY_BUNCH_IC_AVANT_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_AVANT_FLORAISON");
         SENS_FTSW = parameters.get("SENS_FTSW");
         SEUIL_MEDIAN_FTSW = parameters.get("SEUIL_MEDIAN_FTSW");
         DEBUT_RANG_SENSITIVITY_NOUAISON = parameters.get("DEBUT_RANG_SENSITIVITY_NOUAISON");
-        DEBUT_RANG_SENSITIVITY_NOUAISON = parameters.get("FIN_RANG_SENSITIVITY_NOUAISON");
+        FIN_RANG_SENSITIVITY_NOUAISON = parameters.get("FIN_RANG_SENSITIVITY_NOUAISON");
         IC_spikelet_RANG_DEBUT = parameters.get("IC_spikelet_RANG_DEBUT");
         IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
 
@@ -198,6 +199,7 @@ public:
         TT_ini_senescence = TT_ini_senec;
         rank = rk;
         production_speed = prod_speed;
+        TT_corrige = 0;
 
         //ic
         nb_joursIC_setting = 0;
@@ -226,10 +228,10 @@ public:
         double PRODUCTION_SPEED_ADULT = parameters.get("PRODUCTION_SPEED_ADULT");
         double DUREE_OLEO = parameters.get("DUREE_OLEO");
         double RATIO_DUREE_JEUNES_OLEO = parameters.get("RATIO_DUREE_JEUNES_OLEO");
-        TT_oleo_duration = DUREE_OLEO * pow(PRODUCTION_SPEED_ADULT / production_speed, RATIO_DUREE_JEUNES_OLEO); //TODO filer depuis l'arbre à la création du phytomer
+        TT_oleo_duration = DUREE_OLEO * pow(PRODUCTION_SPEED_ADULT / production_speed, RATIO_DUREE_JEUNES_OLEO);
         double TT_ini_oleo = TT_ini_harvest - TT_oleo_duration;
 
-        double rd = ((double) rand() / (RAND_MAX)) + 1;
+        double rd = (double) rand() / RAND_MAX;
         if (rank > parameters.get("ICsex_RANG_FIN")) {
             if(rd < parameters.get("INI_SEX_RATIO")) {
                 status.add(inflo::FEMALE);
@@ -241,7 +243,7 @@ public:
             }
         }
 
-        rd = ((double) rand() / (RAND_MAX)) + 1;
+        rd = (double) rand() / RAND_MAX;
         if (rank > parameters.get("ICabort_RANG_FIN")) {
             if( rd < parameters.get("INI_TAUX_D_AVORTEMENT"))
                 status.add(inflo::ABORTED);
@@ -254,7 +256,6 @@ public:
 
 
     void step_state() {
-
         if( TT_corrige > TT_ini_harvest) {
             if(!status.is(inflo::HARVEST))
                 status.replace(inflo::FLOWERING, inflo::HARVEST);
@@ -314,7 +315,7 @@ public:
 
         //        compute_growth(t);
         if (!status.is(inflo::HARVEST)) {
-            double peduncle_biomass = peduncle->get< double >(t, Peduncle::BIOMASS);
+            double peduncle_biomass = status.is(inflo::FEMALE) && !status.is(inflo::HARVEST)? peduncle->get< double >(t, Peduncle::BIOMASS): 0;
             double bunch_oil_biomass = status.is(inflo::FEMALE) && status.is(inflo::FLOWERING)? bunch->get< double >(t, Bunch::OIL_BIOMASS) : 0;
             double bunch_nonoil_biomass = status.is(inflo::FEMALE) && status.is(inflo::FLOWERING) ?  bunch->get< double >(t, Bunch::NONOIL_BIOMASS) : 0;
             male_biomass = status.is(inflo::MALE) ?
@@ -350,9 +351,9 @@ public:
             TT_since_rank1 += gain_TEff_jour;
 
         demand = 0;
-        demand += status.is(inflo::FLOWERING) ? bunch->get< double >(t, Bunch::DEMAND) : 0;
-        demand += !status.is(inflo::HARVEST) ? peduncle->get< double >(t, Bunch::DEMAND) : 0;
-        demand += status.is(inflo::INITIATED) ? male->get< double >(t, MaleInflo::DEMAND) : 0;
+        demand += status.is(inflo::FEMALE) && status.is(inflo::FLOWERING) ? bunch->get< double >(t, Bunch::DEMAND) : 0;
+        demand += status.is(inflo::FEMALE) && !status.is(inflo::HARVEST) ? peduncle->get< double >(t, Peduncle::DEMAND) : 0;
+        demand += status.is(inflo::MALE) && status.is(inflo::INITIATED) ? male->get< double >(t, MaleInflo::DEMAND) : 0;
 
         //        compute_TT_corrige() //TODO get from phytomer
         if (status.is(inflo::INITIATED))

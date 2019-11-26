@@ -58,7 +58,7 @@ public:
                      LEAF_STRUCTURAL_BIOMASS,
                      INFLO_BIOMASS,
                      RESPIRABLE_BUNCH_BIOMASS,
-                     FEMALE_BUNCH_BIOMASS,
+                     BUNCH_BIOMASS,
                      ASSIM,
                      PHYTOMERNUMBER,
                      NEWPHYTOMEREMERGENCE,
@@ -127,7 +127,7 @@ private:
     double leaf_structural_biomass;
     double inflo_biomass;
     double respirable_bunch_biomass;
-    double female_bunch_biomass;
+    double bunch_biomass;
     double Assim;
     double phytomerNumber;
     double newPhytomerEmergence;
@@ -174,7 +174,7 @@ public:
         Internal(LEAF_STRUCTURAL_BIOMASS, &Tree::leaf_structural_biomass);
         Internal(INFLO_BIOMASS, &Tree::inflo_biomass);
         Internal(RESPIRABLE_BUNCH_BIOMASS, &Tree::respirable_bunch_biomass);
-        Internal(FEMALE_BUNCH_BIOMASS, &Tree::female_bunch_biomass);
+        Internal(BUNCH_BIOMASS, &Tree::bunch_biomass);
         Internal(ASSIM, &Tree::Assim);
         Internal(PHYTOMERNUMBER, &Tree::phytomerNumber);
         Internal(NEWPHYTOMEREMERGENCE, &Tree::newPhytomerEmergence);
@@ -249,7 +249,7 @@ public:
         ei = 0;
 
         totalLeafArea = slw = trunk_height = biomass = total_leaf_biomass = trunk_biomass = leaf_non_structural_biomass =
-                leaf_structural_biomass = inflo_biomass = respirable_bunch_biomass = female_bunch_biomass = Assim =
+                leaf_structural_biomass = inflo_biomass = respirable_bunch_biomass = bunch_biomass = Assim =
                 fr_fruits = fr_reste = offre_fruits = offre_nette = growth_demand = bunch_demand = internode_demand =
                 leaf_demand = male_demand = inflo_demand = male_biomass = peduncule_demand = 0;
 
@@ -269,6 +269,13 @@ public:
         meteo->init(t, parameters);
         reserve->init(t, parameters);
         racines->init(t, parameters);
+        bh->put<double>(t, WaterBalance::RACINES_TAILLEC, racines->get<double>(t-1, Racines::TAILLEC));
+        bh->put<double>(t, WaterBalance::RACINES_TAILLEC1, racines->get<double>(t-1, Racines::TAILLEC1));
+        bh->put<double>(t, WaterBalance::RACINES_TAILLEC2, racines->get<double>(t-1, Racines::TAILLEC2));
+        bh->put<double>(t, WaterBalance::RACINES_TAILLEC1MOINSVAP, racines->get<double>(t-1, Racines::TAILLEC1MOINSVAP));
+        bh->put<double>(t, WaterBalance::RACINES_TAILLEVAP, racines->get<double>(t-1, Racines::TAILLEVAP));
+        bh->put<double>(t, WaterBalance::ET0, meteo->get<double>(t-1, Meteo::ET0));
+        bh->put<double>(t, WaterBalance::TREE_EI, ei);
         bh->init(t, parameters);
 
         //        init_structure(t);
@@ -324,9 +331,7 @@ public:
         Phytomer * phytomer = new Phytomer();
         setsubmodel(PHYTOMERS, phytomer);
         phytomer->init(t, _parameters, number, rank,
-                       number > RANG_D_ABLATION
-                       ? phytomer::INACTIVE
-                       : phytomer::ACTIVE,
+                       (number > RANG_D_ABLATION),
                        age_at_creation,
                        age,
                        production_speed,
@@ -433,7 +438,7 @@ public:
 
             inflo_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::BIOMASS); //## attention pour la respi de maintenance !!!
             respirable_bunch_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::RESPIRABLE_BIOMASS);
-            female_bunch_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::FEMELLE_BIOMASS);
+            bunch_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::FEMELLE_BIOMASS);
             male_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_BIOMASS);
             inflo_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::DEMAND);
 
@@ -443,7 +448,7 @@ public:
 
             //            }
             double reserve_biomass = reserve->get <double>(t-1, Reserve::RESERVE);
-            biomass = leaf_structural_biomass + leaf_non_structural_biomass +  female_bunch_biomass + trunk_biomass + reserve_biomass + male_biomass;
+            biomass = leaf_structural_biomass + leaf_non_structural_biomass +  bunch_biomass + trunk_biomass + reserve_biomass + male_biomass;
 
             if (phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) != phytomer::DEAD) {
                 totalLeafArea += phytomer->leaf_model()->get <double>(t, Leaf::LEAFAREA);

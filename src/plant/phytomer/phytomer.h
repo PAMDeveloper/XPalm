@@ -21,7 +21,6 @@ public:
     enum internals { STATE,
                      RANK,
                      NUMBER,
-                     TREE_AGE_AT_CREATION,
                      AGE,
                      TT_SINCE_RANK1,
                      PRODUCTION_SPEED,
@@ -50,7 +49,6 @@ private:
     phytomer::phytomer_state state;
     double rank;
     double number;
-    double tree_age_at_creation;
     double age;
     double TT_since_rank1;
 
@@ -94,7 +92,6 @@ public:
         Internal(TT_SINCE_RANK1, &Phytomer::TT_since_rank1);
         //predim
         Internal(PRODUCTION_SPEED, &Phytomer::production_speed);
-        Internal(TREE_AGE_AT_CREATION, &Phytomer::tree_age_at_creation);
         Internal(TT_INI_FLOWERING, &Phytomer::TT_ini_flowering);
 
         // externals
@@ -116,7 +113,7 @@ public:
 
 
     void init(double t, const xpalm::ModelParameters& parameters){}
-    void init(double t, const xpalm::ModelParameters& parameters, int nb, int rk, phytomer::phytomer_state st, double tree_age_at_creation,
+    void init(double t, const xpalm::ModelParameters& parameters, int nb, int rk, bool st, double tree_age_at_creation,
               double tree_age, double prod_speed, double flo_tt, double harv_tt, double tt_ini_sen, double inflo_factor)
     {
         last_time = t-1;
@@ -128,6 +125,7 @@ public:
 //        ICsex_RANG_FIN = parameters.get("ICsex_RANG_FIN");
 //        ICabort_RANG_DEBUT = parameters.get("ICabort_RANG_DEBUT");
 //        ICabort_RANG_FIN = parameters.get("ICabort_RANG_FIN");
+        youngest_phytomer_number = 0;
 
         //predim
         number = nb;
@@ -147,7 +145,7 @@ public:
 
         //var
         rank = rk;
-        state = st;
+        state = st ? phytomer::INACTIVE : phytomer::ACTIVE;
         age = tree_age - tree_age_at_creation;
         TT_since_rank1 = parameters.get("T_EFF_INI") * age;
 
