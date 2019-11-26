@@ -173,7 +173,7 @@ public:
             state = phytomer::ACTIVE;
 
 
-        if(state != phytomer::ACTIVE) //TODO remove to include leaf/internode in demand when inactive
+//        if(state != phytomer::ACTIVE) //TODO remove to include leaf/internode in demand when inactive
 //            return;
 
         leaf->put<double>(t, Leaf::PHYTOMER_RANK, rank);
@@ -196,6 +196,7 @@ public:
         inflo->put<double>(t, Inflo::RANK, rank);
         inflo->put<double>(t, Inflo::TT_SINCE_RANK1, TT_since_rank1);
         inflo->put<double>(t, Inflo::TREE_IC, tree_IC);
+
         //set by tree
 //        inflo->put<double>(t, Inflo::FTSW, ftsw);
 //        inflo->put<double>(t, Inflo::FR_RESTE, fr_reste);
