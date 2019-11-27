@@ -303,8 +303,10 @@ public:
 
     void step_state() {
         if( TT_corrige > TT_ini_harvest) {
-            if(!status.is(inflo::HARVEST))
+            if(!status.is(inflo::HARVEST)){
                 status.replace(inflo::FLOWERING, inflo::HARVEST);
+                status.del(inflo::INITIATED);
+            }
         } else if( TT_corrige > TT_ini_flowering) {
             if(!status.is(inflo::FLOWERING))
                 status.replace(inflo::INITIATED, inflo::FLOWERING);
@@ -345,9 +347,6 @@ public:
                 status.add(inflo::MALE);
             }
         }
-
-
-
 
 
         step_state();

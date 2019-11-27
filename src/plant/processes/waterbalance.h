@@ -238,7 +238,7 @@ public:
         FractionC = 0;
         FractionC1Racine = 0;
         FractionC2Racine = 0;
-        ftsw = 0;
+        ftsw = 0.5;
         FractionC1moinsVapRacine =  0;
         compute_fraction();
         EvapMax = 0;

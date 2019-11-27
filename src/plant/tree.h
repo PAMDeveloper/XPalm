@@ -245,7 +245,7 @@ public:
         VITESSE_SENSITIVITY = parameters.get("VITESSE_SENSITIVITY");
 
         //        internals
-        newPhytomerEmergence = 0;
+        newPhytomerEmergence = 0.99;
         phytomerNumber = 0;
         ic = 1;
         ei = 0;
@@ -353,6 +353,7 @@ public:
     {
         age = age + 1 ;
 
+
         compute_biomasse_non_structurale_allouee_aux_feuilles(t);
 
         std::cout << "Age:" << age << std::endl;
@@ -373,8 +374,8 @@ public:
         (*bh)(t);
 
         double TEff = meteo->get<double>(t, Meteo::TEFF);
-
         double ftsw = bh->get<double>(t, WaterBalance::FTSW);
+
 
         //Execution phythomers
         auto it = phytomers.begin();
@@ -400,13 +401,6 @@ public:
         }
 
         //        production_speed = max(MINIMAL_PRODUCTION_SPEED, (-DECREASE_OF_PRODUCTION_SPEED * (t - _parameters.beginDate) ) + PRODUCTION_SPEED_INITIAL); //DD.rang-1
-
-        double production_speed = age_relative_var(age, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
-        newPhytomerEmergence += TEff * production_speed * pow(ic,VITESSE_SENSITIVITY) * ( ftsw > SEUIL_ORGANO ? 1 : ftsw / SEUIL_ORGANO);
-        if (newPhytomerEmergence >= 1) {
-            create_phytomer(t, phytomerNumber + 1, age);
-            newPhytomerEmergence -= 1;
-        }
 
         racines->put(t, Racines::TEFF, TEff);
         racines->put(t, Racines::FTSW, ftsw);
@@ -512,6 +506,14 @@ public:
         }
         double offre_reste = offre_nette - offre_fruits;
         fr_reste = offre_reste / sum_organs_demand;
+
+
+        double production_speed = age_relative_var(age, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
+        newPhytomerEmergence += TEff * production_speed * pow(ic,VITESSE_SENSITIVITY) * ( ftsw > SEUIL_ORGANO ? 1 : ftsw / SEUIL_ORGANO);
+        if (newPhytomerEmergence >= 1) {
+            create_phytomer(t, phytomerNumber + 1, age);
+            newPhytomerEmergence -= 1;
+        }
     }
 
 

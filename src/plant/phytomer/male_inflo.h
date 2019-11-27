@@ -92,8 +92,6 @@ public:
 
     void compute(double t, bool /* update */)
     {
-        last_time = t-1;
-
         demand = MASSE_INFLO_MALE_ADULTE * inflo_dev_factor * ( Teff / TT_flowering_duration );
         assimilate_supply = demand * fr_reste;
         biomass += assimilate_supply / COUT_STRUCTURE_REGIME;

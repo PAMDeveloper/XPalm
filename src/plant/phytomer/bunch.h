@@ -171,8 +171,6 @@ public:
 
     void compute(double t, bool /* update */)
     {
-        last_time = t-1;
-
 //        growth();
         //compute oil and nonoil biomass
         oil_assimilate_supply = oil_demand * fr_fruits;
