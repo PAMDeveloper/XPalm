@@ -48,6 +48,7 @@ public:
                      LAI,
                      EI,
                      IC,
+                     ICS,
                      TOTALLEAFAREA,
                      SLW,
                      TRUNK_HEIGHT,
@@ -164,6 +165,7 @@ public:
         Internal(LAI, &Tree::lai);
         Internal(EI, &Tree::ei);
         Internal(IC, &Tree::ic);
+        Internal(ICS, &Tree::ics);
         Internal(TOTALLEAFAREA, &Tree::totalLeafArea);
         Internal(SLW, &Tree::slw);
         Internal(TRUNK_HEIGHT, &Tree::trunk_height);
@@ -441,10 +443,9 @@ public:
             bunch_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::FEMELLE_BIOMASS);
             male_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_BIOMASS);
             inflo_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::DEMAND);
-
-            bunch_demand += phytomer->inflo_model()->bunch_model()->get <double>(t, Bunch::DEMAND);
-            male_demand += phytomer->inflo_model()->male_model()->get <double>(t, MaleInflo::DEMAND);
-            peduncule_demand += phytomer->inflo_model()->peduncle_model()->get <double>(t, Peduncle::DEMAND);
+            bunch_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::BUNCH_DEMAND);
+            male_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_DEMAND);
+            peduncule_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::PEDUNCLE_DEMAND);
 
             //            }
             double reserve_biomass = reserve->get <double>(t-1, Reserve::RESERVE);

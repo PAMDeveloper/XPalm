@@ -39,11 +39,6 @@ private:
 
     //     parameters
     double INACTIVE_PHYTOMER_NUMBER;
-    //ic
-//    double ICsex_RANG_DEBUT;
-//    double ICsex_RANG_FIN;
-//    double ICabort_RANG_DEBUT;
-//    double ICabort_RANG_FIN;
 
     //     internals
     phytomer::phytomer_state state;
@@ -58,15 +53,6 @@ private:
 
     //attr
     inflo::inflo_states inflo_status;
-
-    //ic
-//    double nb_joursICsex;
-//    double ICsex_tot;
-//    double ICsex;
-//    double nb_joursICabort;
-//    double ICabort_tot;
-//    double ICabort;
-
 
     //   externals
     double youngest_phytomer_number;
@@ -120,28 +106,13 @@ public:
 
         //parameters
         INACTIVE_PHYTOMER_NUMBER = parameters.get("INACTIVE_PHYTOMER_NUMBER");
-        //ic
-//        ICsex_RANG_DEBUT = parameters.get("ICsex_RANG_DEBUT");
-//        ICsex_RANG_FIN = parameters.get("ICsex_RANG_FIN");
-//        ICabort_RANG_DEBUT = parameters.get("ICabort_RANG_DEBUT");
-//        ICabort_RANG_FIN = parameters.get("ICabort_RANG_FIN");
+
         youngest_phytomer_number = 0;
 
         //predim
         number = nb;
         TT_ini_flowering = flo_tt;
         production_speed = prod_speed;
-
-        //ic
-//        nb_joursICsex = 0;
-//        ICsex_tot = 0;
-//        ICsex = 0;
-//        nb_joursICabort = 0;
-//        ICabort_tot = 0;
-//        ICabort = 0;
-//        nb_joursIC_spikelet = 0;
-//        IC_spikelet_tot = 0;
-//        IC_spikelet = 0;
 
         //var
         rank = rk;
@@ -153,10 +124,9 @@ public:
         leaf->init(t, parameters, age);
         internode->init(t, parameters, age, tree_age_at_creation, production_speed);
         inflo->init(t, parameters, age, rank, production_speed, TT_ini_flowering, harv_tt, tt_ini_sen, inflo_factor);
+        inflo_status = inflo->get<inflo::inflo_states, Inflo>(t, Inflo::STATUS);
     }
 
-
-//    double TT_since_rank1 = TEff_ini * phytomer_age; //AGE
 
     void compute(double t, bool /* update */)
     {
@@ -201,27 +171,9 @@ public:
 //        inflo->put<double>(t, Inflo::FR_FRUITS, fr_fruits);
         (*inflo)(t);
         inflo_status = inflo->get<inflo::inflo_states, Inflo>(t, Inflo::STATUS);
-
-        compute_IC();
     }
 
 
-    void compute_IC(){
-//        tree_IC
-//        if (rank > ICsex_RANG_DEBUT && rank < ICsex_RANG_FIN ) {
-//            nb_joursICsex += 1;
-//            ICsex_tot += tree_IC;
-//            ICsex = ICsex_tot / nb_joursICsex;
-//        }
-
-//        if (rank > ICabort_RANG_DEBUT && rank < ICabort_RANG_FIN) {
-//            nb_joursICabort += 1;
-//            ICabort_tot += tree_IC;
-//            ICabort = ICabort_tot / nb_joursICabort;
-//        }
-
-
-    }
 
 };
 

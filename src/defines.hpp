@@ -4,7 +4,6 @@
 #define STRICT_R_HEADERS
 #undef PI
 
-
 #include "iso646.h"
 #include <type_traits> //necessary for enum type checking on states
 
@@ -222,7 +221,7 @@ public:
         states = states | static_cast<int>(state);
     }
     void operator>>(E state) {
-        states = states & !static_cast<int>(state);
+        states = states & ~static_cast<int>(state);
     }
 
     operator int() {
@@ -240,7 +239,7 @@ public:
         states = states | static_cast<int>(state);
     }
     void del(E state) {
-        states = states & !static_cast<int>(state);
+        states = states & ~static_cast<int>(state);
     }
 
     void replace(E from, E to) {
@@ -258,7 +257,7 @@ inline void operator<<(inflo_state& a, inflo_state b) {
     a = static_cast<inflo_state>(static_cast<int>(a) | static_cast<int>(b));
 }
 inline void operator>>(inflo_state& a, inflo_state b) {
-    a = static_cast<inflo_state>(static_cast<int>(a) & !static_cast<int>(b));
+    a = static_cast<inflo_state>(static_cast<int>(a) & ~static_cast<int>(b));
 }
 }
 

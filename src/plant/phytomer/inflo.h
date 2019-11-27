@@ -38,7 +38,12 @@ public:
                      TT_CORRIGE,
                      DEMAND,
                      IC_SETTING,
-                     IC_SPIKELET
+                     IC_SPIKELET,
+                     IC_SEX,
+                     IC_ABORT,
+                     BUNCH_DEMAND,
+                     PEDUNCLE_DEMAND,
+                     MALE_DEMAND
                    };
 
     enum externals { FTSW,
@@ -61,6 +66,15 @@ private:
     double FIN_RANG_SENSITIVITY_NOUAISON;
     double IC_spikelet_RANG_DEBUT;
     double IC_spikelet_RANG_FIN;
+    double ICsex_RANG_DEBUT;
+    double ICsex_RANG_FIN;
+    double ICabort_RANG_DEBUT;
+    double ICabort_RANG_FIN;
+    double Seuil_IC_sex;
+    double SENSITIVITY_SEX;
+    double Seuil_IC_abort;
+    double SENSITIVITY_ABORTION;
+
 
     //     submodels
     std::unique_ptr < Peduncle > peduncle;
@@ -86,6 +100,9 @@ private:
     double gain_TEff_jour;
     double TT_corrige;
     double demand;
+    double bunch_demand;
+    double peduncle_demand;
+    double male_demand;
 
     //ic
     double nb_joursIC_setting;
@@ -94,6 +111,12 @@ private:
     double nb_joursIC_spikelet;
     double IC_spikelet_tot;
     double IC_spikelet;
+    double nb_joursICsex;
+    double IC_sex_tot;
+    double IC_sex;
+    double nb_joursICabort;
+    double IC_abort_tot;
+    double IC_abort;
 
 
     //     externals
@@ -134,6 +157,11 @@ public:
         Internal(DEMAND, &Inflo::demand);
         Internal(IC_SETTING, &Inflo::IC_setting);
         Internal(IC_SPIKELET, &Inflo::IC_spikelet);
+        Internal(IC_SEX, &Inflo::IC_sex);
+        Internal(IC_ABORT, &Inflo::IC_abort);
+        Internal(BUNCH_DEMAND, &Inflo::bunch_demand);
+        Internal(PEDUNCLE_DEMAND, &Inflo::peduncle_demand);
+        Internal(MALE_DEMAND, &Inflo::male_demand);
 
         //          externals
         External(FTSW, &Inflo::ftsw);
@@ -178,8 +206,10 @@ public:
 
 
     void init(double t, const xpalm::ModelParameters& parameters){}
-    void init(double t, const xpalm::ModelParameters& parameters, double phytomer_age, double rk, double prod_speed,
-              double TT_ini_flo, double TT_ini_harv, double TT_ini_senec, double inflo_dev_factor)
+    void init(double t, const xpalm::ModelParameters& parameters, double phytomer_age,
+              double rk, double prod_speed,
+              double TT_ini_flo, double TT_ini_harv,
+              double TT_ini_senec, double inflo_dev_factor)
     {
         last_time = t-1;
 
@@ -192,6 +222,14 @@ public:
         FIN_RANG_SENSITIVITY_NOUAISON = parameters.get("FIN_RANG_SENSITIVITY_NOUAISON");
         IC_spikelet_RANG_DEBUT = parameters.get("IC_spikelet_RANG_DEBUT");
         IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
+        ICsex_RANG_DEBUT = parameters.get("ICsex_RANG_DEBUT");
+        ICsex_RANG_FIN = parameters.get("ICsex_RANG_FIN");
+        ICabort_RANG_DEBUT = parameters.get("ICabort_RANG_DEBUT");
+        ICabort_RANG_FIN = parameters.get("ICabort_RANG_FIN");
+        Seuil_IC_sex = parameters.get("Seuil_IC_sex");
+        SENSITIVITY_SEX = parameters.get("SENSITIVITY_SEX");
+        Seuil_IC_abort = parameters.get("Seuil_IC_abort");
+        SENSITIVITY_ABORTION = parameters.get("SENSITIVITY_ABORTION");
 
         //predim
         TT_ini_flowering = TT_ini_flo;
@@ -201,16 +239,23 @@ public:
         production_speed = prod_speed;
         TT_corrige = 0;
 
+        status.states = 0;
+        status.add(inflo::INITIATED);
+        status_pot.states = 0;
+        status_pot.add(inflo::INITIATED);
+        bunch_demand = 0;
+        male_demand = 0;
+        peduncle_demand = 0;
         //ic
         nb_joursIC_setting = 0;
         IC_setting_tot = 0;
         IC_setting = 0;
-//        nb_joursICsex = 0;
-//        ICsex_tot = 0;
-//        ICsex = 0;
-//        nb_joursICabort = 0;
-//        ICabort_tot = 0;
-//        ICabort = 0;
+        nb_joursICsex = 0;
+        IC_sex_tot = 0;
+        IC_sex = 0;
+        nb_joursICabort = 0;
+        IC_abort_tot = 0;
+        IC_abort = 0;
         nb_joursIC_spikelet = 0;
         IC_spikelet_tot = 0;
         IC_spikelet = 0;
@@ -231,26 +276,27 @@ public:
         TT_oleo_duration = DUREE_OLEO * pow(PRODUCTION_SPEED_ADULT / production_speed, RATIO_DUREE_JEUNES_OLEO);
         double TT_ini_oleo = TT_ini_harvest - TT_oleo_duration;
 
+        peduncle->init(t, parameters, production_speed, TT_ini_flowering, TT_ini_harvest, inflo_dev_factor);
+        bunch->init(t, parameters, production_speed, TT_ini_flowering, TT_ini_harvest, TT_ini_oleo, inflo_dev_factor);
+        male->init(t, parameters, phytomer_age, production_speed, inflo_dev_factor, TT_ini_flowering);
+
         double rd = (double) rand() / RAND_MAX;
-        if (rank > parameters.get("ICsex_RANG_FIN")) {
+        if (rank > ICsex_RANG_FIN) {
             if(rd < parameters.get("INI_SEX_RATIO")) {
                 status.add(inflo::FEMALE);
-                peduncle->init(t, parameters, production_speed, TT_ini_flowering, TT_ini_harvest, inflo_dev_factor);
-                bunch->init(t, parameters, production_speed, TT_ini_flowering, TT_ini_harvest, TT_ini_oleo, inflo_dev_factor);
             } else {
                 status.add(inflo::MALE);
-                male->init(t, parameters, phytomer_age, production_speed, inflo_dev_factor, TT_ini_flowering);
             }
         }
 
         rd = (double) rand() / RAND_MAX;
-        if (rank > parameters.get("ICabort_RANG_FIN")) {
+        if (rank > ICabort_RANG_FIN) {
             if( rd < parameters.get("INI_TAUX_D_AVORTEMENT"))
                 status.add(inflo::ABORTED);
         }
 
+        TT_corrige= parameters.get("T_EFF_INI") * phytomer_age;
         step_state();
-        //TODO compute first growth ?
     }
 
 
@@ -284,6 +330,26 @@ public:
         if(status.is(inflo::ABORTED) || status.is(inflo::DEAD) || status.is(inflo::HARVEST))
             return;
 
+        if (rank == ICabort_RANG_FIN) {
+            double rd = (double) rand() / RAND_MAX;
+            if(rd < min(1.,pow(IC_abort/Seuil_IC_abort, SENSITIVITY_ABORTION))) {
+                status.add(inflo::ABORTED);
+            }
+        }
+
+        if (rank > ICsex_RANG_FIN && !status.is(inflo::FEMALE) && !status.is(inflo::MALE) && !status.is(inflo::ABORTED)) {
+            double rd = (double) rand() / RAND_MAX;
+            if(rd < min(1.,pow(IC_sex/Seuil_IC_sex, SENSITIVITY_SEX))) {
+                status.add(inflo::FEMALE);
+            } else {
+                status.add(inflo::MALE);
+            }
+        }
+
+
+
+
+
         step_state();
 
         if (status.is(inflo::FEMALE)) {
@@ -312,6 +378,7 @@ public:
             male->put<double>(t, MaleInflo::FR_RESTE, fr_reste);
             (*male)(t);
         }
+
 
         //        compute_growth(t);
         if (!status.is(inflo::HARVEST)) {
@@ -350,12 +417,13 @@ public:
         if(rank > 0)
             TT_since_rank1 += gain_TEff_jour;
 
-        demand = 0;
-        demand += status.is(inflo::FEMALE) && status.is(inflo::FLOWERING) ? bunch->get< double >(t, Bunch::DEMAND) : 0;
-        demand += status.is(inflo::FEMALE) && !status.is(inflo::HARVEST) ? peduncle->get< double >(t, Peduncle::DEMAND) : 0;
-        demand += status.is(inflo::MALE) && status.is(inflo::INITIATED) ? male->get< double >(t, MaleInflo::DEMAND) : 0;
 
-        //        compute_TT_corrige() //TODO get from phytomer
+        bunch_demand = status.is(inflo::FEMALE) && status.is(inflo::FLOWERING) ? bunch->get< double >(t, Bunch::DEMAND) : 0;
+        peduncle_demand = status.is(inflo::FEMALE) && !status.is(inflo::HARVEST) ? peduncle->get< double >(t, Peduncle::DEMAND) : 0;
+        male_demand = status.is(inflo::MALE) && status.is(inflo::INITIATED) ? male->get< double >(t, MaleInflo::DEMAND) : 0;
+        demand = bunch_demand + peduncle_demand + male_demand;
+
+        //        compute_TT_corrige()
         if (status.is(inflo::INITIATED))
             TT_corrige += pow(fr_fruits, PLASTICITY_BUNCH_IC_AVANT_FLORAISON) * gain_TEff_jour;
         else if (status.is(inflo::FLOWERING))
@@ -375,6 +443,18 @@ public:
             nb_joursIC_spikelet += 1;
             IC_spikelet_tot += tree_IC;
             IC_spikelet = IC_spikelet_tot / nb_joursIC_spikelet;
+        }
+
+        if (rank > ICsex_RANG_DEBUT && rank < ICsex_RANG_FIN ) {
+            nb_joursICsex += 1;
+            IC_sex_tot += tree_IC;
+            IC_sex = IC_sex_tot / nb_joursICsex;
+        }
+
+        if (rank > ICabort_RANG_DEBUT && rank < ICabort_RANG_FIN) {
+            nb_joursICabort += 1;
+            IC_abort_tot += tree_IC;
+            IC_abort = IC_abort_tot / nb_joursICabort;
         }
     }
 

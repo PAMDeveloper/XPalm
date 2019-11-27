@@ -26,37 +26,68 @@ bool isNullValue(double value){
 
 bool VisibleTraceModel::filterAcceptsRow(int sourceRow,const QModelIndex &sourceParent) const {
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
-    if(date_i + model_i + var_i + phase == -4 && !null_i)
+    if(date_i + model_i + var_i.size() + phase.size() == -4 && !null_i)
         return true;
     bool accepted = true;
-    if(null_i) accepted &= isNullValue(index.data(VALUE_MODEL_ROLE).toDouble());
+    if(null_i) {
+        accepted &= isNullValue(index.data(VALUE_MODEL_ROLE).toDouble());
+        if(index.data(STR_VALUE_ROLE).toString().contains(","))
+            return false;
+    }
     if(date_i != -1) accepted &= (date_i == index.data(DATE_ROLE).toInt());
     if(accepted == false) return accepted;
     if(model_i != -1) accepted &= (model_i == index.data(MODEL_ROLE).toInt() || model_i == index.data(INT_MODEL_ROLE).toInt());
     if(accepted == false) return accepted;
-    if(var_i != -1) accepted &= (var_i == index.data(VAR_ROLE).toInt() || var_i == index.data(INT_VAR_ROLE).toInt());
+
+    if(var_i.size() != 0) {
+        bool laccepted = false;
+        foreach (int v, var_i) {
+            laccepted |= (v == index.data(VAR_ROLE).toInt() || v == index.data(INT_VAR_ROLE).toInt());
+        }
+        accepted &= laccepted;
+    }
     if(accepted == false) return accepted;
-    if(phase != -1) accepted &= (phase == index.data(PHASE_ROLE).toInt());
+    if(phase.size() != 0) {
+        bool laccepted = false;
+        foreach (int v, phase) {
+            laccepted |= (v == index.data(PHASE_ROLE).toInt());
+        }
+        accepted &= laccepted;
+    }
     return accepted;
 }
 
-void  VisibleTraceModel::setFilters(QString date, QString model, QString var, QString phase, bool nullOnly) {
-    if(phase.isEmpty()) {
-        this->phase = -1;
-    } else if(phase.contains(QRegExp("[a-zA-Z]"))) {
-        this->phase = -1;
-        for (int i = 0; i < TraceTypesStr.size(); ++i) {
-            if(TraceTypesStr[i] == phase.toStdString()) {
-                this->phase = i;
-                break;
+void  VisibleTraceModel::setFilters(QString date, QString model, QString var, QString ph, bool nullOnly) {
+    phase.clear();
+    if(!ph.isEmpty()) {
+        QStringList lst = ph.split(",");
+        foreach (QString v, lst) {
+            if(!v.isEmpty()) {
+                if(v.contains(QRegExp("[a-zA-Z]"))) {
+                    for (int i = 0; i < TraceTypesStr.size(); ++i) {
+                        if(TraceTypesStr[i] == v.toStdString()) {
+                            phase.push_back(i);
+                            break;
+                        }
+                    }
+                } else {
+                    phase.push_back(v.toInt());
+                }
             }
         }
-    } else {
-          this->phase = phase.toInt();
     }
+
+    var_i.clear();
+    if(!var.isEmpty()) {
+        QStringList lst = var.split(",");
+        foreach (QString v, lst) {
+            if(!v.isEmpty())
+                var_i.push_back(KernelInfo::term(v.toStdString()));
+        }
+    }
+
     date_i = date.isEmpty() ? -1 : QDate::fromString(date, "yyyy-MM-dd").toJulianDay();
     model_i = model.isEmpty() ? -1 : KernelInfo::term(model.toStdString());
-    var_i = var.isEmpty() ? -1 : KernelInfo::term(var.toStdString());
     null_i = nullOnly;
     invalidate();
 }
@@ -104,6 +135,10 @@ QVariant TraceModel::data(const QModelIndex &index, int role) const {
         return elements[index.row()].get_kernel_info().tgt_internal_var_idx();
     } else if(role == PHASE_ROLE) {
         return (int)elements[index.row()].get_type();
+    } else if(role == STR_VALUE_ROLE) {
+        return QString::fromStdString(
+                    elements[index.row()].get_kernel_info().to_string()
+                ).remove(0,1);
     } else if(role == VALUE_MODEL_ROLE) {
         QStringList l = this->index(index.row(),3).data().toString().split("=");
         double r;

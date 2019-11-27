@@ -14,7 +14,8 @@ enum customRole {
     INT_VAR_ROLE = 23,
     PHASE_ROLE = 24,
     INT_MODEL_ROLE = 25,
-    VALUE_MODEL_ROLE = 26
+    VALUE_MODEL_ROLE = 26,
+    STR_VALUE_ROLE = 27
 };
 
 class TraceModel : public QAbstractTableModel
@@ -33,8 +34,8 @@ class VisibleTraceModel : public QSortFilterProxyModel {
 public:
     int date_i;
     int model_i;
-    int var_i;
-    int phase;
+    std::vector<int> var_i;
+    std::vector<int> phase;
     bool null_i;
     VisibleTraceModel(const TraceElements<DoubleTime> & elements, QObject *parent = 0);
     bool filterAcceptsRow(int sourceRow,const QModelIndex &sourceParent) const;
