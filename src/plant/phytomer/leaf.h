@@ -137,8 +137,9 @@ public:
 
 
         //        internals
-        gain_TEff_jour = 0;
         TT_since_rank1 = 0;
+
+        gain_TEff_jour = 0;
         TT_corrige = 0;
         vitesse_exp = 0;
         demand = 0;

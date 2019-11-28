@@ -120,7 +120,7 @@ public:
         age = tree_age - tree_age_at_creation;
 
         if(rank > 0){
-            TT_since_rank1 = parameters.get("T_EFF_INI") * age - (INACTIVE_PHYTOMER_NUMBER)/production_speed;
+            TT_since_rank1 = parameters.get("T_EFF_INI") * ( age - INACTIVE_PHYTOMER_NUMBER*production_speed);
         }
         else{
             TT_since_rank1=0;
@@ -143,10 +143,10 @@ public:
 
         rank = youngest_phytomer_number - number - INACTIVE_PHYTOMER_NUMBER + 1;
         if (rank>0){
-         TT_since_rank1 += TEff;
+            TT_since_rank1 += TEff;
         }
         else{
-            TT_since_rank1=0;
+            TT_since_rank1 = 0;
         }
 
         if(rank == 1 && state == phytomer::INACTIVE)

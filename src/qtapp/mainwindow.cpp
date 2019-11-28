@@ -53,6 +53,7 @@ MainWindow::~MainWindow()
 void MainWindow::show_trace()
 {
 //    ui->tableView->setModel(NULL);
+    ui->tableView->horizontalHeader()->setStretchLastSection(true);
     trace_model->setFilters(ui->lineEdit->text(), ui->lineEdit_2->text(), ui->lineEdit_3->text(), ui->lineEdit_4->text(), ui->checkBox->isChecked());
     ui->tableView->reset();
 //    ui->tableView->setModel(trace_model);
