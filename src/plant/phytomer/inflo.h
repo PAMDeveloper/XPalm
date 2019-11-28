@@ -295,7 +295,13 @@ public:
                 status.add(inflo::ABORTED);
         }
 
-        TT_corrige= parameters.get("T_EFF_INI") * phytomer_age;
+        if (rank>0){
+            TT_corrige= parameters.get("T_EFF_INI") * phytomer_age;
+        }
+        else{
+            TT_corrige=0;
+        }
+
         step_state();
     }
 

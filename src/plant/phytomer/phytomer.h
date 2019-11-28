@@ -118,8 +118,13 @@ public:
         rank = rk;
         state = st ? phytomer::INACTIVE : phytomer::ACTIVE;
         age = tree_age - tree_age_at_creation;
-        TT_since_rank1 = parameters.get("T_EFF_INI") * age;
 
+        if(rank > 0){
+            TT_since_rank1 = parameters.get("T_EFF_INI") * age - (INACTIVE_PHYTOMER_NUMBER)/production_speed;
+        }
+        else{
+            TT_since_rank1=0;
+        }
         //submodels
         leaf->init(t, parameters, age);
         internode->init(t, parameters, age, tree_age_at_creation, production_speed);
@@ -134,9 +139,16 @@ public:
             return;
 
         age++;
-        TT_since_rank1 += TEff;
+
 
         rank = youngest_phytomer_number - number - INACTIVE_PHYTOMER_NUMBER + 1;
+        if (rank>0){
+         TT_since_rank1 += TEff;
+        }
+        else{
+            TT_since_rank1=0;
+        }
+
         if(rank == 1 && state == phytomer::INACTIVE)
             state = phytomer::ACTIVE;
 
