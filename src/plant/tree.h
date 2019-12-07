@@ -292,7 +292,7 @@ public:
         lai = totalLeafArea * DENS / 10000;
         ei = 1 - exp(- K * lai);
 
-//        bh->put<double>(t, WaterBalance::TREE_EI, ei);
+        //        bh->put<double>(t, WaterBalance::TREE_EI, ei);
 
         double STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
         double STEM_RAYON = parameters.get("STEM_RAYON");
@@ -387,7 +387,7 @@ public:
 
             phytomer->leaf_model()->put<double>(t, Leaf::FTSW, ftsw);
             phytomer->leaf_model()->put<double>(t, Leaf::FR_RESTE, fr_reste);
-//            phytomer->leaf_model()->put<double>(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, fraction_non_str_biomasse_allouee);//done in compute struct biom for leaves
+            //            phytomer->leaf_model()->put<double>(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, fraction_non_str_biomasse_allouee);//done in compute struct biom for leaves
             phytomer->leaf_model()->put<double>(t, Leaf::LEAF_RES_AVAI, reserve->get<double>(t-1, Reserve::LEAF_RES_AVAI));
 
             phytomer->internode_model()->put<double>(t, Internode::FR_RESTE, fr_reste);
@@ -422,26 +422,28 @@ public:
         it = phytomers.begin();
         while (it != phytomers.end()) {
             Phytomer* phytomer = (*it);
-            //            if(phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) == phytomer::ACTIVE) { //
 
-            leaf_structural_biomass += phytomer->leaf_model()->get <double>(t, Leaf::STRUCTURAL_BIOMASS);
-            leaf_non_structural_biomass += phytomer->leaf_model()->get <double>(t, Leaf::NON_STRUCTURAL_BIOMASS);
-            leaf_demand += phytomer->leaf_model()->get <double>(t, Leaf::DEMAND);
+            if(phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) != phytomer::DEAD) {
 
-            trunk_height += phytomer->internode_model()->get <double>(t, Internode::LENGTH);
-            trunk_biomass += phytomer->internode_model()->get <double>(t, Internode::BIOMASS);
-            internode_demand +=  phytomer->internode_model()->get <double>(t, Internode::DEMAND);
+                leaf_structural_biomass += phytomer->leaf_model()->get <double>(t, Leaf::STRUCTURAL_BIOMASS);
+                leaf_non_structural_biomass += phytomer->leaf_model()->get <double>(t, Leaf::NON_STRUCTURAL_BIOMASS);
+                leaf_demand += phytomer->leaf_model()->get <double>(t, Leaf::DEMAND);
 
-            inflo_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::BIOMASS); //## attention pour la respi de maintenance !!!
-            respirable_bunch_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::RESPIRABLE_BIOMASS);
-            bunch_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::FEMELLE_BIOMASS);
-            male_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_BIOMASS);
-            inflo_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::DEMAND);
-            bunch_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::BUNCH_DEMAND);
-            male_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_DEMAND);
-            peduncule_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::PEDUNCLE_DEMAND);
+                trunk_height += phytomer->internode_model()->get <double>(t, Internode::LENGTH);
+                trunk_biomass += phytomer->internode_model()->get <double>(t, Internode::BIOMASS);
+                internode_demand +=  phytomer->internode_model()->get <double>(t, Internode::DEMAND);
 
-            //            }
+                inflo_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::BIOMASS); //## attention pour la respi de maintenance !!!
+                respirable_bunch_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::RESPIRABLE_BIOMASS);
+                bunch_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::FEMELLE_BIOMASS);
+                male_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_BIOMASS);
+                inflo_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::DEMAND);
+                bunch_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::BUNCH_DEMAND);
+                male_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_DEMAND);
+                peduncule_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::PEDUNCLE_DEMAND);
+
+            }
+
             double reserve_biomass = reserve->get <double>(t-1, Reserve::RESERVE);
             biomass = leaf_structural_biomass + leaf_non_structural_biomass +  bunch_biomass + trunk_biomass + reserve_biomass + male_biomass;
 
@@ -492,12 +494,12 @@ public:
         //        if (AF_FRUITS >= 1) {
         offre_fruits = min( ( (AF_FRUITS * bunch_demand) * offre_nette / demand_growth_corrected ), bunch_demand );
 
-//        if(bunch_demand==0) {
-//            fr_reste = offre_nette / sum_organs_demand;
-//            fr_fruits = 1;
-//        } else {
+        //        if(bunch_demand==0) {
+        //            fr_reste = offre_nette / sum_organs_demand;
+        //            fr_fruits = 1;
+        //        } else {
 
-//        }
+        //        }
 
         if (bunch_demand==0) {
             fr_fruits = 1;

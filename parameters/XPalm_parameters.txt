@@ -1,15 +1,15 @@
-PRODUCTION_SPEED_INITIAL = 0.0141 ### 0.0063 ## MINIMAL_PRODUCTION_SPEED - adulte  - (DD-1)
-PRODUCTION_SPEED_ADULT = 0.0063 # (DD-1)
+PRODUCTION_SPEED_INITIAL = 0.0141 ### 0.0063 ## MINIMAL_PRODUCTION_SPEED - adulte  - (rank.DD-1)
+PRODUCTION_SPEED_ADULT = 0.0063 # (rank.DD-1)
 #####  AGE PARAMS #########
 AGE = 8   ### 8 - adulte | 3 - normal
 AGE_ADULT = 8
 AGE_PLANTING = 3
 AGE_START_PROD = 2
-TT_FLOWERING_ADULT = 2640
-TT_FLOWERING_INITIAL = 1500
-TT_HARVEST_ADULT = 4095
-TT_HARVEST_INITIAL = 3000
-TT_SENESCENCE = 1520
+TT_FLOWERING_ADULT = 9430 ### depuis rank 1: 2640   
+TT_FLOWERING_INITIAL = 6300 ### depuis rank 1: 1500
+TT_HARVEST_ADULT = 12150 ### depuis rank 1: 4095
+TT_HARVEST_INITIAL = 8100 ### depuis rank 1:3000
+TT_SENESCENCE = 6350 ### depuis rank 1:1520
 AF_FRUITS = 1.5 # coefficient d affinite pour les fruits
 LOCAL_LIGHT_INTERCEPTION = 0  ## 1 pour mettre le mode actif
 a_loi_beta_interception = 1.4   ### plus a est petit plus le haut intercepte beaucoup
@@ -25,8 +25,8 @@ RANG_DEBUT_SENS_PN_LONG_TERMES = -3
 RANG_FIN_SENS_PN_LONG_TERMES = 3
 
 # ablation_feuille
-DEBUT_DEFOLIATON = 2500
-FIN_DEFOLIATON =   3500 
+DEBUT_DEFOLIATON = 2500 ### depuis rank 1:
+FIN_DEFOLIATON =   3500 ### depuis rank 1:
 RANG_DEFOLIATON = 15
 POURC_DEFOLIATON = 0  # en unite de 0,0.1,0.2,0.3 1
 
@@ -66,7 +66,7 @@ T_BASE = 15
 T_OPT1 = 25
 T_OPT2 = 30
 T_LIM = 40
-T_EFF_INI = 1.875
+T_EFF_INI = 6.875
 
 MASSE_MEAN_PEDUNCULE_ADULTE = 2.1 
 MEAN_FRUIT_NUMBER_ADULTE = 1600

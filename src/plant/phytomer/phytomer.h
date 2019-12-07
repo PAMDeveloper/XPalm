@@ -22,7 +22,7 @@ public:
                      RANK,
                      NUMBER,
                      AGE,
-                     TT_SINCE_RANK1,
+                     TT_SINCE_APPEARENCE,
                      PRODUCTION_SPEED,
                      TT_INI_FLOWERING
                    };
@@ -45,7 +45,7 @@ private:
     double rank;
     double number;
     double age;
-    double TT_since_rank1;
+    double TT_since_appearence;
 
     //predim
     double production_speed;
@@ -75,7 +75,7 @@ public:
         Internal(RANK, &Phytomer::rank);
         Internal(NUMBER, &Phytomer::number);
         Internal(AGE, &Phytomer::age);
-        Internal(TT_SINCE_RANK1, &Phytomer::TT_since_rank1);
+        Internal(TT_SINCE_APPEARENCE, &Phytomer::TT_since_appearence);
         //predim
         Internal(PRODUCTION_SPEED, &Phytomer::production_speed);
         Internal(TT_INI_FLOWERING, &Phytomer::TT_ini_flowering);
@@ -118,13 +118,8 @@ public:
         rank = rk;
         state = st ? phytomer::INACTIVE : phytomer::ACTIVE;
         age = tree_age - tree_age_at_creation;
+        TT_since_appearence = parameters.get("T_EFF_INI")*age;
 
-        if(rank > 0){
-            TT_since_rank1 = parameters.get("T_EFF_INI") * age - (INACTIVE_PHYTOMER_NUMBER)/production_speed;
-        }
-        else{
-            TT_since_rank1=0;
-        }
         //submodels
         leaf->init(t, parameters, age);
         internode->init(t, parameters, age, tree_age_at_creation, production_speed);
@@ -136,18 +131,15 @@ public:
     void compute(double t, bool /* update */)
     {
         if(state == phytomer::DEAD) //TODO remove to include leaf/internode in demand when inactive
+
             return;
 
         age++;
 
 
         rank = youngest_phytomer_number - number - INACTIVE_PHYTOMER_NUMBER + 1;
-        if (rank>0){
-         TT_since_rank1 += TEff;
-        }
-        else{
-            TT_since_rank1=0;
-        }
+
+         TT_since_appearence += TEff;
 
         if(rank == 1 && state == phytomer::INACTIVE)
             state = phytomer::ACTIVE;
@@ -174,7 +166,7 @@ public:
 
         inflo->put<double>(t, Inflo::TEFF, TEff);
         inflo->put<double>(t, Inflo::RANK, rank);
-        inflo->put<double>(t, Inflo::TT_SINCE_RANK1, TT_since_rank1);
+        inflo->put<double>(t, Inflo::TT_SINCE_APPEARENCE, TT_since_appearence);
         inflo->put<double>(t, Inflo::TREE_IC, tree_IC);
 
         //set by tree

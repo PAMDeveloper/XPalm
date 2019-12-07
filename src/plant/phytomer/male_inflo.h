@@ -76,14 +76,14 @@ public:
         double RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
         TT_flowering_duration = RANG_DEBUT_CROISSANCE_PEDUNCULE / production_speed;
         double TEff_ini = parameters.get("T_EFF_INI");
-        double TT_since_rank1 = TEff_ini * phytomer_age;
+        double TT_since_appearence = TEff_ini * phytomer_age;
 
         //init structure
-        if (TT_since_rank1 <= TT_ini_flowering) { // !inflo_status.is(inflo::FLOWERING)
+        if (TT_since_appearence <= TT_ini_flowering) { // !inflo_status.is(inflo::FLOWERING)
             biomass = 0;
             demand = 0;
         } else {
-            double fr_growth = min(1.0, (TT_ini_flowering - TT_since_rank1) / TT_flowering_duration );
+            double fr_growth = min(1.0, (TT_ini_flowering - TT_since_appearence) / TT_flowering_duration );
             biomass = MASSE_INFLO_MALE_ADULTE * inflo_dev_factor * fr_growth / COUT_STRUCTURE_REGIME;
             demand = MASSE_INFLO_MALE_ADULTE * inflo_dev_factor * ( TEff_ini / TT_flowering_duration );
         }
