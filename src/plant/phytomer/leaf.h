@@ -11,6 +11,8 @@ public:
                      SFMAX,
                      STRUCTURAL_BIOMASS,
                      NON_STRUCTURAL_BIOMASS,
+                     STRUCTURAL_BIOMASS_HARVESTED,
+                     NON_STRUCTURAL_BIOMASS_HARVESTED,
                      TOTAL_BIOMASS,
                      SLW,
                      GAIN_TEFF_JOUR,
@@ -54,6 +56,8 @@ private:
     double SFMax;
     double structural_biomass;
     double non_structural_biomass;
+    double structural_biomass_harvested;
+    double non_structural_biomass_harvested;
     double slw;
     double gain_TEff_jour;
     double TT_since_rank1;
@@ -86,6 +90,8 @@ public:
         Internal(SFMAX, &Leaf::SFMax);
         Internal(STRUCTURAL_BIOMASS, &Leaf::structural_biomass);
         Internal(NON_STRUCTURAL_BIOMASS, &Leaf::non_structural_biomass);
+        Internal(STRUCTURAL_BIOMASS_HARVESTED, &Leaf::structural_biomass_harvested);
+        Internal(NON_STRUCTURAL_BIOMASS_HARVESTED, &Leaf::non_structural_biomass_harvested);
         Internal(TOTAL_BIOMASS, &Leaf::total_biomass);
         Internal(SLW, &Leaf::slw);
         Internal(GAIN_TEFF_JOUR, &Leaf::gain_TEff_jour);
@@ -116,7 +122,7 @@ public:
     void init(double t, const xpalm::ModelParameters& parameters) {}
     void init(double t, const xpalm::ModelParameters& parameters, double phytomer_age)
     {
-//        AtomicModel<Leaf>::init(t, parameters);
+        //        AtomicModel<Leaf>::init(t, parameters);
 
         last_time = t-1;
 
@@ -148,6 +154,8 @@ public:
         potLeafArea = 0;
         increase_potleafArea = 0;
         fraction_non_str_biomasse_allouee = 1;
+        structural_biomass_harvested = 0;
+        non_structural_biomass_harvested =0;
 
         // init structure
         double TTfeuille = phytomer_age * parameters.get("T_EFF_INI");
@@ -156,16 +164,20 @@ public:
         structural_biomass = leafArea * SLW_min * 10 / POURC_FOLIOLE;
         non_structural_biomass = leafArea * (SLW_ini - SLW_min) * 10 / POURC_FOLIOLE;
 
-
+        structural_biomass_harvested=0;
+        non_structural_biomass_harvested=0;
 
         if (inflo_status.is(inflo::FEMALE)
                 && !inflo_status.is(inflo::ABORTED)
                 && inflo_status.is(inflo::HARVEST)){
-            structural_biomass = 0;
-            non_structural_biomass = 0;
+            structural_biomass_harvested=structural_biomass;
+            non_structural_biomass_harvested=non_structural_biomass;
             demand = 0;
             leafArea = 0;
         }
+
+        structural_biomass=structural_biomass-structural_biomass_harvested;
+        non_structural_biomass=non_structural_biomass-non_structural_biomass_harvested;
 
         if (leafArea > 0)
             slw = (structural_biomass + non_structural_biomass) * (POURC_FOLIOLE / leafArea) / 10;
@@ -193,7 +205,7 @@ public:
         increase_potleafArea = correctedTEff * vitesse_exp * ( ftsw >  SEUIL_EXPAN ? 1 : ftsw / SEUIL_EXPAN);
 
         demand = (leafArea == 0 && phytomer_rank != 1) ? 0 : increase_potleafArea*(SLW_min * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE; //TODO check condition sur rang 1
-//          demand = (leafArea == 0) ? 0 : increase_potleafArea*(SLW_min * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE;
+        //          demand = (leafArea == 0) ? 0 : increase_potleafArea*(SLW_min * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE;
 
     }
 
@@ -234,16 +246,22 @@ public:
 
     void compute(double t, bool /* update */)
     {
-        if (inflo_status.is(inflo::FEMALE)
-                && !inflo_status.is(inflo::ABORTED)
-                && inflo_status.is(inflo::HARVEST)){
-            structural_biomass = 0;
-            non_structural_biomass = 0;
-            demand = 0;
-        }
+        structural_biomass_harvested = 0;
+        non_structural_biomass_harvested =0;
 
         growth();
         growth_demand(t);
+
+        if (inflo_status.is(inflo::FEMALE)
+                && !inflo_status.is(inflo::ABORTED)
+                && inflo_status.is(inflo::HARVEST)){
+            structural_biomass_harvested = structural_biomass;
+            non_structural_biomass_harvested = non_structural_biomass;
+            demand = 0;
+        }
+
+        structural_biomass = structural_biomass-structural_biomass_harvested;
+        non_structural_biomass = non_structural_biomass-non_structural_biomass_harvested;
 
     }
 

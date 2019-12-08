@@ -130,9 +130,16 @@ public:
 
     void compute(double t, bool /* update */)
     {
-        if(state == phytomer::DEAD) //TODO remove to include leaf/internode in demand when inactive
 
-            return;
+        if(rank == 1 && state == phytomer::INACTIVE)
+            state = phytomer::ACTIVE;
+
+        if(rank == 60 && state == phytomer::ACTIVE)
+            state = phytomer::DEAD;
+
+//        if(state == phytomer::DEAD) //TODO remove to include leaf/internode in demand when inactive
+
+//            return;
 
         age++;
 
@@ -141,8 +148,6 @@ public:
 
          TT_since_appearence += TEff;
 
-        if(rank == 1 && state == phytomer::INACTIVE)
-            state = phytomer::ACTIVE;
 
 
 //        if(state != phytomer::ACTIVE) //TODO remove to include leaf/internode in demand when inactive
@@ -152,11 +157,6 @@ public:
         leaf->put<phytomer::phytomer_state>(t, Leaf::PHYTOMER_STATE, state);
         leaf->put<inflo::inflo_states>(t, Leaf::INFLO_STATUT, inflo_status);
         leaf->put<double>(t, Leaf::TEFF, TEff);
-        //set by tree
-//        leaf->put<double>(t, Leaf::FTSW, ftsw);
-//        leaf->put<double>(t, Leaf::FR_RESTE, fr_reste);
-//        leaf->put<double>(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, fraction_non_str_biomasse_allouee);
-//        leaf->put<double>(t, Leaf::DELTA_BIOMASSE_RESERVE_LEAF, delta_biomasse_reserve_leaf);
         (*leaf)(t);
 
         internode->put<double>(t, Internode::TEFF, TEff); //TODO passer dans tree

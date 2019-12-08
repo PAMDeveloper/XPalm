@@ -35,6 +35,11 @@ public:
                      BUNCH_OIL_BIOMASS,
                      BUNCH_NONOIL_BIOMASS,
                      MALE_BIOMASS,
+                     PEDUNCLE_BIOMASS_HARVESTED,
+                     FEMELLE_BIOMASS_HARVESTED,
+                     BUNCH_OIL_BIOMASS_HARVESTED,
+                     BUNCH_NONOIL_BIOMASS_HARVESTED,
+                     MALE_BIOMASS_HARVESTED,
                      RED_VITESSE_FTSW,
                      RESPIRABLE_BIOMASS,
                      GAIN_TEFF_JOUR,
@@ -101,6 +106,13 @@ private:
     double bunch_oil_biomass;
     double bunch_nonoil_biomass;
     double male_biomass;
+
+    double peduncle_biomass_harvested;
+    double femelle_biomass_harvested;
+    double bunch_oil_biomass_harvested;
+    double bunch_nonoil_biomass_harvested;
+    double male_biomass_harvested;
+
     double red_vitesse_FTSW;
     double respirable_biomass;
     double gain_TEff_jour;
@@ -160,6 +172,11 @@ public:
         Internal(BUNCH_OIL_BIOMASS, &Inflo::bunch_oil_biomass);
         Internal(BUNCH_NONOIL_BIOMASS, &Inflo::bunch_nonoil_biomass);
         Internal(MALE_BIOMASS, &Inflo::male_biomass);
+        Internal(PEDUNCLE_BIOMASS_HARVESTED, &Inflo::peduncle_biomass_harvested);
+        Internal(FEMELLE_BIOMASS_HARVESTED, &Inflo::femelle_biomass_harvested);
+        Internal(BUNCH_OIL_BIOMASS_HARVESTED, &Inflo::bunch_oil_biomass_harvested);
+        Internal(BUNCH_NONOIL_BIOMASS_HARVESTED, &Inflo::bunch_nonoil_biomass_harvested);
+        Internal(MALE_BIOMASS_HARVESTED, &Inflo::male_biomass_harvested);
         Internal(RED_VITESSE_FTSW, &Inflo::red_vitesse_FTSW);
         Internal(RESPIRABLE_BIOMASS, &Inflo::respirable_biomass);
         Internal(GAIN_TEFF_JOUR, &Inflo::gain_TEff_jour);
@@ -277,6 +294,13 @@ public:
         bunch_oil_biomass=0;
         bunch_nonoil_biomass=0;
         male_biomass= 0;
+
+        peduncle_biomass_harvested=0;
+        femelle_biomass_harvested= 0;
+        bunch_oil_biomass_harvested=0;
+        bunch_nonoil_biomass_harvested=0;
+        male_biomass_harvested= 0;
+
         red_vitesse_FTSW= 0;
         respirable_biomass= 0;
         gain_TEff_jour= 0;
@@ -316,7 +340,7 @@ public:
 
     void step_state() {
         if( TT_corrige > TT_ini_harvest) {
-            if(!status.is(inflo::HARVEST)){
+            if(!status.is(inflo::HARVEST) && status.is(inflo::FEMALE)){
                 status.replace(inflo::FLOWERING, inflo::HARVEST);
                 status.del(inflo::INITIATED);
             }
@@ -328,13 +352,13 @@ public:
                 status.add(inflo::INITIATED);
         }
 
-        if(TT_corrige > TT_ini_harvest - TT_oleo_duration && TT_corrige < TT_ini_harvest)
+        if(TT_corrige > TT_ini_harvest - TT_oleo_duration && TT_corrige < TT_ini_harvest && status.is(inflo::FEMALE))
             status.add(inflo::OLEOSYNTHESIS);
         else
             status.del(inflo::OLEOSYNTHESIS);
 
         if(TT_corrige > TT_ini_senescence && status.is(inflo::MALE))
-            status.add(inflo::SENESCENCE);
+            status.replace(inflo::INITIATED, inflo::SENESCENCE);
         else
             status.del(inflo::SENESCENCE);
     }
@@ -342,7 +366,9 @@ public:
 
     void compute(double t, bool /* update */)
     {
-        if(status.is(inflo::ABORTED) || status.is(inflo::DEAD) || status.is(inflo::HARVEST))
+//        if(status.is(inflo::ABORTED) || status.is(inflo::DEAD) || status.is(inflo::HARVEST))
+//            return;
+        if(status.is(inflo::ABORTED))
             return;
 
         if (rank == ICabort_RANG_FIN) {
@@ -391,23 +417,57 @@ public:
                 bunch_nonoil_biomass =  bunch->get< double >(t, Bunch::NONOIL_BIOMASS);
 
             }
+        }
 
-            if (status.is(inflo::MALE) && status.is(inflo::INITIATED) && !status.is(inflo::SENESCENCE)) {
-                male->put<double>(t, MaleInflo::TEFF, TEff);
-                male->put<double>(t, MaleInflo::FR_RESTE, fr_reste);
-                (*male)(t);
+        if(status.is(inflo::HARVEST)) { // TODO check for carbon balance --> potential error from aborted satus
+            peduncle->put<double>(t, Peduncle::IC_SPIKELET, IC_spikelet);
+            peduncle->put<double>(t, Peduncle::TEFF, TEff);
+            peduncle->put<double>(t, Peduncle::TT_CORRIGE, TT_corrige);
+            peduncle->put<double>(t, Peduncle::TT_SINCE_APPEARENCE, TT_since_appearence);
+            peduncle->put<double>(t, Peduncle::FR_RESTE, fr_reste);
+            (*peduncle)(t);
 
-                male_biomass = male->get< double >(t, MaleInflo::BIOMASS);
-            }
+            bunch->put<double>(t, Bunch::TEFF, TEff);
+            bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS_POT, status);
+            bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS, status_pot);
+            bunch->put<double>(t, Bunch::TT_SINCE_APPEARENCE, TT_since_appearence);
+            bunch->put<double>(t, Bunch::FR_FRUITS, fr_fruits);
+            bunch->put<double>(t, Bunch::IC_SPIKELET, IC_spikelet);
+            bunch->put<double>(t, Bunch::IC_SETTING, IC_setting);
+            bunch->put<double>(t, Bunch::RANK, rank);
+            (*bunch)(t);
 
-
-
-            //        compute_growth(t);
-            femelle_biomass = bunch_oil_biomass  + bunch_nonoil_biomass + peduncle_biomass;
-            biomass = femelle_biomass + male_biomass;
-            respirable_biomass = bunch_nonoil_biomass + peduncle_biomass + male_biomass;
+            bunch_oil_biomass_harvested = bunch->get< double >(t, Bunch::OIL_BIOMASS);
+            bunch_nonoil_biomass_harvested =  bunch->get< double >(t, Bunch::NONOIL_BIOMASS);
+            peduncle_biomass_harvested =  peduncle->get< double >(t, Peduncle::BIOMASS);
 
         }
+
+        if (status.is(inflo::MALE) && status.is(inflo::INITIATED)) {
+            male->put<double>(t, MaleInflo::TEFF, TEff);
+            male->put<double>(t, MaleInflo::FR_RESTE, fr_reste);
+            (*male)(t);
+
+            male_biomass = male->get< double >(t, MaleInflo::BIOMASS);
+        }
+
+        if (status.is(inflo::MALE) && status.is(inflo::SENESCENCE)) {
+            male->put<double>(t, MaleInflo::TEFF, TEff);
+            male->put<double>(t, MaleInflo::FR_RESTE, fr_reste);
+            (*male)(t);
+
+            male_biomass_harvested = male->get< double >(t, MaleInflo::BIOMASS);
+        }
+
+
+
+        //        compute_growth(t);
+        femelle_biomass = bunch_oil_biomass  + bunch_nonoil_biomass + peduncle_biomass;
+        biomass = femelle_biomass + male_biomass;
+        respirable_biomass = bunch_nonoil_biomass + peduncle_biomass + male_biomass;
+
+        femelle_biomass_harvested = bunch_oil_biomass_harvested  + bunch_nonoil_biomass_harvested + peduncle_biomass_harvested;
+
 
         //        compute_demand(t);
 

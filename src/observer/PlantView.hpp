@@ -46,13 +46,13 @@ public:
 
          selector("ASSIM", artis::kernel::DOUBLE,{Tree::ASSIM});
          selector("BIOMASS", artis::kernel::DOUBLE,{Tree::BIOMASS});
-         selector("BUNCH_DEMAND", artis::kernel::DOUBLE,{Tree::BUNCH_DEMAND});
          selector("BUNCH_BIOMASS", artis::kernel::DOUBLE,{Tree::BUNCH_BIOMASS});
          selector("LEAF_NON_STRUCTURAL_BIOMASS", artis::kernel::DOUBLE,{Tree::LEAF_NON_STRUCTURAL_BIOMASS});
          selector("EI", artis::kernel::DOUBLE,{Tree::EI});
          selector("IC", artis::kernel::DOUBLE,{Tree::IC});
          selector("LEAF_STRUCTURAL_BIOMASS", artis::kernel::DOUBLE,{Tree::LEAF_STRUCTURAL_BIOMASS});
          selector("MALE_BIOMASS", artis::kernel::DOUBLE,{Tree::MALE_BIOMASS});
+         selector("BUNCH_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::BUNCH_BIOMASS_HARVESTED});
          selector("RESPIRABLE_BUNCH_BIOMASS", artis::kernel::DOUBLE,{Tree::RESPIRABLE_BUNCH_BIOMASS});
          selector("TOTALLEAFAREA", artis::kernel::DOUBLE,{Tree::TOTALLEAFAREA});
          selector("TRUNK_BIOMASS", artis::kernel::DOUBLE,{Tree::TRUNK_BIOMASS});
@@ -64,10 +64,11 @@ public:
         selector("INTERNODE_DEMAND", artis::kernel::DOUBLE,{Tree::INTERNODE_DEMAND});
         selector("LEAF_DEMAND", artis::kernel::DOUBLE,{Tree::LEAF_DEMAND});
         selector("MALE_DEMAND", artis::kernel::DOUBLE,{Tree::MALE_DEMAND});
+        selector("BUNCH_DEMAND", artis::kernel::DOUBLE,{Tree::BUNCH_DEMAND});
 //        selector("NEWPHYTOMEREMERGENCE", artis::kernel::DOUBLE,{Tree::NEWPHYTOMEREMERGENCE});
 //        selector("OFFRE_FRUITS", artis::kernel::DOUBLE,{Tree::OFFRE_FRUITS});
 //        selector("OFFRE_NETTE", artis::kernel::DOUBLE,{Tree::OFFRE_NETTE});
-//        selector("PEDUNCULE_DEMAND", artis::kernel::DOUBLE,{Tree::PEDUNCULE_DEMAND});
+        selector("PEDUNCULE_DEMAND", artis::kernel::DOUBLE,{Tree::PEDUNCULE_DEMAND});
         selector("PHYTOMERNUMBER", artis::kernel::DOUBLE,{Tree::PHYTOMERNUMBER});
         selector("SLW", artis::kernel::DOUBLE,{Tree::SLW});
         selector("TOTAL_LEAF_BIOMASS", artis::kernel::DOUBLE,{Tree::TOTAL_LEAF_BIOMASS});
