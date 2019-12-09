@@ -155,9 +155,9 @@ public:
         male(new MaleInflo())
     {
         //         submodels
-        setsubmodel(PEDUNCLE, peduncle.get());
-        setsubmodel(FRUIT, bunch.get());
-        setsubmodel(MALEINFLO, male.get());
+        submodel(PEDUNCLE, peduncle.get());
+        submodel(FRUIT, bunch.get());
+        submodel(MALEINFLO, male.get());
 
         //         internals
         Internal(STATUS, &Inflo::status);

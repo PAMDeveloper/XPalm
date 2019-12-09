@@ -75,6 +75,20 @@ public:
         selector("TRUNK_HEIGHT", artis::kernel::DOUBLE,{Tree::TRUNK_HEIGHT});
         selector("LAI", artis::kernel::DOUBLE,{Tree::LAI});
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         //PlantModel
 //        selector("BIOMLEAF", artis::kernel::DOUBLE, {
 //                     PlantModel::LEAF_BIOM_STRUCT });

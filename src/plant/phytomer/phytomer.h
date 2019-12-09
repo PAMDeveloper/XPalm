@@ -66,9 +66,9 @@ public:
         inflo(new Inflo())
     {
         //         submodels
-        setsubmodel(LEAF, leaf.get());
-        setsubmodel(INTERNODE, internode.get());
-        setsubmodel(INFLO, inflo.get());
+        submodel(LEAF, leaf.get());
+        submodel(INTERNODE, internode.get());
+        submodel(INFLO, inflo.get());
 
         //         internals
         Internal(STATE, &Phytomer::state);

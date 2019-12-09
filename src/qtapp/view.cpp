@@ -135,7 +135,6 @@ void ChartView::saveChart() {
 }
 void ChartView::ShowContextMenu(const QPoint &pos)
 {
-    qDebug() << "test";
    QMenu contextMenu(tr("Context menu"), this);
 
    QAction action1("Save chart", this);

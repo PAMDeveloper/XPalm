@@ -42,7 +42,7 @@ using namespace model;
 class Tree : public CoupledModel < Tree >
 {
 public:
-    enum submodels {  PHYTOMERS, RACINES, RESERVE, BH, METEO };
+    enum submodels { RACINES, RESERVE, BH, METEO, PHYTOMERS };
 
     enum internals { AGE,
                      LAI,
@@ -165,10 +165,10 @@ public:
         bh(new WaterBalance())
     {
         //         submodels
-        setsubmodel(RESERVE, reserve.get());
-        setsubmodel(RACINES, racines.get());
-        setsubmodel(BH, bh.get());
-        setsubmodel(METEO, meteo.get());
+        submodel(RACINES, racines.get());
+        submodel(RESERVE, reserve.get());
+        submodel(BH, bh.get());
+        submodel(METEO, meteo.get());
 
         //         internals
         Internal(AGE, &Tree::age);

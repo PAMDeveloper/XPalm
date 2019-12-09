@@ -319,6 +319,7 @@ void MainWindow::on_actionLaunch_simulation_triggered()
     ::Trace::trace().clear();
     GlobalParameters globalParameters;
     XPalmContext context(parameters.get("BeginDate"), parameters.get("EndDate"));
+//    XPalmContext context(parameters.get("BeginDate"), parameters.get("BeginDate")+4);
     Tree * m = new Tree;
     XPalmSimulator simulator(m, globalParameters);
     observer::PlantView *view = new observer::PlantView();
