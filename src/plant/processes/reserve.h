@@ -137,16 +137,34 @@ public:
         REALL_COST = parameters.get("REALL_COST");
         MOB_RATE_MAX = parameters.get("MOB_RATE_MAX");
 
+        //externals
+        double STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
+        double STEM_RAYON = parameters.get("STEM_RAYON");
+        double INITIAL_HEIGHT = parameters.get("INITIAL_HEIGHT");
+        tree_trunk_biomass=1000  * STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * INITIAL_HEIGHT;
+        assim_avai=0;
+        leaf_res=0;
+        totalLeafArea=0;
+
         //internals
         double POURCENT_NSC_ST_INI = parameters.get("POURCENT_NSC_ST_INI");
+        leaf_non_structural_biomass=0;
+
         reserve = POURCENT_NSC_ST_INI * tree_trunk_biomass + leaf_non_structural_biomass;
         trunk_res = POURCENT_NSC_ST_INI * tree_trunk_biomass;
         leaf_res_max = (SLW_max - SLW_min) * totalLeafArea / POURC_FOLIOLE;
         leaf_res_min = 0;
+        leaf_res_pot = leaf_res_max - leaf_res_min;
+        leaf_res_avai=0;
         trunk_res_min = POURCENT_NSC_ST_MIN * tree_trunk_biomass;
         trunk_res_max = POURCENT_NSC_ST_MAX * tree_trunk_biomass;
+        trunk_res_pot = trunk_res_max - trunk_res_min;
+        trunk_res_avai = trunk_res - trunk_res_min;
         reserve_min = trunk_res_min;
         reserve_max = leaf_res_max + trunk_res_max;
+        reserve_pot = reserve_max - reserve_min;
+        reserve_avai = leaf_res_avai + trunk_res_avai;
+        mob_rate = ( MOB_RATE_MAX / reserve_pot ) * reserve_avai;
     }
 
 

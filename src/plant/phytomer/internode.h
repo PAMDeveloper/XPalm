@@ -83,7 +83,7 @@ public:
 //        AtomicModel<Internode>::init(t, parameters);
 
         //default init
-        last_time = t-1;
+        last_time = t;
         _parameters = parameters;
 
         //        parameters

@@ -59,7 +59,7 @@ public:
                      TEFF,
                      FR_RESTE,
                      FR_FRUITS,
-                     TT_SINCE_APPEARENCE,
+                     TT_SINCE_APPEARANCE,
                      TREE_IC
                    };
 
@@ -144,7 +144,7 @@ private:
     double fr_reste;
     double fr_fruits;
     //    double TT_since_rank1;
-    double TT_since_appearence;
+    double TT_since_appearance;
     double tree_IC;
 
 public:
@@ -196,7 +196,7 @@ public:
         External(TEFF, &Inflo::TEff);
         External(FR_RESTE, &Inflo::fr_reste);
         External(FR_FRUITS, &Inflo::fr_fruits);
-        External(TT_SINCE_APPEARENCE, &Inflo::TT_since_appearence);
+        External(TT_SINCE_APPEARANCE, &Inflo::TT_since_appearance);
         External(TREE_IC, &Inflo::tree_IC);
     }
 
@@ -238,7 +238,7 @@ public:
               double TT_ini_flo, double TT_ini_harv,
               double TT_ini_senec, double inflo_dev_factor)
     {
-        last_time = t-1;
+        last_time = t;
 
         //        parameters
         PLASTICITY_BUNCH_IC_APRES_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_APRES_FLORAISON");
@@ -395,7 +395,7 @@ public:
                 peduncle->put<double>(t, Peduncle::IC_SPIKELET, IC_spikelet);
                 peduncle->put<double>(t, Peduncle::TEFF, TEff);
                 peduncle->put<double>(t, Peduncle::TT_CORRIGE, TT_corrige);
-                peduncle->put<double>(t, Peduncle::TT_SINCE_APPEARENCE, TT_since_appearence);
+                peduncle->put<double>(t, Peduncle::TT_SINCE_APPEARANCE, TT_since_appearance);
                 peduncle->put<double>(t, Peduncle::FR_RESTE, fr_reste);
                 (*peduncle)(t);
 
@@ -406,7 +406,7 @@ public:
                 bunch->put<double>(t, Bunch::TEFF, TEff);
                 bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS_POT, status);
                 bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS, status_pot);
-                bunch->put<double>(t, Bunch::TT_SINCE_APPEARENCE, TT_since_appearence);
+                bunch->put<double>(t, Bunch::TT_SINCE_APPEARANCE, TT_since_appearance);
                 bunch->put<double>(t, Bunch::FR_FRUITS, fr_fruits);
                 bunch->put<double>(t, Bunch::IC_SPIKELET, IC_spikelet);
                 bunch->put<double>(t, Bunch::IC_SETTING, IC_setting);
@@ -423,14 +423,14 @@ public:
             peduncle->put<double>(t, Peduncle::IC_SPIKELET, IC_spikelet);
             peduncle->put<double>(t, Peduncle::TEFF, TEff);
             peduncle->put<double>(t, Peduncle::TT_CORRIGE, TT_corrige);
-            peduncle->put<double>(t, Peduncle::TT_SINCE_APPEARENCE, TT_since_appearence);
+            peduncle->put<double>(t, Peduncle::TT_SINCE_APPEARANCE, TT_since_appearance);
             peduncle->put<double>(t, Peduncle::FR_RESTE, fr_reste);
             (*peduncle)(t);
 
             bunch->put<double>(t, Bunch::TEFF, TEff);
             bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS_POT, status);
             bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS, status_pot);
-            bunch->put<double>(t, Bunch::TT_SINCE_APPEARENCE, TT_since_appearence);
+            bunch->put<double>(t, Bunch::TT_SINCE_APPEARANCE, TT_since_appearance);
             bunch->put<double>(t, Bunch::FR_FRUITS, fr_fruits);
             bunch->put<double>(t, Bunch::IC_SPIKELET, IC_spikelet);
             bunch->put<double>(t, Bunch::IC_SETTING, IC_setting);
@@ -482,7 +482,7 @@ public:
 
         //        Organ.growth_demand(self, correctedTEff);
         //        if(rank > 0)
-        TT_since_appearence += gain_TEff_jour;
+        TT_since_appearance += gain_TEff_jour;
 
 
         bunch_demand = status.is(inflo::FEMALE) && status.is(inflo::FLOWERING) ? bunch->get< double >(t, Bunch::DEMAND) : 0;

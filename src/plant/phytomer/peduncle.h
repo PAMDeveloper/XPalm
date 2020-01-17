@@ -42,7 +42,7 @@ public:
                       IC_SPIKELET,
                       TEFF,
                       TT_CORRIGE,
-                      TT_SINCE_APPEARENCE,
+                      TT_SINCE_APPEARANCE,
                       FR_RESTE
                    };
 
@@ -71,7 +71,7 @@ private:
     double IC_spikelet;
     double Teff;
     double TT_corrige;
-    double TT_since_appearence;
+    double TT_since_appearance;
     double fr_reste;
 
 public:
@@ -89,7 +89,7 @@ public:
         External(IC_SPIKELET, &Peduncle::IC_spikelet);
         External(TEFF, &Peduncle::Teff);
         External(TT_CORRIGE, &Peduncle::TT_corrige);
-        External(TT_SINCE_APPEARENCE, &Peduncle::TT_since_appearence);
+        External(TT_SINCE_APPEARANCE, &Peduncle::TT_since_appearance);
         External(FR_RESTE, &Peduncle::fr_reste);
     }
 
@@ -122,16 +122,16 @@ public:
         demand_pot = 0;
 
         //init structure
-        if (TT_since_appearence < TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE / production_speed) {
+        if (TT_since_appearance < TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE / production_speed) {
             biomass = 0 ;
         } else {
-            if (TT_since_appearence > TT_ini_harvest)
+            if (TT_since_appearance > TT_ini_harvest)
                 biomass = 0;
             else {
                 double coeff = 1;
-                if ( TT_since_appearence <= TT_ini_flowering ) {
+                if ( TT_since_appearance <= TT_ini_flowering ) {
                     double TT_since_growth = RANG_DEBUT_CROISSANCE_PEDUNCULE / prod_speed;
-                    coeff = ( TT_since_appearence - (TT_ini_flowering - TT_since_growth)) / TT_since_growth;
+                    coeff = ( TT_since_appearance - (TT_ini_flowering - TT_since_growth)) / TT_since_growth;
                 }
 
                 biomass = inflo_dev_factor * MASSE_MEAN_PEDUNCULE_ADULTE * coeff;
@@ -159,7 +159,7 @@ public:
             demand = 0;
 
         //compute_pot_demand
-        if (TT_since_appearence > TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
+        if (TT_since_appearance > TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
             demand_pot = inflo_dev_factor * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed) * Teff;
         else
             demand_pot = 0;

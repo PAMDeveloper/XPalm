@@ -8,7 +8,7 @@ class Leaf : public AtomicModel < Leaf >
 {
 public:
     enum internals { LEAFAREA,
-                     SFMAX,
+                     SF_IND,
                      STRUCTURAL_BIOMASS,
                      NON_STRUCTURAL_BIOMASS,
                      STRUCTURAL_BIOMASS_HARVESTED,
@@ -26,6 +26,7 @@ public:
                      INCREASE_POTLEAFAREA };
 
     enum externals { TEFF,
+                     TT_SINCE_APPEARANCE,
                      PHYTOMER_RANK,
                      FTSW,
                      INFLO_STATUT,
@@ -38,8 +39,6 @@ private:
 
     //      parameters
     double SLW_min;
-    double INITIAL_SFIND;
-    double MAXIMAL_SFIND;
     double INFLEXION;
     double COURBURE;
     double POURC_FOLIOLE;
@@ -53,7 +52,7 @@ private:
 
     //     internals
     double leafArea; //m²
-    double SFMax;
+    double SF_ind;
     double structural_biomass;
     double non_structural_biomass;
     double structural_biomass_harvested;
@@ -76,6 +75,7 @@ private:
     phytomer::phytomer_state phytomer_state;
     double TEff;
     double phytomer_rank;
+    double TT_since_appearance;
     double ftsw;
     double fr_reste;
     double delta_biomasse_reserve_leaf;
@@ -87,7 +87,7 @@ public:
     {
         //         internals
         Internal(LEAFAREA, &Leaf::leafArea);
-        Internal(SFMAX, &Leaf::SFMax);
+        Internal(SF_IND, &Leaf::SF_ind);
         Internal(STRUCTURAL_BIOMASS, &Leaf::structural_biomass);
         Internal(NON_STRUCTURAL_BIOMASS, &Leaf::non_structural_biomass);
         Internal(STRUCTURAL_BIOMASS_HARVESTED, &Leaf::structural_biomass_harvested);
@@ -109,6 +109,7 @@ public:
         External(PHYTOMER_STATE, &Leaf::phytomer_state);
         External(TEFF, &Leaf::TEff);
         External(PHYTOMER_RANK, &Leaf::phytomer_rank);
+        External(TT_SINCE_APPEARANCE, &Leaf::TT_since_appearance);
         External(FTSW, &Leaf::ftsw);
         External(FR_RESTE, &Leaf::fr_reste);
         External(LEAF_RES_AVAI, &Leaf::delta_biomasse_reserve_leaf);
@@ -120,18 +121,16 @@ public:
     {
     }
     void init(double t, const xpalm::ModelParameters& parameters) {}
-    void init(double t, const xpalm::ModelParameters& parameters, double phytomer_age)
+    void init(double t, const xpalm::ModelParameters& parameters, int rank, double TT_since_appearance, double SF_ind_leaf)
     {
         //        AtomicModel<Leaf>::init(t, parameters);
 
-        last_time = t-1;
+        last_time = t;
 
         //        parameters
         SLW_min = parameters.get("SLW_min") * 10; //kg.m-2
         SLW_max = parameters.get("SLW_max") * 10; //kg.m-2
         SLW_ini = parameters.get("SLW_ini") * 10; //kg.m-2
-        INITIAL_SFIND = parameters.get("INITIAL_SFIND");
-        MAXIMAL_SFIND = parameters.get("MAXIMAL_SFIND");
         COUT_RESPI_FEUILLE = parameters.get("COUT_RESPI_FEUILLE");
         POURC_FOLIOLE = parameters.get("POURC_FOLIOLE");
         INCREASE_OF_LEAF_AREA = parameters.get("INCREASE_OF_LEAF_AREA");
@@ -158,53 +157,64 @@ public:
         non_structural_biomass_harvested =0;
 
         // init structure
-        double TTfeuille = phytomer_age * parameters.get("T_EFF_INI");
-        SFMax = min(INCREASE_OF_LEAF_AREA * phytomer_age + INITIAL_SFIND, MAXIMAL_SFIND);
-        leafArea = (SFMax / (1 + exp(-(TTfeuille - INFLEXION) / COURBURE)));
-        structural_biomass = leafArea * SLW_min * 10 / POURC_FOLIOLE;
-        non_structural_biomass = leafArea * (SLW_ini - SLW_min) * 10 / POURC_FOLIOLE;
+//        double TTfeuille = phytomer_age * parameters.get("T_EFF_INI");
+//        SFMax = min(INCREASE_OF_LEAF_AREA * phytomer_age + INITIAL_SFIND, MAXIMAL_SFIND);
+//        SFMax = min(INCREASE_OF_LEAF_AREA * TT_since_appearance + INITIAL_SFIND, MAXIMAL_SFIND);
+        SF_ind=SF_ind_leaf;
 
-        structural_biomass_harvested=0;
-        non_structural_biomass_harvested=0;
+        double structural_leafArea = (SF_ind / (1 + exp(-(TT_since_appearance - INFLEXION) / COURBURE)));
+        structural_biomass = structural_leafArea * SLW_min * 10 / POURC_FOLIOLE;
+        non_structural_biomass = structural_leafArea * (SLW_ini - SLW_min) * 10 / POURC_FOLIOLE;
 
-        if (inflo_status.is(inflo::FEMALE)
-                && !inflo_status.is(inflo::ABORTED)
-                && inflo_status.is(inflo::HARVEST)){
-            structural_biomass_harvested=structural_biomass;
-            non_structural_biomass_harvested=non_structural_biomass;
-            demand = 0;
-            leafArea = 0;
-        }
+        //        structural_biomass_harvested=0;
+        //        non_structural_biomass_harvested=0;
 
-        structural_biomass=structural_biomass-structural_biomass_harvested;
-        non_structural_biomass=non_structural_biomass-non_structural_biomass_harvested;
+        //        if (inflo_status.is(inflo::FEMALE)
+        //                && !inflo_status.is(inflo::ABORTED)
+        //                && inflo_status.is(inflo::HARVEST)){
+        //            structural_biomass_harvested=structural_biomass;
+        //            non_structural_biomass_harvested=non_structural_biomass;
+        //            demand = 0;
+        //            leafArea = 0;
+        //        }
 
-        if (leafArea > 0)
-            slw = (structural_biomass + non_structural_biomass) * (POURC_FOLIOLE / leafArea) / 10;
+        //        structural_biomass=structural_biomass-structural_biomass_harvested;
+        //        non_structural_biomass=non_structural_biomass-non_structural_biomass_harvested;
+
+        if (structural_leafArea > 0)
+            slw = (structural_biomass + non_structural_biomass) * (POURC_FOLIOLE / structural_leafArea) / 10;
+
+        leafArea= (rank > 0)? structural_leafArea: 0;
     }
 
     void growth_demand(double /*t*/) {
         //        compute_coupe_feuille_recolte
         double correctedTEff = TEff * (ftsw > SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
-        gain_TEff_jour = TEff * ( ftsw >  SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
+
+        gain_TEff_jour = correctedTEff;
 
         //       Organ.growth_demand(self, correctedTEff) //TODO faire le get dans l'organe après execution
-        if (phytomer_rank > 0)
-            TT_since_rank1 += TEff;
+//        double rank_start_leafarea_growth=-10;
+//        if (phytomer_rank > rank_start_leafarea_growth)
+//            TT_since_rank1 += TEff;
 
         //       compute_pot_inc_LeafArea(correctedTEff)
-        SFMax = min(MAXIMAL_SFIND, INCREASE_OF_LEAF_AREA * TT_since_rank1 + INITIAL_SFIND);
+//        SFMax = min(MAXIMAL_SFIND, INCREASE_OF_LEAF_AREA * TT_since_rank1 + INITIAL_SFIND);
+//        SFMax = min(INCREASE_OF_LEAF_AREA * age + INITIAL_SFIND, MAXIMAL_SFIND);
 
         //           computevitesse_exp(TT_corrige);
-        vitesse_exp = -SFMax *
-                (-exp(-(TT_corrige-INFLEXION)/COURBURE)/COURBURE)
-                / pow( (1+exp(-(TT_corrige-INFLEXION)/COURBURE)),2);
+//        vitesse_exp = -SFMax *
+//                (-exp(-(TT_corrige-INFLEXION)/COURBURE)/COURBURE)
+//                / pow( (1+exp(-(TT_corrige-INFLEXION)/COURBURE)),2);
 
         //           computevitesse_exp(TT_since_rank1);
-        vitesse_exp = -SFMax * (-exp(-(TT_since_rank1-INFLEXION)/COURBURE)/COURBURE)/pow( (1+exp(-(TT_since_rank1-INFLEXION)/COURBURE)),2);
+
+        vitesse_exp = -SF_ind * (-exp(-(TT_since_appearance-INFLEXION)/COURBURE)/COURBURE)/pow( (1+exp(-(TT_since_appearance-INFLEXION)/COURBURE)),2);
         increase_potleafArea = correctedTEff * vitesse_exp * ( ftsw >  SEUIL_EXPAN ? 1 : ftsw / SEUIL_EXPAN);
 
-        demand = (leafArea == 0 && phytomer_rank != 1) ? 0 : increase_potleafArea*(SLW_min * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE; //TODO check condition sur rang 1
+        demand =  increase_potleafArea*(SLW_min * COUT_RESPI_FEUILLE );
+
+//        demand = (leafArea == 0 && phytomer_rank != 1) ? 0 : increase_potleafArea*(SLW_min * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE; //TODO check condition sur rang 1
         //          demand = (leafArea == 0) ? 0 : increase_potleafArea*(SLW_min * COUT_RESPI_FEUILLE ) / POURC_FOLIOLE;
 
     }
@@ -246,22 +256,21 @@ public:
 
     void compute(double t, bool /* update */)
     {
-        structural_biomass_harvested = 0;
-        non_structural_biomass_harvested =0;
-
         growth();
         growth_demand(t);
 
-        if (inflo_status.is(inflo::FEMALE)
-                && !inflo_status.is(inflo::ABORTED)
-                && inflo_status.is(inflo::HARVEST)){
-            structural_biomass_harvested = structural_biomass;
-            non_structural_biomass_harvested = non_structural_biomass;
-            demand = 0;
-        }
+        //        if (inflo_status.is(inflo::FEMALE)
+        //                && !inflo_status.is(inflo::ABORTED)
+        //                && inflo_status.is(inflo::HARVEST)){
+        //            structural_biomass_harvested += structural_biomass;
+        //            non_structural_biomass_harvested += non_structural_biomass;
+        //            demand = 0;
+        //            structural_biomass=0;
+        //            non_structural_biomass=0;
+        //        }
 
-        structural_biomass = structural_biomass-structural_biomass_harvested;
-        non_structural_biomass = non_structural_biomass-non_structural_biomass_harvested;
+        //        structural_biomass = structural_biomass-structural_biomass_harvested;
+        //        non_structural_biomass = non_structural_biomass-non_structural_biomass_harvested;
 
     }
 

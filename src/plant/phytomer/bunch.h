@@ -28,7 +28,7 @@ public:
     enum externals { TEFF,
                      INFLO_STATUS_POT,
                      INFLO_STATUS,
-                     TT_SINCE_APPEARENCE,
+                     TT_SINCE_APPEARANCE,
                      FR_FRUITS,
                      IC_SPIKELET,
                      IC_SETTING,
@@ -68,7 +68,7 @@ private:
     inflo::inflo_states inflo_status;
     inflo::inflo_states inflo_status_pot;
     double Teff;
-    double TT_since_appearence;
+    double TT_since_appearance;
     double fr_fruits;
     double IC_spikelet;
     double IC_setting;
@@ -102,7 +102,7 @@ public:
         External(TEFF, &Bunch::Teff);
         External(INFLO_STATUS_POT, &Bunch::inflo_status_pot);
         External(INFLO_STATUS, &Bunch::inflo_status);
-        External(TT_SINCE_APPEARENCE, &Bunch::TT_since_appearence);
+        External(TT_SINCE_APPEARANCE, &Bunch::TT_since_appearance);
         External(FR_FRUITS, &Bunch::fr_fruits);
         External(IC_SPIKELET, &Bunch::IC_spikelet);
         External(IC_SETTING, &Bunch::IC_setting);
@@ -145,12 +145,15 @@ public:
         TT_oleo_duration = DUREE_OLEO * pow(PRODUCTION_SPEED_ADULT / production_speed, RATIO_DUREE_JEUNES_OLEO);
 
 //        oil_statut = oil::UNKNOWN;
+        fruit_number=0;
         oil_assimilate_supply = 0;
         nonoil_assimilate_supply = 0;
+        nonoil_demand_pot=0;
         oil_biomass = 0;
         nonoil_biomass = 0;
         masse_ind = 0;
         ratio_huile_mesocarp = 0;
+        final_oil_mass=0;
 
         if (!inflo_status.is(inflo::FLOWERING)) { //voire si etat dispo
             oil_biomass = 0;
@@ -162,11 +165,11 @@ public:
 
             double total_final_biomass = inflo_dev_factor *  MEAN_FRUIT_NUMBER_ADULTE * (IND_FRUIT_WEIGHT/1000);
             double TT_bunch_dev_duration = TT_ini_harvest - TT_ini_flowering;
-            double fr_bunch_dev = (TT_since_appearence - TT_ini_flowering) / TT_bunch_dev_duration;
+            double fr_bunch_dev = (TT_since_appearance - TT_ini_flowering) / TT_bunch_dev_duration;
             nonoil_biomass = total_final_biomass * (1 - OIL_CONTENT ) * fr_bunch_dev;
 
             if(inflo_status.is(inflo::OLEOSYNTHESIS)) {
-                double fr_oleo = (TT_since_appearence - TT_ini_oleo) / TT_oleo_duration;
+                double fr_oleo = (TT_since_appearance - TT_ini_oleo) / TT_oleo_duration;
                 final_oil_mass = total_final_biomass * OIL_CONTENT;
                 oil_biomass =  final_oil_mass * fr_oleo;
             }

@@ -72,6 +72,7 @@ public:
         selector("PHYTOMERNUMBER", artis::kernel::DOUBLE,{Tree::PHYTOMERNUMBER});
         selector("SLW", artis::kernel::DOUBLE,{Tree::SLW});
         selector("TOTAL_LEAF_BIOMASS", artis::kernel::DOUBLE,{Tree::TOTAL_LEAF_BIOMASS});
+        selector("LEAF_NON_STRUCTURAL_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::LEAF_NON_STRUCTURAL_BIOMASS_HARVESTED});
         selector("TRUNK_HEIGHT", artis::kernel::DOUBLE,{Tree::TRUNK_HEIGHT});
         selector("LAI", artis::kernel::DOUBLE,{Tree::LAI});
 
