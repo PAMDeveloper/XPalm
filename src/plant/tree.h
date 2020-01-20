@@ -267,7 +267,7 @@ public:
 
 
         //        internals
-        newPhytomerEmergence = 0.99;
+        newPhytomerEmergence = 0;
         phytomerNumber = INACTIVE_PHYTOMER_NUMBER + RANG_D_ABLATION;
         ic = 1;
         ei = 0;

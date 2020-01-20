@@ -144,7 +144,8 @@ public:
     void compute(double t, bool /* update */)
     {
 
-//        rank = total_phytomer_number - number - INACTIVE_PHYTOMER_NUMBER-1;
+
+         rank = total_phytomer_number - INACTIVE_PHYTOMER_NUMBER - number - 1;
 
         if(rank > 0 && state == phytomer::INACTIVE)
             state = phytomer::ACTIVE;
