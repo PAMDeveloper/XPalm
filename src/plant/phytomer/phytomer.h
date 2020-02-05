@@ -26,7 +26,7 @@ public:
                      TT_SINCE_APPEARANCE,
                      PRODUCTION_SPEED,
                      TT_INI_FLOWERING,
-                     SF_IND
+                     SF_FIN
                    };
 
     enum external { TOTAL_PHYTOMER_NUMBER,
@@ -41,7 +41,6 @@ private:
 
     //     parameters
     double INACTIVE_PHYTOMER_NUMBER;
-    double RANG_D_ABLATION;
 
     //     internals
     phytomer::phytomer_state state;
@@ -54,7 +53,7 @@ private:
     //predim
     double production_speed;
     double TT_ini_flowering;
-    double SF_ind;
+    double SF_fin;
 
     //attr
     inflo::inflo_states inflo_status;
@@ -86,7 +85,7 @@ public:
         //predim
         Internal(PRODUCTION_SPEED, &Phytomer::production_speed);
         Internal(TT_INI_FLOWERING, &Phytomer::TT_ini_flowering);
-        Internal(SF_IND, &Phytomer::SF_ind);
+        Internal(SF_FIN, &Phytomer::SF_fin);
 
         // externals
         External(TOTAL_PHYTOMER_NUMBER, &Phytomer::total_phytomer_number);
@@ -108,33 +107,33 @@ public:
 
     void init(double t, const xpalm::ModelParameters& parameters){}
     void init(double t, const xpalm::ModelParameters& parameters, int nb, int total_phyto_, bool st, double tree_age_at_creation_,
-              double tree_age, double prod_speed, double flo_tt, double harv_tt, double tt_ini_sen, double inflo_factor, double SF_ind_)
+              double tree_age, double prod_speed, double flo_tt, double harv_tt, double tt_ini_sen, double inflo_factor, double SF_fin_)
     {
         last_time = t;
 
         //parameters
         INACTIVE_PHYTOMER_NUMBER = parameters.get("INACTIVE_PHYTOMER_NUMBER");
-//        RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
-
-//        youngest_phytomer_number = 0;
-//        youngest_phytomer_number = INACTIVE_PHYTOMER_NUMBER + RANG_D_ABLATION;
 
         //predim
         number = nb;
         TT_ini_flowering = flo_tt;
         production_speed = prod_speed;
-        SF_ind = SF_ind_;
+        SF_fin = SF_fin_;
         //var
 //        rank = rk;
         rank = total_phyto_ - INACTIVE_PHYTOMER_NUMBER - nb - 1;
-        state = st ? phytomer::INACTIVE : phytomer::ACTIVE;
-//         state = phytomer::INACTIVE;
+//        state = st ? phytomer::INACTIVE : phytomer::ACTIVE;
+
+        state= (rank > 0)
+                ? phytomer::ACTIVE
+                : phytomer::INACTIVE;
+
         tree_age_at_creation = tree_age_at_creation_;
         age = tree_age - tree_age_at_creation_;
         TT_since_appearance = parameters.get("T_EFF_INI")*age;
 
         //submodels
-        leaf->init(t, parameters, rank, TT_since_appearance, SF_ind);
+        leaf->init(t, parameters, rank, state, TT_since_appearance, SF_fin);
         internode->init(t, parameters, age, tree_age_at_creation, production_speed);
         inflo->init(t, parameters, age, rank, production_speed, TT_ini_flowering, harv_tt, tt_ini_sen, inflo_factor);
         inflo_status = inflo->get<inflo::inflo_states, Inflo>(t, Inflo::STATUS);

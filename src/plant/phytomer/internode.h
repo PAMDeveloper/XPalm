@@ -89,8 +89,8 @@ public:
         //        parameters
         COUT_RESPI_INTERNODE = parameters.get("COUT_RESPI_INTERNODE");
         PLASTICITY_INTERNODE_IC = parameters.get("PLASTICITY_INTERNODE_IC");
-        STEM_RAYON = parameters.get("STEM_RAYON");
-        STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
+        STEM_RAYON = parameters.get("STEM_RAYON"); //cm
+        STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY"); //(g cm-3)
 
         //        internals
         length_increase_pot = 0;
@@ -104,18 +104,18 @@ public:
         // ini
         double DEBUT_CROISSANCE_EN = parameters.get("DEBUT_CROISSANCE_EN") * 365;
         double FIN_CROISSANCE_EN = parameters.get("FIN_CROISSANCE_EN") * 365;
-        double EN_LENGTH_ADULTE = parameters.get("EN_LENGTH_ADULTE") / 100; //from cm to m
-        double EN_LENGTH_INI = parameters.get("EN_LENGTH_INI") / 100; //from cm to m
-        max_length_pot = age_relative_var(tree_age_at_phyto_creation + phytomer_age, DEBUT_CROISSANCE_EN, FIN_CROISSANCE_EN, EN_LENGTH_INI, EN_LENGTH_ADULTE);
+        double EN_LENGTH_ADULTE = parameters.get("EN_LENGTH_ADULTE") ; //cm
+        double EN_LENGTH_INI = parameters.get("EN_LENGTH_INI"); //cm
+        max_length_pot = age_relative_var(tree_age_at_phyto_creation + phytomer_age, DEBUT_CROISSANCE_EN, FIN_CROISSANCE_EN, EN_LENGTH_INI, EN_LENGTH_ADULTE); // cm
 
         duree_allongement = 1 / production_speed;
 
         // init structure
         double TEff_ini = parameters.get("T_EFF_INI");
         double fr_allongement = min(1.0, (phytomer_age * TEff_ini) / duree_allongement );
-        length = fr_allongement * max_length_pot;
-        double volume = _PI * pow( STEM_RAYON, 2) * length;
-        biomass = 1000 * volume * STEM_APPARENT_DENSITY;
+        length = fr_allongement * max_length_pot; //cm
+        double volume = _PI * pow( STEM_RAYON, 2) * length; //cm3
+        biomass =  volume * STEM_APPARENT_DENSITY; //gCH2O
     }
 
     void compute(double /*t*/, bool /* update */)
@@ -137,8 +137,8 @@ public:
             length_increase_pot = 0;
         }
 
-        double volume_pot = _PI * pow( STEM_RAYON, 2) * length_increase_pot;
-        demand =  volume_pot * STEM_APPARENT_DENSITY * COUT_RESPI_INTERNODE * 1000;
+        double volume_pot = _PI * pow( STEM_RAYON, 2) * length_increase_pot; //cm3
+        demand =  volume_pot * STEM_APPARENT_DENSITY * COUT_RESPI_INTERNODE ; //gCH20
 
         gain_TEff_jour = TEff;
     }
