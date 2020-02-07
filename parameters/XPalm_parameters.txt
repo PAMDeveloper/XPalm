@@ -1,27 +1,38 @@
 
+#####  METEO PARAMS #########
+LATITUDE = 0.97
+ALTITUDE = 50 # en metres
+DENS = 143
+T_BASE = 15
+T_OPT1 = 25
+T_OPT2 = 30
+T_LIM = 40
+T_EFF_INI = 9 #6.875
+
+
+#####  FTSW PARAMS #########
+Z1 = 200 # profondeur du compartiment de surface ou il y a peut y avoir de l'evap ou alors egal a la profondeur d enracinement de la plante de couverture
+Z2 = 2000 # profondeur du compartiment de profodeur Z1+Z2 = profondeur du sol
+H_CR = 0.23 # humidite a la capacite de retention
+H_PF = 0.10 # humidite au point de fletrissement
+H_0 = 0.15 # humidite du sol a l initialisation
+H_PF_Z1 = 0.05 # 0.5*HPF_EVAP si pas de plante de surface 0.10 si plante de surface
+
+#####  ROOTS PARAMS #########
+VITESSE_RACINES = 0.3  # mm par degre jour
+FTSW_RACINES = 0.2     
+SEUIL_EVAP = 0.5
+SEUIL_TRANSPI = 0.5
+Z_INIT = 2000 
+
+#####  TREE PARAMS #########
 SEED = 1  ###Set the seed
-
-#####  AGE PARAMS #########
-
 AGE = 8   ### 8 - adulte | 3 - normal
 AGE_ADULT = 8
 AGE_PLANTING = 3
 AGE_START_PROD = 2
-
 PRODUCTION_SPEED_INITIAL = 0.0145### 1/(10*6.75) 1leaf every 10 days ## MINIMAL_PRODUCTION_SPEED - adulte  - (rank.DD-1)
 PRODUCTION_SPEED_ADULT = 0.0096 #=1/(15*6.75) 1leaf every 15 days(rank.DD-1)
-
-TT_FLOWERING_ADULT = 9430 ### depuis rank 1: 2640   
-TT_FLOWERING_INITIAL = 6300 ### depuis rank 1: 1500
-TT_HARVEST_ADULT = 12150 ### depuis rank 1: 4095
-TT_HARVEST_INITIAL = 8100 ### depuis rank 1:3000
-
-FRACTION_PERIOD_OLEOSYNTHESIS = 0.8 ### fraction de la période du développement du régime correspondant à l'oléosynthèse
-FRACTION_PERIOD_DEV_PEDUNCLE = 0.2 ### fraction de la période du développement du régime correspondant à l'oléosynthèse
-
-TT_MALE_SENESCENCE = 6350 ### depuis rank 1:1520
-AF_FRUITS = 1.5 # coefficient d affinite pour les fruits
-
 LOCAL_LIGHT_INTERCEPTION = 0  ## 1 pour mettre le mode actif
 a_loi_beta_interception = 1.4   ### plus a est petit plus le haut intercepte beaucoup
 b_loi_beta_interception = 7
@@ -34,66 +45,101 @@ seuil_FTSW_pour_red_a_long_termes_de_Pn = 0.4
 SENS_REMANESCENCE = 2.5 ### exposant pour rendre compte de la sensibilite au stress
 RANG_DEBUT_SENS_PN_LONG_TERMES = -3
 RANG_FIN_SENS_PN_LONG_TERMES = 3
-
-# ablation_feuille
-DEBUT_DEFOLIATON = 2500 ### depuis rank 1:
-FIN_DEFOLIATON =   3500 ### depuis rank 1:
-RANG_DEFOLIATON = 15
-POURC_DEFOLIATON = 0  # en unite de 0,0.1,0.2,0.3 1
-
-# ablation_regime 
-DEBUT_ABLATION_REGIME = 2500
-FIN_ABLATION_REGIME =   3500
-POURC_ABLATION_REGIME = 0
-RANG_D_ABLATION_REGIME = 25
-
-## site
-LATITUDE = 0.97
-ALTITUDE = 50 # en metres
-
-## sol
-Z1 = 200 # profondeur du compartiment de surface ou il y a peut y avoir de l'evap ou alors egal a la profondeur d enracinement de la plante de couverture
-Z2 = 2000 # profondeur du compartiment de profodeur Z1+Z2 = profondeur du sol
-H_CR = 0.23 # humidite a la capacite de retention
-H_PF = 0.10 # humidite au point de fletrissement
-H_0 = 0.15 # humidite du sol a l initialisation
-H_PF_Z1 = 0.05 # 0.5*HPF_EVAP si pas de plante de surface 0.10 si plante de surface
-
-##caracteristique plantation en debut de simulation
-DENS = 143
-
-INI_SEX_RATIO = 0.8  ###si rd <INI_SEX_RATIO  --> femelle
-INI_TAUX_D_AVORTEMENT = 0.2 ###si rd INI_TAUX_D_AVORTEMENT --> aborted
-
-## PHOTOSYNTHESE
 EFFICIENCE_BIOLOGIQUE = 4.8
 SEUIL_PHOTO = 0.6  # seuil à partir duquel perte de conductance (assimilation réduite)
 K = 0.5
 KC = 1
 INACTIVE_PHYTOMER_NUMBER = 60
+AF_FRUITS = 1.5 # coefficient d affinite pour les fruits
 
-### temperatures cardinales
-T_BASE = 15
-T_OPT1 = 25
-T_OPT2 = 30
-T_LIM = 40
-T_EFF_INI = 9 #6.875
 
-MASSE_MEAN_PEDUNCULE_ADULTE = 2.1 
-MEAN_FRUIT_NUMBER_ADULTE = 1600
-MASSE_REGIME_INI = 3.5    
-MASSE_INFLO_MALE_ADULTE = 1.2
-OIL_CONTENT = 0.73 
-IND_FRUIT_WEIGHT = 6.5 
-COUT_STRUCTURE_REGIME = 1.44
-COUT_OIL = 3.2
-DUREE_OLEO = 634,9206349206349‬ ## (28-24)/ 0.0063  # recolte au rang 28 a peu pres et debut au rang 24 
+#####  INTERNODE PARAMS #########
+INITIAL_HEIGHT = 400 # (cm)
+STEM_APPARENT_DENSITY = 0.15  (g.cm-3)
+STEM_RAYON = 30 (cm)
+EN_LENGTH_INI = 0.1  # (cm)
+EN_LENGTH_ADULTE = 3 #(cm)
+DEBUT_CROISSANCE_EN = 4 # (annee)
+FIN_CROISSANCE_EN = 8 # (annee)
+PLASTICITY_INTERNODE_IC = 0.5 # plasticite internode au trophique entre 0 et 1 0 : tout plastique, 1 : pas plastique
+COUT_RESPI_MAINTENANCE_STIPE = 0.001 # (gCH2O/gDM)
+COUT_RESPI_INTERNODE = 1.44 #(gCH2O/gDM)
+
+
+#####  INFLO PARAMS #########
+TT_FLOWERING_ADULT = 9430 ### depuis rank 1: 2640   
+TT_FLOWERING_INITIAL = 6300 ### depuis rank 1: 1500
+TT_HARVEST_ADULT = 12150 ### depuis rank 1: 4095
+TT_HARVEST_INITIAL = 8100 ### depuis rank 1:3000
+FRACTION_PERIOD_OLEOSYNTHESIS = 0.8 ### fraction de la période du développement du régime correspondant à l'oléosynthèse
+FRACTION_PERIOD_DEV_PEDUNCLE = 0.2 ### fraction de la période du développement du régime correspondant à l'oléosynthèse
+TT_MALE_SENESCENCE = 6350 ### depuis rank 1:1520
+DEBUT_ABLATION_REGIME = 2500
+FIN_ABLATION_REGIME =   3500
+POURC_ABLATION_REGIME = 0
+RANG_D_ABLATION_REGIME = 25
+INI_SEX_RATIO = 0.8  ###si rd <INI_SEX_RATIO  --> femelle
+INI_TAUX_D_AVORTEMENT = 0.2 ###si rd INI_TAUX_D_AVORTEMENT --> aborted
+REPRO_CONSTRUCTION_COST = 1.44 ###construction cost of reproductive organs (gCH2O/gDM)
 RANG_DEBUT_CROISSANCE_PEDUNCULE = 8  # nombre de rangs avant floraison # 11.5
 COUT_RESPI_MAINTENANCE_BUNCH =  0.0044
 RATIO_DUREE_JEUNES_OLEO = 1
 RANG_D_ABLATION = 50   #l appeler rang de mort
+#ICsex_RANG_DEBUT = -28
+#ICsex_RANG_FIN = -20
+PERIOD_SEX_DETERMINATION = 1350  # 15days * 9° *10 rang period before abortion (spathe abortion) when sex is determined (in TT)
+SENSITIVITY_SEX = 2
+Seuil_IC_sex = 1
+ICabort_RANG_DEBUT = 8          #8  #n'est plus utilisé
+ICabort_RANG_FIN = 12           # 12 #n'est plus utilisé
+PERIOD_ABORTION = 1350  # 15days * 9° *10 rang period before flowering (spathe appearence) when abortion is triggered (in TT) 
+ days 
+SENSITIVITY_ABORTION = 2
+Seuil_IC_abort = 1
 
-### leaf dimensions
+
+##### MALE INFLO PARAMS #########
+MASSE_INFLO_MALE_ADULTE = 1.2
+
+#####  PEDUNCLE PARAMS #########
+#IC_spikelet_RANG_DEBUT = -10
+#IC_spikelet_RANG_FIN = -5
+PERIOD_DEV_SPIKELET= 675 #5rg * 15 days * 9°C periode apres flowering pendant laquelle le taux de nouaison est modulable (TT)
+SENSIVITY_IC_SPIKELET =  0.30 #  0.05 0.5 ?
+MASSE_MEAN_PEDUNCULE_ADULTE = 2.1 
+
+#####  BUNCH PARAMS #########
+COUT_OIL = 3.2
+DUREE_OLEO = 634,9206349206349‬ ## (28-24)/ 0.0063  # recolte au rang 28 a peu pres et debut au rang 24 
+INITIAL_BIOMASS = 500   # non utilise
+RANG_DEBUT_OLEO = 24  # n est plus fonctionnel
+OIL_CONTENT = 0.73 
+IND_FRUIT_WEIGHT = 6.5 
+MEAN_FRUIT_NUMBER_ADULTE = 1600
+MASSE_REGIME_INI = 3.5    
+PERIOD_FRUIT_SET = 405# 3rg * 15 days * 9°C periode apres flowering pendant laquelle le taux de nouaison est modulable (TT)
+# DEBUT_RANG_SENSITIVITY_NOUAISON = 3 # nombre de rang avant floraison pour le debut de determination du nombre de grains   
+FIN_RANG_SENSITIVITY_NOUAISON = 1  # nombre de rang avant floraison pour le debut de determination du nombre de grains
+SENSIVITY_IC_SETTING = 0.30   #0.05 0.5 ?
+PLASTICITY_BUNCH_IC_AVANT_FLORAISON = 0.6  # plasticite bunch au trophique entre 0 et 1 0 : tout plastique, 1 : pas plastique
+PLASTICITY_BUNCH_IC_APRES_FLORAISON = 0.2
+SEUIL_MEDIAN_FTSW = 0.75
+SENS_FTSW = 1
+
+
+#####  RESERVE PARAMS #########
+POURCENT_NSC_ST_MAX = 0.30 # pourcentage de reserve max dans le stipe a verifier c est beaucoup !!! 0.7
+POURCENT_NSC_ST_MIN = 0.05 # pourcentage de reserve min dans le stipe
+POURCENT_NSC_ST_INI = 0.30  ### 0.7
+COUT_RESERVE = 0.75 # cout de la mise en reserve % du CH20 qui peut etre mis en reserve
+MOB_RATE_MAX = 0.025 # % max de la biomasse dans les reserves qui peut etre destockee 
+REALL_COST = 0.60
+
+#####  LEAF PARAMS #########
+#DEBUT_DEFOLIATON = 2500 ### depuis rank 1:
+#FIN_DEFOLIATON =   3500 ### depuis rank 1:
+#RANG_DEFOLIATON = 15
+#POURC_DEFOLIATON = 0  # en unite de 0,0.1,0.2,0.3 1
 MAXIMAL_SFIND = 12    
 INITIAL_SFIND = 2.5    
 INCREASE_OF_LEAF_AREA =  0.00419  # (cm2.Cd-1)
@@ -112,64 +158,3 @@ SEUIL_DUREE = 0.6 # ralentissement de la duree d expansion en stress (affecte au
 SEUIL_ORGANO = 0.1
 VITESSE_SENSITIVITY = 0.15 #plasticite de la vitesse de prod a l'IC
 
-###Stem param
-INITIAL_HEIGHT = 400 # (cm)
-STEM_APPARENT_DENSITY = 0.15  (g.cm-3)
-STEM_RAYON = 30 (cm)
-EN_LENGTH_INI = 0.1  # (cm)
-EN_LENGTH_ADULTE = 3 #(cm)
-DEBUT_CROISSANCE_EN = 4 # (annee)
-FIN_CROISSANCE_EN = 8 # (annee)
-PLASTICITY_INTERNODE_IC = 0.5 # plasticite internode au trophique entre 0 et 1 0 : tout plastique, 1 : pas plastique
-
-COUT_RESPI_MAINTENANCE_STIPE = 0.001 # (gCH2O/gDM)
-COUT_RESPI_INTERNODE = 1.44 #(gCH2O/gDM)
-
-# Racines
-VITESSE_RACINES = 0.3  # mm par degre jour
-FTSW_RACINES = 0.2     
-SEUIL_EVAP = 0.5
-SEUIL_TRANSPI = 0.5
-Z_INIT = 2000    
-
-# Reserves
-POURCENT_NSC_ST_MAX = 0.30 # pourcentage de reserve max dans le stipe a verifier c est beaucoup !!! 0.7
-POURCENT_NSC_ST_MIN = 0.05 # pourcentage de reserve min dans le stipe
-POURCENT_NSC_ST_INI = 0.30  ### 0.7
-COUT_RESERVE = 0.75 # cout de la mise en reserve % du CH20 qui peut etre mis en reserve
-MOB_RATE_MAX = 0.025 # % max de la biomasse dans les reserves qui peut etre destockee 
-REALL_COST = 0.60
-
-## Variables relatives a la sensibilite a IC
-ICsex_RANG_DEBUT = -28
-ICsex_RANG_FIN = -20
-PERIOD_SEX_DETERMINATION = 2700 # 15days * 9° *20 rang period before flowering (spathe appearence) when abortion can be triggered (in TT)
-
-
-SENSITIVITY_SEX = 2
-Seuil_IC_sex = 1
-
-ICabort_RANG_DEBUT = 8          #8  #n'est plus utilisé
-ICabort_RANG_FIN = 12           # 12 #n'est plus utilisé
-PERIOD_ABORTION = 1350  # 15days * 9° *10 rang period before flowering (spathe appearence) when abortion is triggered and sex is determined (in TT) 
- days 
-SENSITIVITY_ABORTION = 2
-Seuil_IC_abort = 1
-
-IC_spikelet_RANG_DEBUT = -10
-IC_spikelet_RANG_FIN = -5
-SENSIVITY_IC_SPIKELET =  0.30 #  0.05 0.5 ?
-
-DEBUT_RANG_SENSITIVITY_NOUAISON = 3 # nombre de rang avant floraison pour le debut de determination du nombre de grains   
-FIN_RANG_SENSITIVITY_NOUAISON = 1  # nombre de rang avant floraison pour le debut de determination du nombre de grains
-SENSIVITY_IC_SETTING = 0.30   #0.05 0.5 ?
-
-PLASTICITY_BUNCH_IC_AVANT_FLORAISON = 0.6  # plasticite bunch au trophique entre 0 et 1 0 : tout plastique, 1 : pas plastique
-PLASTICITY_BUNCH_IC_APRES_FLORAISON = 0.2
-
-SEUIL_MEDIAN_FTSW = 0.75
-SENS_FTSW = 1
-
-INITIAL_BIOMASS = 500   # non utilise
-
-RANG_DEBUT_OLEO = 24  # n est plus fonctionnel

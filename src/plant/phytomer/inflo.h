@@ -27,6 +27,7 @@ public:
                      STATUS_POT,
                      TT_INI_OLEO,
                      TT_INI_SEX,
+                     TT_INI_ABORTION,
                      TT_INI_FLOWERING,
                      TT_INI_HARVEST,
                      TT_INI_MALE_SENESCENCE,
@@ -41,7 +42,7 @@ public:
                      BUNCH_OIL_BIOMASS_HARVESTED,
                      BUNCH_NONOIL_BIOMASS_HARVESTED,
                      MALE_BIOMASS_HARVESTED,
-                     RED_VITESSE_FTSW,
+                     //                     RED_VITESSE_FTSW,
                      RESPIRABLE_BIOMASS,
                      GAIN_TEFF_JOUR,
                      TT_CORRIGE,
@@ -71,21 +72,25 @@ private:
     double PLASTICITY_BUNCH_IC_AVANT_FLORAISON;
     double SENS_FTSW;
     double SEUIL_MEDIAN_FTSW;
-    double DEBUT_RANG_SENSITIVITY_NOUAISON;
-    double FIN_RANG_SENSITIVITY_NOUAISON;
-    double IC_spikelet_RANG_DEBUT;
-    double IC_spikelet_RANG_FIN;
-    double ICsex_RANG_DEBUT;
-    double ICsex_RANG_FIN;
-    double ICabort_RANG_DEBUT;
-    double ICabort_RANG_FIN;
+    //    double DEBUT_RANG_SENSITIVITY_NOUAISON;
+    //    double FIN_RANG_SENSITIVITY_NOUAISON;
+    double PERIOD_FRUIT_SET;
+    //    double IC_spikelet_RANG_DEBUT;
+    //    double IC_spikelet_RANG_FIN;
+    double PERIOD_DEV_SPIKELET;
+    //    double ICsex_RANG_DEBUT;
+    //    double ICsex_RANG_FIN;
+    double PERIOD_SEX_DETERMINATION;
+    //    double ICabort_RANG_DEBUT;
+    //    double ICabort_RANG_FIN;
+    double PERIOD_ABORTION;
     double Seuil_IC_sex;
     double SENSITIVITY_SEX;
     double Seuil_IC_abort;
     double SENSITIVITY_ABORTION;
     double SEED;
     double FRACTION_PERIOD_OLEOSYNTHESIS;
-    double PERIOD_ABORTION;
+
 
     //     submodels
     std::unique_ptr < Peduncle > peduncle;
@@ -100,6 +105,7 @@ private:
     double TT_ini_flowering;
     double TT_ini_oleo;
     double TT_ini_sex;
+    double TT_ini_abortion;
     double TT_ini_harvest;
     double TT_ini_male_senescence;
     double production_speed;
@@ -117,9 +123,9 @@ private:
     double bunch_nonoil_biomass_harvested;
     double male_biomass_harvested;
 
-    double red_vitesse_FTSW;
+    //    double red_vitesse_FTSW;
     double respirable_biomass;
-    double gain_TEff_jour;
+//    double gain_TEff_jour;
     double TT_corrige;
     double demand;
     double bunch_demand;
@@ -175,16 +181,18 @@ public:
         Internal(PEDUNCLE_BIOMASS, &Inflo::peduncle_biomass);
         Internal(FEMELLE_BIOMASS, &Inflo::femelle_biomass);
         Internal(BUNCH_OIL_BIOMASS, &Inflo::bunch_oil_biomass);
+        Internal(BUNCH_OIL_BIOMASS_HARVESTED, &Inflo::bunch_oil_biomass_harvested);
         Internal(BUNCH_NONOIL_BIOMASS, &Inflo::bunch_nonoil_biomass);
+        Internal(BUNCH_NONOIL_BIOMASS_HARVESTED, &Inflo::bunch_nonoil_biomass_harvested);
         Internal(MALE_BIOMASS, &Inflo::male_biomass);
         Internal(PEDUNCLE_BIOMASS_HARVESTED, &Inflo::peduncle_biomass_harvested);
         Internal(FEMELLE_BIOMASS_HARVESTED, &Inflo::femelle_biomass_harvested);
         Internal(BUNCH_OIL_BIOMASS_HARVESTED, &Inflo::bunch_oil_biomass_harvested);
         Internal(BUNCH_NONOIL_BIOMASS_HARVESTED, &Inflo::bunch_nonoil_biomass_harvested);
         Internal(MALE_BIOMASS_HARVESTED, &Inflo::male_biomass_harvested);
-        Internal(RED_VITESSE_FTSW, &Inflo::red_vitesse_FTSW);
+        //        Internal(RED_VITESSE_FTSW, &Inflo::red_vitesse_FTSW);
         Internal(RESPIRABLE_BIOMASS, &Inflo::respirable_biomass);
-        Internal(GAIN_TEFF_JOUR, &Inflo::gain_TEff_jour);
+//        Internal(GAIN_TEFF_JOUR, &Inflo::gain_TEff_jour);
         Internal(TT_CORRIGE, &Inflo::TT_corrige);
         Internal(DEMAND, &Inflo::demand);
         Internal(IC_SETTING, &Inflo::IC_setting);
@@ -252,21 +260,26 @@ public:
         PLASTICITY_BUNCH_IC_AVANT_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_AVANT_FLORAISON");
         SENS_FTSW = parameters.get("SENS_FTSW");
         SEUIL_MEDIAN_FTSW = parameters.get("SEUIL_MEDIAN_FTSW");
-        DEBUT_RANG_SENSITIVITY_NOUAISON = parameters.get("DEBUT_RANG_SENSITIVITY_NOUAISON");
-        FIN_RANG_SENSITIVITY_NOUAISON = parameters.get("FIN_RANG_SENSITIVITY_NOUAISON");
-        IC_spikelet_RANG_DEBUT = parameters.get("IC_spikelet_RANG_DEBUT");
-        IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
-        ICsex_RANG_DEBUT = parameters.get("ICsex_RANG_DEBUT");
-        ICsex_RANG_FIN = parameters.get("ICsex_RANG_FIN");
-        ICabort_RANG_DEBUT = parameters.get("ICabort_RANG_DEBUT");
-        ICabort_RANG_FIN = parameters.get("ICabort_RANG_FIN");
+        //        DEBUT_RANG_SENSITIVITY_NOUAISON = parameters.get("DEBUT_RANG_SENSITIVITY_NOUAISON");
+        //        FIN_RANG_SENSITIVITY_NOUAISON = parameters.get("FIN_RANG_SENSITIVITY_NOUAISON");
+        //        IC_spikelet_RANG_DEBUT = parameters.get("IC_spikelet_RANG_DEBUT");
+        //        IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
+        PERIOD_DEV_SPIKELET = parameters.get("PERIOD_DEV_SPIKELET");
+        //        ICsex_RANG_DEBUT = parameters.get("ICsex_RANG_DEBUT");
+        PERIOD_SEX_DETERMINATION = parameters.get("PERIOD_SEX_DETERMINATION");
+        //        ICsex_RANG_FIN = parameters.get("ICsex_RANG_FIN");
+        //        ICabort_RANG_DEBUT = parameters.get("ICabort_RANG_DEBUT");
+        //        ICabort_RANG_FIN = parameters.get("ICabort_RANG_FIN");
+        PERIOD_ABORTION = parameters.get("PERIOD_ABORTION");
+
         Seuil_IC_sex = parameters.get("Seuil_IC_sex");
         SENSITIVITY_SEX = parameters.get("SENSITIVITY_SEX");
         Seuil_IC_abort = parameters.get("Seuil_IC_abort");
         SENSITIVITY_ABORTION = parameters.get("SENSITIVITY_ABORTION");
         FRACTION_PERIOD_OLEOSYNTHESIS = parameters.get("FRACTION_PERIOD_OLEOSYNTHESIS");
         SEED = parameters.get("SEED");
-        PERIOD_ABORTION = parameters.get("PERIOD_ABORTION");
+
+        PERIOD_FRUIT_SET=parameters.get("PERIOD_FRUIT_SET");
 
         //predim
         TT_ini_flowering = TT_ini_flo;
@@ -312,9 +325,9 @@ public:
         bunch_nonoil_biomass_harvested=0;
         male_biomass_harvested= 0;
 
-        red_vitesse_FTSW= 0;
+        //        red_vitesse_FTSW= 0;
         respirable_biomass= 0;
-        gain_TEff_jour= 0;
+//        gain_TEff_jour= 0;
         demand= 0;
 
 
@@ -326,7 +339,9 @@ public:
         srand(SEED);
         TT_corrige= parameters.get("T_EFF_INI") * phytomer_age;
         TT_ini_oleo = TT_ini_flowering +(1-FRACTION_PERIOD_OLEOSYNTHESIS)*(TT_ini_harvest - TT_ini_flowering);
-        TT_ini_sex = TT_ini_flowering - PERIOD_ABORTION;
+        TT_ini_abortion = TT_ini_flowering-PERIOD_DEV_SPIKELET;
+        TT_ini_sex = TT_ini_abortion - PERIOD_SEX_DETERMINATION;
+
 
         male->init(t, parameters, phytomer_age, inflo_dev_factor, TT_ini_flowering, TT_ini_male_senescence);
         peduncle->init(t, parameters, production_speed, TT_ini_flowering, TT_ini_harvest, inflo_dev_factor);
@@ -335,19 +350,10 @@ public:
 
         // init step state
 
-        // set abortion
-        double rd_abort = (double) rand() / RAND_MAX;
-        //        if (rank > ICabort_RANG_FIN) {
-        if (TT_corrige > TT_ini_sex && status.is(inflo::INITIATED)) {
-            if( rd_abort < parameters.get("INI_TAUX_D_AVORTEMENT"))
-                status.replace(inflo::INITIATED, inflo::ABORTED);
-            else status.replace(inflo::INITIATED, inflo::NON_ABORTED);
-        }
-
         // define sex
         double rd_sex = (double) rand() / RAND_MAX;
         //        if (rank > ICsex_RANG_FIN) {
-        if (TT_corrige > TT_ini_sex && status.is(inflo::NON_ABORTED)) {
+        if (TT_corrige > TT_ini_sex && !status.is(inflo::FEMALE) &&  !status.is(inflo::MALE) ) {
             if(rd_sex < parameters.get("INI_SEX_RATIO")) {
                 status.add(inflo::FEMALE);
             } else {
@@ -355,13 +361,21 @@ public:
             }
         }
 
+        // set abortion
+        double rd_abort = (double) rand() / RAND_MAX;
+        //        if (rank > ICabort_RANG_FIN) {
+        if (TT_corrige > TT_ini_abortion && !status.is(inflo::ABORTED) && !status.is(inflo::NON_ABORTED)) {
+            if( rd_abort < parameters.get("INI_TAUX_D_AVORTEMENT"))
+                status.replace(inflo::INITIATED, inflo::ABORTED);
+            else status.replace(inflo::INITIATED, inflo::NON_ABORTED);
+        }
 
 
         step_state();
     }
 
 
-    void step_state() {
+    void step_state() {//TODO add SEX_DETERMINATION, SPIKELET_DEV and  FRUIT_SET states
         if (status.is(inflo::NON_ABORTED)){
 
             //femelle
@@ -426,20 +440,9 @@ public:
         if(status.is(inflo::ABORTED))
             return;
 
-        // set abortion
-        //                if (rank == ICabort_RANG_FIN) {
-        if (TT_corrige >= TT_ini_sex && status.is(inflo::INITIATED)) {
-            double rd_abort = (double) rand() / RAND_MAX;
-            if(rd_abort < min(1.,pow(IC_abort/Seuil_IC_abort, SENSITIVITY_ABORTION))) {
-                //                status.add(inflo::ABORTED);
-                status.replace(inflo::INITIATED, inflo::ABORTED);
-            }
-            else status.replace(inflo::INITIATED, inflo::NON_ABORTED);
-        }
-
         // define sex
         //        if (rank > ICsex_RANG_FIN && !status.is(inflo::FEMALE) && !status.is(inflo::MALE) && !status.is(inflo::ABORTED)) {
-        if (TT_corrige >= TT_ini_sex && status.is(inflo::NON_ABORTED) && !status.is(inflo::FEMALE) && !status.is(inflo::MALE)) {
+        if (TT_corrige >= TT_ini_sex && !status.is(inflo::FEMALE) && !status.is(inflo::MALE)) {
             double rd_sex = (double) rand() / RAND_MAX;
             if(rd_sex < min(1.,pow(IC_sex/Seuil_IC_sex, SENSITIVITY_SEX))) {
                 status.add(inflo::FEMALE);
@@ -448,40 +451,23 @@ public:
             }
         }
 
-        step_state();
-
-    !!!arret
-
-        if (status.is(inflo::FEMALE)) {
-            if(!status.is(inflo::HARVEST)) {
-                peduncle->put<double>(t, Peduncle::IC_SPIKELET, IC_spikelet);
-                peduncle->put<double>(t, Peduncle::TEFF, TEff);
-                peduncle->put<double>(t, Peduncle::TT_CORRIGE, TT_corrige);
-                peduncle->put<double>(t, Peduncle::TT_SINCE_APPEARANCE, TT_since_appearance);
-                peduncle->put<double>(t, Peduncle::FR_RESTE, fr_reste);
-                (*peduncle)(t);
-
-                peduncle_biomass =  peduncle->get< double >(t, Peduncle::BIOMASS);
+        // set abortion
+        //                if (rank == ICabort_RANG_FIN) {
+        if (TT_corrige >= TT_ini_abortion && !status.is(inflo::ABORTED) && !status.is(inflo::NON_ABORTED)) {
+            double rd_abort = (double) rand() / RAND_MAX;
+            if(rd_abort < min(1.,pow(IC_abort/Seuil_IC_abort, SENSITIVITY_ABORTION))) {
+                //                status.add(inflo::ABORTED);
+                status.replace(inflo::INITIATED, inflo::ABORTED);
             }
-
-            if (status.is(inflo::FEMALE) && status.is(inflo::FLOWERING)) {
-                bunch->put<double>(t, Bunch::TEFF, TEff);
-                bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS_POT, status);
-                bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS, status_pot);
-                bunch->put<double>(t, Bunch::TT_SINCE_APPEARANCE, TT_since_appearance);
-                bunch->put<double>(t, Bunch::FR_FRUITS, fr_fruits);
-                bunch->put<double>(t, Bunch::IC_SPIKELET, IC_spikelet);
-                bunch->put<double>(t, Bunch::IC_SETTING, IC_setting);
-                bunch->put<double>(t, Bunch::RANK, rank);
-                (*bunch)(t);
-
-                bunch_oil_biomass = bunch->get< double >(t, Bunch::OIL_BIOMASS);
-                bunch_nonoil_biomass =  bunch->get< double >(t, Bunch::NONOIL_BIOMASS);
-
-            }
+            else status.replace(inflo::INITIATED, inflo::NON_ABORTED);
         }
 
-        if(status.is(inflo::HARVEST)) { // TODO check for carbon balance --> potential error from aborted satus
+
+
+        step_state();
+
+        if (status.is(inflo::FEMALE)) {
+            //compute perduncle
             peduncle->put<double>(t, Peduncle::IC_SPIKELET, IC_spikelet);
             peduncle->put<double>(t, Peduncle::TEFF, TEff);
             peduncle->put<double>(t, Peduncle::TT_CORRIGE, TT_corrige);
@@ -489,9 +475,15 @@ public:
             peduncle->put<double>(t, Peduncle::FR_RESTE, fr_reste);
             (*peduncle)(t);
 
+            peduncle_biomass =  peduncle->get< double >(t, Peduncle::BIOMASS);
+            peduncle_biomass_harvested =  peduncle->get< double >(t, Peduncle::BIOMASS_HARVESTED);
+            peduncle_demand = peduncle->get< double >(t, Peduncle::DEMAND);
+
+            //compute bunch
             bunch->put<double>(t, Bunch::TEFF, TEff);
             bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS_POT, status);
             bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS, status_pot);
+            bunch->put<double>(t, Bunch::TT_CORRIGE, TT_corrige);
             bunch->put<double>(t, Bunch::TT_SINCE_APPEARANCE, TT_since_appearance);
             bunch->put<double>(t, Bunch::FR_FRUITS, fr_fruits);
             bunch->put<double>(t, Bunch::IC_SPIKELET, IC_spikelet);
@@ -499,92 +491,143 @@ public:
             bunch->put<double>(t, Bunch::RANK, rank);
             (*bunch)(t);
 
-            bunch_oil_biomass_harvested = bunch->get< double >(t, Bunch::OIL_BIOMASS);
-            bunch_nonoil_biomass_harvested =  bunch->get< double >(t, Bunch::NONOIL_BIOMASS);
-            peduncle_biomass_harvested =  peduncle->get< double >(t, Peduncle::BIOMASS);
+            bunch_oil_biomass = bunch->get< double >(t, Bunch::OIL_BIOMASS);
+            bunch_oil_biomass_harvested = bunch->get< double >(t, Bunch::OIL_BIOMASS_HARVESTED);
+            bunch_nonoil_biomass =  bunch->get< double >(t, Bunch::NONOIL_BIOMASS);
+            bunch_nonoil_biomass_harvested =  bunch->get< double >(t, Bunch::NONOIL_BIOMASS_HARVESTED);
+            bunch_demand = bunch->get< double >(t, Bunch::DEMAND);
+
+
+
+
 
         }
 
-        if (status.is(inflo::MALE) && status.is(inflo::INITIATED)) {
+        //        }
+
+        //        if(status.is(inflo::HARVEST)) { // TODO check for carbon balance --> potential error from aborted satus
+        //            peduncle->put<double>(t, Peduncle::IC_SPIKELET, IC_spikelet);
+        //            peduncle->put<double>(t, Peduncle::TEFF, TEff);
+        //            peduncle->put<double>(t, Peduncle::TT_CORRIGE, TT_corrige);
+        //            peduncle->put<double>(t, Peduncle::TT_SINCE_APPEARANCE, TT_since_appearance);
+        //            peduncle->put<double>(t, Peduncle::FR_RESTE, fr_reste);
+        //            (*peduncle)(t);
+
+        //            bunch->put<double>(t, Bunch::TEFF, TEff);
+        //            bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS_POT, status);
+        //            bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS, status_pot);
+        //            bunch->put<double>(t, Bunch::TT_SINCE_APPEARANCE, TT_since_appearance);
+        //            bunch->put<double>(t, Bunch::FR_FRUITS, fr_fruits);
+        //            bunch->put<double>(t, Bunch::IC_SPIKELET, IC_spikelet);
+        //            bunch->put<double>(t, Bunch::IC_SETTING, IC_setting);
+        //            bunch->put<double>(t, Bunch::RANK, rank);
+        //            (*bunch)(t);
+
+        //            bunch_oil_biomass_harvested = bunch->get< double >(t, Bunch::OIL_BIOMASS);
+        //            bunch_nonoil_biomass_harvested =  bunch->get< double >(t, Bunch::NONOIL_BIOMASS);
+        //            peduncle_biomass_harvested =  peduncle->get< double >(t, Peduncle::BIOMASS);
+
+        //        }
+
+        if (status.is(inflo::MALE)) {
             male->put<double>(t, MaleInflo::TEFF, TEff);
             male->put<double>(t, MaleInflo::FR_RESTE, fr_reste);
             (*male)(t);
 
             male_biomass = male->get< double >(t, MaleInflo::BIOMASS);
-        }
-
-        if (status.is(inflo::MALE) && status.is(inflo::SENESCENCE)) {
-            male->put<double>(t, MaleInflo::TEFF, TEff);
-            male->put<double>(t, MaleInflo::FR_RESTE, fr_reste);
-            (*male)(t);
-
             male_biomass_harvested = male->get< double >(t, MaleInflo::BIOMASS);
+            male_demand = male->get< double >(t, MaleInflo::DEMAND);
         }
-
 
 
         //        compute_growth(t);
         femelle_biomass = bunch_oil_biomass  + bunch_nonoil_biomass + peduncle_biomass;
         biomass = femelle_biomass + male_biomass;
         respirable_biomass = bunch_nonoil_biomass + peduncle_biomass + male_biomass;
-
         femelle_biomass_harvested = bunch_oil_biomass_harvested  + bunch_nonoil_biomass_harvested + peduncle_biomass_harvested;
 
 
         //        compute_demand(t);
 
         //Demand //TODO get from tree
-        if (status.is(inflo::INITIATED))
-            red_vitesse_FTSW = pow((ftsw + 1 - SEUIL_MEDIAN_FTSW ), SENS_FTSW );
-        else
-            red_vitesse_FTSW = 1;
+        //        if (status.is(inflo::INITIATED))
+        //            red_vitesse_FTSW = pow((ftsw + 1 - SEUIL_MEDIAN_FTSW ), SENS_FTSW );
+        //        else
+        //            red_vitesse_FTSW = 1;
 
-        double correctedTEff = red_vitesse_FTSW * TEff;
-        gain_TEff_jour = correctedTEff;
+        //        double correctedTEff = red_vitesse_FTSW * TEff;
+
+        //        gain_TEff_jour = correctedTEff;
+
+
 
         //        Organ.growth_demand(self, correctedTEff);
         //        if(rank > 0)
-        TT_since_appearance += gain_TEff_jour;
+//        TT_since_appearance += gain_TEff_jour;
 
-
-        bunch_demand = status.is(inflo::FEMALE) && status.is(inflo::FLOWERING) ? bunch->get< double >(t, Bunch::DEMAND) : 0;
-        peduncle_demand = status.is(inflo::FEMALE) && !status.is(inflo::HARVEST) ? peduncle->get< double >(t, Peduncle::DEMAND) : 0;
-        male_demand = status.is(inflo::MALE) && status.is(inflo::INITIATED) ? male->get< double >(t, MaleInflo::DEMAND) : 0;
         demand = bunch_demand + peduncle_demand + male_demand;
 
         //        compute_TT_corrige()
-        if (status.is(inflo::INITIATED))
-            TT_corrige += pow(fr_fruits, PLASTICITY_BUNCH_IC_AVANT_FLORAISON) * gain_TEff_jour;
+        if (status.is(inflo::NON_ABORTED))
+            TT_corrige += pow(fr_fruits, PLASTICITY_BUNCH_IC_AVANT_FLORAISON) * TEff;
         else if (status.is(inflo::FLOWERING))
-            TT_corrige += pow(fr_fruits, PLASTICITY_BUNCH_IC_APRES_FLORAISON) * gain_TEff_jour;
+            TT_corrige += pow(fr_fruits, PLASTICITY_BUNCH_IC_APRES_FLORAISON) * TEff;
 
 
-        //IC
-        if (TT_corrige > TT_ini_flowering - DEBUT_RANG_SENSITIVITY_NOUAISON / production_speed &&
-                TT_corrige < TT_ini_flowering - FIN_RANG_SENSITIVITY_NOUAISON / production_speed &&
-                TT_corrige < TT_ini_flowering) {
-            nb_joursIC_setting += 1;
-            IC_setting_tot += tree_IC;
-            IC_setting = (IC_setting_tot) / nb_joursIC_setting;
-        }
 
-        if (rank > IC_spikelet_RANG_DEBUT && rank < IC_spikelet_RANG_FIN){
-            nb_joursIC_spikelet += 1;
-            IC_spikelet_tot += tree_IC;
-            IC_spikelet = IC_spikelet_tot / nb_joursIC_spikelet;
-        }
-
-        if (rank > ICsex_RANG_DEBUT && rank < ICsex_RANG_FIN ) {
+        //IC on sex determination
+        if (TT_corrige >= TT_ini_sex-PERIOD_SEX_DETERMINATION && TT_corrige < TT_ini_sex ) {
             nb_joursICsex += 1;
             IC_sex_tot += tree_IC;
             IC_sex = IC_sex_tot / nb_joursICsex;
         }
 
-        if (rank > ICabort_RANG_DEBUT && rank < ICabort_RANG_FIN) {
+        //IC on abortion
+        if (TT_corrige >= TT_ini_sex && TT_corrige < TT_ini_abortion) {
             nb_joursICabort += 1;
             IC_abort_tot += tree_IC;
             IC_abort = IC_abort_tot / nb_joursICabort;
         }
+
+        //IC on spikelet biomass
+        if (TT_corrige >= TT_ini_abortion && TT_corrige < TT_ini_flowering){
+            nb_joursIC_spikelet += 1;
+            IC_spikelet_tot += tree_IC;
+            IC_spikelet = IC_spikelet_tot / nb_joursIC_spikelet;
+        }
+
+        //IC on fruit set
+        if (TT_corrige >= TT_ini_flowering && TT_corrige < TT_ini_flowering+ PERIOD_FRUIT_SET) {
+            nb_joursIC_setting += 1;
+            IC_setting_tot += tree_IC;
+            IC_setting = (IC_setting_tot) / nb_joursIC_setting;
+        }
+
+        //        if (TT_corrige > TT_ini_flowering - DEBUT_RANG_SENSITIVITY_NOUAISON / production_speed &&
+        //                TT_corrige < TT_ini_flowering - FIN_RANG_SENSITIVITY_NOUAISON / production_speed &&
+        //                TT_corrige < TT_ini_flowering) {
+        //            nb_joursIC_setting += 1;
+        //            IC_setting_tot += tree_IC;
+        //            IC_setting = (IC_setting_tot) / nb_joursIC_setting;
+        //        }
+
+        //        if (rank > IC_spikelet_RANG_DEBUT && rank < IC_spikelet_RANG_FIN){
+        //            nb_joursIC_spikelet += 1;
+        //            IC_spikelet_tot += tree_IC;
+        //            IC_spikelet = IC_spikelet_tot / nb_joursIC_spikelet;
+        //        }
+
+        //        if (rank > ICsex_RANG_DEBUT && rank < ICsex_RANG_FIN ) {
+        //            nb_joursICsex += 1;
+        //            IC_sex_tot += tree_IC;
+        //            IC_sex = IC_sex_tot / nb_joursICsex;
+        //        }
+
+        //        if (rank > ICabort_RANG_DEBUT && rank < ICabort_RANG_FIN) {
+        //            nb_joursICabort += 1;
+        //            IC_abort_tot += tree_IC;
+        //            IC_abort = IC_abort_tot / nb_joursICabort;
+        //        }
     }
 
 

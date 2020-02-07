@@ -34,6 +34,7 @@ public:
     enum internals { DEMAND,
                      ASSIMILATE_SUPPLY,
                      BIOMASS ,
+                     BIOMASS_HARVESTED,
                      POTENTIAL_BIOMASS ,
                      DEMAND_POT,
                      TT_PED_DEV_DURATION
@@ -44,7 +45,8 @@ public:
         TEFF,
         TT_CORRIGE,
         TT_SINCE_APPEARANCE,
-        FR_RESTE
+        FR_RESTE,
+        INFLO_STATUS
     };
 
 private:
@@ -53,12 +55,13 @@ private:
     //    double RANG_DEBUT_CROISSANCE_PEDUNCULE;
     double SENSIVITY_IC_SPIKELET;
     double MASSE_MEAN_PEDUNCULE_ADULTE;
-    double COUT_STRUCTURE_REGIME;
+    double REPRO_CONSTRUCTION_COST;
     double FRACTION_PERIOD_DEV_PEDUNCLE ;
 
     //     internals
     //predim
     double TT_ini_flowering;
+    double TT_ini_harvest;
     double inflo_dev_factor;
     double production_speed;
     double TT_ped_dev_duration;
@@ -66,11 +69,13 @@ private:
     double demand;
     double assimilate_supply;
     double biomass ;
+    double biomass_harvested;
     double potential_biomass;
     double demand_pot;
 
 
     //     externals
+    inflo::inflo_states inflo_status;
     double IC_spikelet;
     double Teff;
     double TT_corrige;
@@ -85,6 +90,7 @@ public:
         Internal(DEMAND, &Peduncle::demand);
         Internal(ASSIMILATE_SUPPLY, &Peduncle::assimilate_supply);
         Internal(BIOMASS , &Peduncle::biomass );
+        Internal(BIOMASS , &Peduncle::biomass_harvested );
         Internal(POTENTIAL_BIOMASS , &Peduncle::potential_biomass );
         Internal(DEMAND_POT, &Peduncle::demand_pot);
         Internal(TT_PED_DEV_DURATION, &Peduncle::TT_ped_dev_duration);
@@ -96,6 +102,7 @@ public:
         External(TT_CORRIGE, &Peduncle::TT_corrige);
         External(TT_SINCE_APPEARANCE, &Peduncle::TT_since_appearance);
         External(FR_RESTE, &Peduncle::fr_reste);
+        External(INFLO_STATUS, &Peduncle::inflo_status);
     }
 
     virtual ~Peduncle()
@@ -103,13 +110,14 @@ public:
     }
 
     void init(double t, const xpalm::ModelParameters& parameters) {}
-    void init(double t, const xpalm::ModelParameters& parameters, double prod_speed, double flo_tt, double TT_ini_harvest, double inflo_factor)
+    void init(double t, const xpalm::ModelParameters& parameters, double prod_speed, double flo_tt, double TT_ini_harvest_, double inflo_factor)
     {
         init(t, parameters);
         //        AtomicModel<Peduncle>::init(t, parameters);
         last_time = t-1;
 
         TT_ini_flowering = flo_tt;
+        TT_ini_harvest=TT_ini_harvest_;
         inflo_dev_factor = inflo_factor;
         production_speed = prod_speed;
 
@@ -120,7 +128,7 @@ public:
         double TEff_ini = parameters.get("T_EFF_INI");
 
         //        RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
-        COUT_STRUCTURE_REGIME = parameters.get("COUT_STRUCTURE_REGIME");
+        REPRO_CONSTRUCTION_COST = parameters.get("REPRO_CONSTRUCTION_COST");
 
         //        double PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL");
 
@@ -128,36 +136,39 @@ public:
         demand = 0;
         assimilate_supply = 0;
         demand_pot = 0;
+        biomass = 0 ;
+        biomass_harvested=0;
 
         TT_ped_dev_duration = FRACTION_PERIOD_DEV_PEDUNCLE* (TT_ini_harvest - TT_ini_flowering);
 
         //init structure
-        if (TT_since_appearance < TT_ini_flowering) {
-            biomass = 0 ;
-        } else {
-            if (TT_since_appearance > TT_ini_harvest)
-                biomass = 0;
-            else {
-                if ( TT_since_appearance <= TT_ini_flowering ) {
-
-
-                    double fr_ped_dev = min(1.0, (TT_since_appearance - TT_ini_flowering) / TT_ped_dev_duration);
-
-                    //                double coeff = 1;
-                    //                if ( TT_since_appearance <= TT_ini_flowering ) {
-                    //                    double TT_since_growth = RANG_DEBUT_CROISSANCE_PEDUNCULE / prod_speed;
-                    //                    coeff = ( TT_since_appearance - (TT_ini_flowering - TT_since_growth)) / TT_since_growth;
-                    //                }
-
-                    //                biomass = inflo_dev_factor * MASSE_MEAN_PEDUNCULE_ADULTE * coeff;
-
-                    biomass = MASSE_MEAN_PEDUNCULE_ADULTE * inflo_dev_factor * fr_ped_dev/ COUT_STRUCTURE_REGIME;
-                    demand= MASSE_MEAN_PEDUNCULE_ADULTE * inflo_dev_factor * ( TEff_ini / TT_ped_dev_duration );
-
-                }
-            }
-            potential_biomass = biomass;
+        //        if (TT_since_appearance < TT_ini_flowering) {
+        //            biomass = 0 ;
+        //        } else {
+        if (inflo_status.is(inflo::HARVEST)){
+            biomass_harvested=biomass;
+            biomass = 0;
         }
+        else {
+            if ( inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS) ) {
+
+                double fr_ped_dev = min(1.0, (TT_since_appearance - TT_ini_flowering) / TT_ped_dev_duration);
+
+                //                double coeff = 1;
+                //                if ( TT_since_appearance <= TT_ini_flowering ) {
+                //                    double TT_since_growth = RANG_DEBUT_CROISSANCE_PEDUNCULE / prod_speed;
+                //                    coeff = ( TT_since_appearance - (TT_ini_flowering - TT_since_growth)) / TT_since_growth;
+                //                }
+
+                //                biomass = inflo_dev_factor * MASSE_MEAN_PEDUNCULE_ADULTE * coeff;
+
+                biomass = MASSE_MEAN_PEDUNCULE_ADULTE * inflo_dev_factor * fr_ped_dev;
+                demand= MASSE_MEAN_PEDUNCULE_ADULTE * inflo_dev_factor * REPRO_CONSTRUCTION_COST * ( TEff_ini / TT_ped_dev_duration );
+
+            }
+        }
+        potential_biomass = biomass;
+        //    }
 
     }
 
@@ -167,15 +178,21 @@ public:
 
         // growth();
         assimilate_supply = demand * fr_reste;
-        biomass += assimilate_supply / COUT_STRUCTURE_REGIME;
-        potential_biomass += demand/ COUT_STRUCTURE_REGIME;
+        biomass += assimilate_supply / REPRO_CONSTRUCTION_COST;
+        potential_biomass += demand/ REPRO_CONSTRUCTION_COST;
+        demand=0;
 
         //        growth_demand();
-        if (TT_corrige > TT_ini_flowering){
-            demand = inflo_dev_factor * COUT_STRUCTURE_REGIME * pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration;
+        if (inflo_status.is(inflo::HARVEST)){
+            biomass_harvested=biomass;
+            biomass = 0;
+
         }
         else
-            demand = 0;
+
+            if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)){
+                demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration;
+            }
 
 
         //        if (TT_corrige > TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
