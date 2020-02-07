@@ -150,8 +150,8 @@ public:
         double POURCENT_NSC_ST_INI = parameters.get("POURCENT_NSC_ST_INI");
         leaves_non_structural_biomass=0;
 
-        reserve = POURCENT_NSC_ST_INI * trunk_biomass + leaves_non_structural_biomass;
         trunk_res = POURCENT_NSC_ST_INI * trunk_biomass;
+        reserve = trunk_res + leaves_non_structural_biomass;
         leaves_res_max = (SLW_max - SLW_min) * plantLeafArea *10000 / POURC_FOLIOLE; //gDM
         leaves_res_min = 0;
         leaves_res_pot = leaves_res_max - leaves_res_min;

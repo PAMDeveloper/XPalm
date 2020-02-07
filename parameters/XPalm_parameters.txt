@@ -1,5 +1,8 @@
 
+SEED = 1  ###Set the seed
+
 #####  AGE PARAMS #########
+
 AGE = 8   ### 8 - adulte | 3 - normal
 AGE_ADULT = 8
 AGE_PLANTING = 3
@@ -12,7 +15,11 @@ TT_FLOWERING_ADULT = 9430 ### depuis rank 1: 2640
 TT_FLOWERING_INITIAL = 6300 ### depuis rank 1: 1500
 TT_HARVEST_ADULT = 12150 ### depuis rank 1: 4095
 TT_HARVEST_INITIAL = 8100 ### depuis rank 1:3000
-TT_SENESCENCE = 6350 ### depuis rank 1:1520
+
+FRACTION_PERIOD_OLEOSYNTHESIS = 0.8 ### fraction de la période du développement du régime correspondant à l'oléosynthèse
+FRACTION_PERIOD_DEV_PEDUNCLE = 0.2 ### fraction de la période du développement du régime correspondant à l'oléosynthèse
+
+TT_MALE_SENESCENCE = 6350 ### depuis rank 1:1520
 AF_FRUITS = 1.5 # coefficient d affinite pour les fruits
 
 LOCAL_LIGHT_INTERCEPTION = 0  ## 1 pour mettre le mode actif
@@ -55,8 +62,8 @@ H_PF_Z1 = 0.05 # 0.5*HPF_EVAP si pas de plante de surface 0.10 si plante de surf
 ##caracteristique plantation en debut de simulation
 DENS = 143
 
-INI_SEX_RATIO = 0.8
-INI_TAUX_D_AVORTEMENT = 0.2
+INI_SEX_RATIO = 0.8  ###si rd <INI_SEX_RATIO  --> femelle
+INI_TAUX_D_AVORTEMENT = 0.2 ###si rd INI_TAUX_D_AVORTEMENT --> aborted
 
 ## PHOTOSYNTHESE
 EFFICIENCE_BIOLOGIQUE = 4.8
@@ -136,11 +143,16 @@ REALL_COST = 0.60
 ## Variables relatives a la sensibilite a IC
 ICsex_RANG_DEBUT = -28
 ICsex_RANG_FIN = -20
+PERIOD_SEX_DETERMINATION = 2700 # 15days * 9° *20 rang period before flowering (spathe appearence) when abortion can be triggered (in TT)
+
+
 SENSITIVITY_SEX = 2
 Seuil_IC_sex = 1
 
-ICabort_RANG_DEBUT = 8          #8
-ICabort_RANG_FIN = 12           # 12
+ICabort_RANG_DEBUT = 8          #8  #n'est plus utilisé
+ICabort_RANG_FIN = 12           # 12 #n'est plus utilisé
+PERIOD_ABORTION = 1350  # 15days * 9° *10 rang period before flowering (spathe appearence) when abortion is triggered and sex is determined (in TT) 
+ days 
 SENSITIVITY_ABORTION = 2
 Seuil_IC_abort = 1
 

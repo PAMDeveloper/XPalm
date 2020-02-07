@@ -101,7 +101,7 @@ private:
     double TT_FLOWERING_ADULT;
     double TT_HARVEST_INITIAL;
     double TT_HARVEST_ADULT;
-    double TT_SENESCENCE;
+    double TT_MALE_SENESCENCE;
     double MAXIMAL_SFIND;
     double INITIAL_SFIND;
     double DENS;
@@ -255,7 +255,7 @@ public:
         TT_FLOWERING_ADULT = parameters.get("TT_FLOWERING_ADULT");
         TT_HARVEST_INITIAL = parameters.get("TT_HARVEST_INITIAL");
         TT_HARVEST_ADULT = parameters.get("TT_HARVEST_ADULT");
-        TT_SENESCENCE = parameters.get("TT_SENESCENCE");
+        TT_MALE_SENESCENCE = parameters.get("TT_MALE_SENESCENCE");
         MAXIMAL_SFIND  = parameters.get("MAXIMAL_SFIND");
         INITIAL_SFIND  = parameters.get("INITIAL_SFIND");
 
@@ -285,7 +285,8 @@ public:
                 leaves_non_structural_biomass = leaves_structural_biomass = leaves_structural_biomass_harvested = leaves_non_structural_biomass_harvested =
                 inflo_biomass = respirable_bunch_biomass = bunch_biomass = bunch_biomass_harvested = Assim =
                 fr_fruits = fr_reste = offre_fruits = offre_nette = growth_demand = bunch_demand = internode_demand =
-                leaves_demand = male_demand = inflo_demand = male_biomass = male_biomass_harvested = peduncule_demand =offre_reste = total_biomass = 0;
+                leaves_demand = male_demand = inflo_demand = male_biomass = male_biomass_harvested = peduncule_demand =offre_reste =
+                total_biomass = total_repro_biomass_harvested = 0;
 
 
         //init structure
@@ -373,7 +374,7 @@ public:
         double TT_ini_flowering = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_FLOWERING_INITIAL, TT_FLOWERING_ADULT);
         double TT_ini_harvest = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_HARVEST_INITIAL, TT_HARVEST_ADULT);
         double inflo_dev_factor = age_relative_var(age_at_creation, AGE_START_PROD, AGE_ADULT, 0, 1);
-        double TT_ini_senescence = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_FLOWERING_INITIAL, TT_FLOWERING_INITIAL + TT_SENESCENCE);
+        double TT_ini_male_senescence = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_FLOWERING_INITIAL, TT_FLOWERING_INITIAL + TT_MALE_SENESCENCE);
 
         //        Leaf area increase with plant age
         double SF_ind = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, INITIAL_SFIND , MAXIMAL_SFIND);
@@ -387,7 +388,7 @@ public:
                        production_speed,
                        TT_ini_flowering,
                        TT_ini_harvest,
-                       TT_ini_senescence,
+                       TT_ini_male_senescence,
                        inflo_dev_factor,
                        SF_ind);
 
@@ -473,28 +474,26 @@ public:
 
             //            if(phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE) != phytomer::DEAD) {
 
-            plantLeafArea += phytomer->leaf_model()->get <double>(t, Leaf::LEAFAREA);
-
-            leaves_structural_biomass += phytomer->leaf_model()->get <double>(t, Leaf::LEAF_STRUCTURAL_BIOMASS);
-            leaves_non_structural_biomass += phytomer->leaf_model()->get <double>(t, Leaf::LEAF_NON_STRUCTURAL_BIOMASS);
-
-            leaves_structural_biomass_harvested += phytomer->leaf_model()->get <double>(t, Leaf::LEAF_STRUCTURAL_BIOMASS_HARVESTED);
-            leaves_non_structural_biomass_harvested += phytomer->leaf_model()->get <double>(t, Leaf::LEAF_NON_STRUCTURAL_BIOMASS_HARVESTED);
-
-            leaves_demand += phytomer->leaf_model()->get <double>(t, Leaf::LEAF_DEMAND);
-
+            //stem
             trunk_height += phytomer->internode_model()->get <double>(t, Internode::LENGTH);
             trunk_biomass += phytomer->internode_model()->get <double>(t, Internode::BIOMASS);
             internode_demand +=  phytomer->internode_model()->get <double>(t, Internode::DEMAND);
 
+            //leaves
+            plantLeafArea += phytomer->leaf_model()->get <double>(t, Leaf::LEAFAREA);
+            leaves_structural_biomass += phytomer->leaf_model()->get <double>(t, Leaf::LEAF_STRUCTURAL_BIOMASS);
+            leaves_non_structural_biomass += phytomer->leaf_model()->get <double>(t, Leaf::LEAF_NON_STRUCTURAL_BIOMASS);
+            leaves_structural_biomass_harvested += phytomer->leaf_model()->get <double>(t, Leaf::LEAF_STRUCTURAL_BIOMASS_HARVESTED);
+            leaves_non_structural_biomass_harvested += phytomer->leaf_model()->get <double>(t, Leaf::LEAF_NON_STRUCTURAL_BIOMASS_HARVESTED);
+            leaves_demand += phytomer->leaf_model()->get <double>(t, Leaf::LEAF_DEMAND);
+
+            //inflo
             inflo_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::BIOMASS); //## attention pour la respi de maintenance !!!
             respirable_bunch_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::RESPIRABLE_BIOMASS);
             bunch_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::FEMELLE_BIOMASS);
             male_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_BIOMASS);
-
             bunch_biomass_harvested += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::FEMELLE_BIOMASS_HARVESTED);
             male_biomass_harvested += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_BIOMASS_HARVESTED);
-
             inflo_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::DEMAND);
             bunch_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::BUNCH_DEMAND);
             male_demand += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_DEMAND);

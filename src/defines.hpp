@@ -184,29 +184,30 @@ enum phytomer_state {  ACTIVE = 0,
 }
 
 
-namespace bunch {
-enum bunch_state {
-    OLEOSYNTHESE = 0,
-    AVANT_OLEOSYNTHESE = 1,
-    RECOLTE = 2,
-    ABORTED = 3,
-    ABLATED = 4
-};
-}
+//namespace bunch {
+//enum bunch_state {
+//    OLEOSYNTHESE = 0,
+//    AVANT_OLEOSYNTHESE = 1,
+//    RECOLTE = 2,
+//    ABORTED = 3,
+//    ABLATED = 4
+//};
+//}
 
 
 
 namespace inflo {
 enum inflo_state {
-      ABORTED = 1
-    , INITIATED = 2
-    , MALE = 4
-    , FEMALE = 8
-    , FLOWERING = 16
-    , OLEOSYNTHESIS = 32
-    , HARVEST = 64
-    , DEAD = 128
-    , SENESCENCE = 256
+    ABORTED = 1
+    ,NON_ABORTED = 2
+    , INITIATED = 4
+    , MALE = 8
+    , FEMALE = 16
+    , FLOWERING = 32
+    , OLEOSYNTHESIS = 64
+    , HARVEST = 128
+    , DEAD = 256
+    , SENESCENCE = 512
 };
 
 

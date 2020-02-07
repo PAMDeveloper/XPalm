@@ -139,10 +139,13 @@ public:
         masse_ind_max = IND_FRUIT_WEIGHT / 1000;
         pot_fruits_number = inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE;
 
-        double RATIO_DUREE_JEUNES_OLEO = parameters.get("RATIO_DUREE_JEUNES_OLEO");
-        double PRODUCTION_SPEED_ADULT = parameters.get("PRODUCTION_SPEED_ADULT");
-        double DUREE_OLEO = parameters.get("DUREE_OLEO");
-        TT_oleo_duration = DUREE_OLEO * pow(PRODUCTION_SPEED_ADULT / production_speed, RATIO_DUREE_JEUNES_OLEO);
+//        double RATIO_DUREE_JEUNES_OLEO = parameters.get("RATIO_DUREE_JEUNES_OLEO");
+//        double PRODUCTION_SPEED_ADULT = parameters.get("PRODUCTION_SPEED_ADULT");
+//        double DUREE_OLEO = parameters.get("DUREE_OLEO");
+//        TT_oleo_duration = DUREE_OLEO * pow(PRODUCTION_SPEED_ADULT / production_speed, RATIO_DUREE_JEUNES_OLEO);
+
+        double FRACTION_PERIOD_OLEOSYNTHESIS = parameters.get("FRACTION_PERIOD_OLEOSYNTHESIS");
+        TT_oleo_duration = FRACTION_PERIOD_OLEOSYNTHESIS*(TT_ini_harvest - TT_ini_flowering);
 
 //        oil_statut = oil::UNKNOWN;
         fruit_number=0;
@@ -165,11 +168,11 @@ public:
 
             double total_final_biomass = inflo_dev_factor *  MEAN_FRUIT_NUMBER_ADULTE * (IND_FRUIT_WEIGHT/1000);
             double TT_bunch_dev_duration = TT_ini_harvest - TT_ini_flowering;
-            double fr_bunch_dev = (TT_since_appearance - TT_ini_flowering) / TT_bunch_dev_duration;
+            double fr_bunch_dev = min (1.0 , (TT_since_appearance - TT_ini_flowering) / TT_bunch_dev_duration);
             nonoil_biomass = total_final_biomass * (1 - OIL_CONTENT ) * fr_bunch_dev;
 
             if(inflo_status.is(inflo::OLEOSYNTHESIS)) {
-                double fr_oleo = (TT_since_appearance - TT_ini_oleo) / TT_oleo_duration;
+                double fr_oleo = min (1.0, (TT_since_appearance - TT_ini_oleo) / TT_oleo_duration);
                 final_oil_mass = total_final_biomass * OIL_CONTENT;
                 oil_biomass =  final_oil_mass * fr_oleo;
             }

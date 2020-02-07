@@ -35,30 +35,33 @@ public:
                      ASSIMILATE_SUPPLY,
                      BIOMASS ,
                      POTENTIAL_BIOMASS ,
-                     DEMAND_POT
+                     DEMAND_POT,
+                     TT_PED_DEV_DURATION
                    };
 
     enum externals {
-                      IC_SPIKELET,
-                      TEFF,
-                      TT_CORRIGE,
-                      TT_SINCE_APPEARANCE,
-                      FR_RESTE
-                   };
+        IC_SPIKELET,
+        TEFF,
+        TT_CORRIGE,
+        TT_SINCE_APPEARANCE,
+        FR_RESTE
+    };
 
 private:
 
     //      parameters
-    double RANG_DEBUT_CROISSANCE_PEDUNCULE;
+    //    double RANG_DEBUT_CROISSANCE_PEDUNCULE;
     double SENSIVITY_IC_SPIKELET;
     double MASSE_MEAN_PEDUNCULE_ADULTE;
     double COUT_STRUCTURE_REGIME;
+    double FRACTION_PERIOD_DEV_PEDUNCLE ;
 
     //     internals
     //predim
     double TT_ini_flowering;
     double inflo_dev_factor;
     double production_speed;
+    double TT_ped_dev_duration;
     //var
     double demand;
     double assimilate_supply;
@@ -84,6 +87,8 @@ public:
         Internal(BIOMASS , &Peduncle::biomass );
         Internal(POTENTIAL_BIOMASS , &Peduncle::potential_biomass );
         Internal(DEMAND_POT, &Peduncle::demand_pot);
+        Internal(TT_PED_DEV_DURATION, &Peduncle::TT_ped_dev_duration);
+
 
         //          externals
         External(IC_SPIKELET, &Peduncle::IC_spikelet);
@@ -101,7 +106,7 @@ public:
     void init(double t, const xpalm::ModelParameters& parameters, double prod_speed, double flo_tt, double TT_ini_harvest, double inflo_factor)
     {
         init(t, parameters);
-//        AtomicModel<Peduncle>::init(t, parameters);
+        //        AtomicModel<Peduncle>::init(t, parameters);
         last_time = t-1;
 
         TT_ini_flowering = flo_tt;
@@ -111,58 +116,78 @@ public:
         //        parameters
         SENSIVITY_IC_SPIKELET = parameters.get("SENSIVITY_IC_SPIKELET");
         MASSE_MEAN_PEDUNCULE_ADULTE = parameters.get("MASSE_MEAN_PEDUNCULE_ADULTE");
-        RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
+        FRACTION_PERIOD_DEV_PEDUNCLE = parameters.get("FRACTION_PERIOD_DEV_PEDUNCLE");
+        double TEff_ini = parameters.get("T_EFF_INI");
+
+        //        RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
         COUT_STRUCTURE_REGIME = parameters.get("COUT_STRUCTURE_REGIME");
 
-//        double PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL");
+        //        double PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL");
 
         //internals
         demand = 0;
         assimilate_supply = 0;
         demand_pot = 0;
 
+        TT_ped_dev_duration = FRACTION_PERIOD_DEV_PEDUNCLE* (TT_ini_harvest - TT_ini_flowering);
+
         //init structure
-        if (TT_since_appearance < TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE / production_speed) {
+        if (TT_since_appearance < TT_ini_flowering) {
             biomass = 0 ;
         } else {
             if (TT_since_appearance > TT_ini_harvest)
                 biomass = 0;
             else {
-                double coeff = 1;
                 if ( TT_since_appearance <= TT_ini_flowering ) {
-                    double TT_since_growth = RANG_DEBUT_CROISSANCE_PEDUNCULE / prod_speed;
-                    coeff = ( TT_since_appearance - (TT_ini_flowering - TT_since_growth)) / TT_since_growth;
+
+
+                    double fr_ped_dev = min(1.0, (TT_since_appearance - TT_ini_flowering) / TT_ped_dev_duration);
+
+                    //                double coeff = 1;
+                    //                if ( TT_since_appearance <= TT_ini_flowering ) {
+                    //                    double TT_since_growth = RANG_DEBUT_CROISSANCE_PEDUNCULE / prod_speed;
+                    //                    coeff = ( TT_since_appearance - (TT_ini_flowering - TT_since_growth)) / TT_since_growth;
+                    //                }
+
+                    //                biomass = inflo_dev_factor * MASSE_MEAN_PEDUNCULE_ADULTE * coeff;
+
+                    biomass = MASSE_MEAN_PEDUNCULE_ADULTE * inflo_dev_factor * fr_ped_dev/ COUT_STRUCTURE_REGIME;
+                    demand= MASSE_MEAN_PEDUNCULE_ADULTE * inflo_dev_factor * ( TEff_ini / TT_ped_dev_duration );
+
                 }
-
-                biomass = inflo_dev_factor * MASSE_MEAN_PEDUNCULE_ADULTE * coeff;
             }
+            potential_biomass = biomass;
         }
-        potential_biomass = biomass;
-    }
 
+    }
 
     void compute(double t, bool /* update */)
     {
-//        growth();
-        //compute assimilate supply
+
+
+        // growth();
         assimilate_supply = demand * fr_reste;
         biomass += assimilate_supply / COUT_STRUCTURE_REGIME;
+        potential_biomass += demand/ COUT_STRUCTURE_REGIME;
 
-//        growth_demand();
-        //compute potential biomass
-        potential_biomass = inflo_dev_factor * pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * MASSE_MEAN_PEDUNCULE_ADULTE;
-
-        //compute_demand
-        if (TT_corrige > TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
-            demand = inflo_dev_factor * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed) * Teff;
+        //        growth_demand();
+        if (TT_corrige > TT_ini_flowering){
+            demand = inflo_dev_factor * COUT_STRUCTURE_REGIME * pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration;
+        }
         else
             demand = 0;
 
-        //compute_pot_demand
-        if (TT_since_appearance > TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
-            demand_pot = inflo_dev_factor * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed) * Teff;
-        else
-            demand_pot = 0;
+
+        //        if (TT_corrige > TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
+        //            demand = inflo_dev_factor * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed) * Teff;
+        //        else
+        //            demand = 0;
+
+        //        //compute_pot_demand
+        //        if (TT_since_appearance > TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
+        //            demand_pot = inflo_dev_factor * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed) * Teff;
+        //        else
+        //            demand_pot = 0;
     }
 
 
