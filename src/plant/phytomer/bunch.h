@@ -138,7 +138,7 @@ public:
         //        AtomicModel<Bunch>::init(t, parameters);
 
         //default init
-        last_time = t-1;
+        last_time = t;
 
         //        parameters
         OIL_CONTENT = parameters.get("OIL_CONTENT");
@@ -202,6 +202,7 @@ public:
             }
 
         }
+
         if (inflo_status.is(inflo::HARVEST)){
             oil_biomass_harvested=oil_biomass;
             nonoil_biomass_harvested=nonoil_biomass;

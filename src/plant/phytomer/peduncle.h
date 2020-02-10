@@ -90,7 +90,7 @@ public:
         Internal(DEMAND, &Peduncle::demand);
         Internal(ASSIMILATE_SUPPLY, &Peduncle::assimilate_supply);
         Internal(BIOMASS , &Peduncle::biomass );
-        Internal(BIOMASS , &Peduncle::biomass_harvested );
+        Internal(BIOMASS_HARVESTED , &Peduncle::biomass_harvested );
         Internal(POTENTIAL_BIOMASS , &Peduncle::potential_biomass );
         Internal(DEMAND_POT, &Peduncle::demand_pot);
         Internal(TT_PED_DEV_DURATION, &Peduncle::TT_ped_dev_duration);
@@ -114,7 +114,7 @@ public:
     {
         init(t, parameters);
         //        AtomicModel<Peduncle>::init(t, parameters);
-        last_time = t-1;
+        last_time = t;
 
         TT_ini_flowering = flo_tt;
         TT_ini_harvest=TT_ini_harvest_;

@@ -198,9 +198,9 @@ enum phytomer_state {  ACTIVE = 0,
 
 namespace inflo {
 enum inflo_state {
-    ABORTED = 1
-    ,NON_ABORTED = 2
-    , INITIATED = 4
+    INITIATED = 1
+    , NON_ABORTED = 2
+    , ABORTED = 4
     , MALE = 8
     , FEMALE = 16
     , FLOWERING = 32

@@ -109,7 +109,7 @@ public:
     void init(double t, const xpalm::ModelParameters& parameters, int nb, int total_phyto_, bool st, double tree_age_at_creation_,
               double tree_age, double prod_speed, double flo_tt, double harv_tt, double tt_ini_sen, double inflo_factor, double SF_fin_)
     {
-        last_time = t;
+        last_time = t-1;
 
         //parameters
         INACTIVE_PHYTOMER_NUMBER = parameters.get("INACTIVE_PHYTOMER_NUMBER");
