@@ -81,7 +81,8 @@ public:
                      INFLO_DEMAND,
                      MALE_BIOMASS,
                      MALE_BIOMASS_HARVESTED,
-                     TOTAL_REPRO_BIOMASS_HARVESTED,
+                     TOTAL_BUNCH_BIOMASS_HARVESTED,
+                     TOTAL_INFLO_MALE_BIOMASS_HARVESTED,
                      PEDUNCULE_DEMAND };
 
 private:
@@ -161,7 +162,8 @@ private:
     double inflo_demand;
     double male_biomass;
     double male_biomass_harvested;
-    double total_repro_biomass_harvested;
+    double total_bunch_biomass_harvested;
+    double total_inflo_male_biomass_harvested;
     double peduncule_demand;
 
 
@@ -217,7 +219,8 @@ public:
         Internal(INFLO_DEMAND, &Tree::inflo_demand);
         Internal(MALE_BIOMASS, &Tree::male_biomass);
         Internal(MALE_BIOMASS_HARVESTED, &Tree::male_biomass_harvested);
-        Internal(TOTAL_REPRO_BIOMASS_HARVESTED, &Tree::total_repro_biomass_harvested);
+        Internal(TOTAL_BUNCH_BIOMASS_HARVESTED, &Tree::total_bunch_biomass_harvested);
+        Internal(TOTAL_INFLO_MALE_BIOMASS_HARVESTED, &Tree::total_inflo_male_biomass_harvested);
         Internal(PEDUNCULE_DEMAND, &Tree::peduncule_demand);
     }
 
@@ -286,7 +289,7 @@ public:
                 inflo_biomass = respirable_bunch_biomass = bunch_biomass = bunch_biomass_harvested = Assim =
                 fr_fruits = fr_reste = offre_fruits = offre_nette = growth_demand = bunch_demand = internode_demand =
                 leaves_demand = male_demand = inflo_demand = male_biomass = male_biomass_harvested = peduncule_demand =offre_reste =
-                total_biomass = total_repro_biomass_harvested = 0;
+                total_biomass = total_bunch_biomass_harvested = total_inflo_male_biomass_harvested= 0;
 
 
         //init structure
@@ -510,8 +513,8 @@ public:
 
         // compute total harvested biomass
         total_leaves_biomass_harvested = leaves_structural_biomass_harvested + leaves_non_structural_biomass_harvested;
-        total_repro_biomass_harvested=bunch_biomass_harvested+male_biomass;
-
+        total_bunch_biomass_harvested = bunch_biomass_harvested;
+        total_inflo_male_biomass_harvested = male_biomass_harvested;
 
         double TMoy = (_parameters.get(t).TMax + _parameters.get(t).TMin) / 2;
         double Q10 = pow(2, (TMoy - 25)/10);

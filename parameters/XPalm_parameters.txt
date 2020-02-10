@@ -92,8 +92,7 @@ SENSITIVITY_SEX = 2
 Seuil_IC_sex = 1
 ICabort_RANG_DEBUT = 8          #8  #n'est plus utilisé
 ICabort_RANG_FIN = 12           # 12 #n'est plus utilisé
-PERIOD_ABORTION = 1350  # 15days * 9° *10 rang period before flowering (spathe appearence) when abortion is triggered (in TT) 
- days 
+PERIOD_ABORTION = 1350  # 15days * 9° *10 rang period before flowering (spathe appearence) when abortion is triggered (in TT)  
 SENSITIVITY_ABORTION = 2
 Seuil_IC_abort = 1
 
@@ -104,7 +103,7 @@ MASSE_INFLO_MALE_ADULTE = 1.2
 #####  PEDUNCLE PARAMS #########
 #IC_spikelet_RANG_DEBUT = -10
 #IC_spikelet_RANG_FIN = -5
-PERIOD_DEV_SPIKELET= 675 #5rg * 15 days * 9°C periode apres flowering pendant laquelle le taux de nouaison est modulable (TT)
+PERIOD_DEV_SPIKELET = 675 #5rg * 15 days * 9°C periode apres flowering pendant laquelle le taux de nouaison est modulable (TT)
 SENSIVITY_IC_SPIKELET =  0.30 #  0.05 0.5 ?
 MASSE_MEAN_PEDUNCULE_ADULTE = 2.1 
 

@@ -167,6 +167,7 @@ public:
 
             }
         }
+
         potential_biomass = biomass;
         //    }
 

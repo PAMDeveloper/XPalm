@@ -56,6 +56,7 @@ public:
         //TREE
         selector("TOTAL_BIOMASS", artis::kernel::DOUBLE,{Tree::TOTAL_BIOMASS});
         selector("BUNCH_BIOMASS", artis::kernel::DOUBLE,{Tree::BUNCH_BIOMASS});
+        selector("TOTAL_BUNCH_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::TOTAL_BUNCH_BIOMASS_HARVESTED});
         selector("LEAVES_NON_STRUCTURAL_BIOMASS", artis::kernel::DOUBLE,{Tree::LEAVES_NON_STRUCTURAL_BIOMASS});
         selector("EI", artis::kernel::DOUBLE,{Tree::EI});
         selector("IC", artis::kernel::DOUBLE,{Tree::IC});

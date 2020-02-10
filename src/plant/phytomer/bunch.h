@@ -45,7 +45,7 @@ private:
     double COUT_OIL;
     double REPRO_CONSTRUCTION_COST;
     double SENSIVITY_IC_SPIKELET;
-    double IC_spikelet_RANG_FIN;
+//    double IC_spikelet_RANG_FIN;
     double SENSIVITY_IC_SETTING;
     double PERIOD_FRUIT_SET;
 
@@ -145,7 +145,7 @@ public:
         COUT_OIL = parameters.get("COUT_OIL");
         REPRO_CONSTRUCTION_COST = parameters.get("REPRO_CONSTRUCTION_COST");
         SENSIVITY_IC_SPIKELET = parameters.get("SENSIVITY_IC_SPIKELET");
-        IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
+//        IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
         SENSIVITY_IC_SETTING = parameters.get("SENSIVITY_IC_SETTING");
         PERIOD_FRUIT_SET= parameters.get("PERIOD_FRUIT_SET");
 
@@ -239,7 +239,7 @@ public:
         //        growth_demand();
 
         //        if (rank > IC_spikelet_RANG_FIN) {
-        if (TT_corrige>=TT_ini_flowering+ PERIOD_FRUIT_SET) //TODO add FRUIT_SET State
+        if (TT_corrige>=TT_ini_flowering+ PERIOD_FRUIT_SET)
             fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pow(IC_setting, SENSIVITY_IC_SETTING) * pot_fruits_number;
         else if (TT_corrige>=TT_ini_flowering){
             fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pot_fruits_number;

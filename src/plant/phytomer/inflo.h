@@ -125,7 +125,7 @@ private:
 
     //    double red_vitesse_FTSW;
     double respirable_biomass;
-//    double gain_TEff_jour;
+    //    double gain_TEff_jour;
     double TT_corrige;
     double demand;
     double bunch_demand;
@@ -192,7 +192,7 @@ public:
         Internal(MALE_BIOMASS_HARVESTED, &Inflo::male_biomass_harvested);
         //        Internal(RED_VITESSE_FTSW, &Inflo::red_vitesse_FTSW);
         Internal(RESPIRABLE_BIOMASS, &Inflo::respirable_biomass);
-//        Internal(GAIN_TEFF_JOUR, &Inflo::gain_TEff_jour);
+        //        Internal(GAIN_TEFF_JOUR, &Inflo::gain_TEff_jour);
         Internal(TT_CORRIGE, &Inflo::TT_corrige);
         Internal(DEMAND, &Inflo::demand);
         Internal(IC_SETTING, &Inflo::IC_setting);
@@ -251,7 +251,7 @@ public:
               double TT_ini_flo, double TT_ini_harv,
               double TT_ini_senec, double inflo_dev_factor)
     {
-        last_time = t;
+        last_time = t-1;
 
 
 
@@ -327,7 +327,7 @@ public:
 
         //        red_vitesse_FTSW= 0;
         respirable_biomass= 0;
-//        gain_TEff_jour= 0;
+        //        gain_TEff_jour= 0;
         demand= 0;
 
 
@@ -342,11 +342,9 @@ public:
         TT_ini_abortion = TT_ini_flowering-PERIOD_DEV_SPIKELET;
         TT_ini_sex = TT_ini_abortion - PERIOD_SEX_DETERMINATION;
 
-
-        male->init(t, parameters, phytomer_age, inflo_dev_factor, TT_ini_flowering, TT_ini_male_senescence);
         peduncle->init(t, parameters, production_speed, TT_ini_flowering, TT_ini_harvest, inflo_dev_factor);
         bunch->init(t, parameters, production_speed, TT_ini_flowering, TT_ini_harvest, TT_ini_oleo, inflo_dev_factor);
-
+        male->init(t, parameters, phytomer_age, inflo_dev_factor, TT_ini_flowering, TT_ini_male_senescence);
 
         // init step state
 
@@ -356,8 +354,10 @@ public:
         if (TT_corrige > TT_ini_sex && !status.is(inflo::FEMALE) &&  !status.is(inflo::MALE) ) {
             if(rd_sex < parameters.get("INI_SEX_RATIO")) {
                 status.add(inflo::FEMALE);
+
             } else {
                 status.add(inflo::MALE);
+
             }
         }
 
@@ -497,10 +497,6 @@ public:
             bunch_nonoil_biomass_harvested =  bunch->get< double >(t, Bunch::NONOIL_BIOMASS_HARVESTED);
             bunch_demand = bunch->get< double >(t, Bunch::DEMAND);
 
-
-
-
-
         }
 
         //        }
@@ -563,7 +559,7 @@ public:
 
         //        Organ.growth_demand(self, correctedTEff);
         //        if(rank > 0)
-//        TT_since_appearance += gain_TEff_jour;
+        //        TT_since_appearance += gain_TEff_jour;
 
         demand = bunch_demand + peduncle_demand + male_demand;
 

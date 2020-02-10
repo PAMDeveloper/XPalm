@@ -185,6 +185,7 @@ public:
 //        inflo->put<double>(t, Inflo::FR_RESTE, fr_reste);
 //        inflo->put<double>(t, Inflo::FR_FRUITS, fr_fruits);
         (*inflo)(t);
+
         inflo_status = inflo->get<inflo::inflo_states, Inflo>(t, Inflo::STATUS);
     }
 
