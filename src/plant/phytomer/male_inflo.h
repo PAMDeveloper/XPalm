@@ -15,11 +15,17 @@ namespace model {
 class MaleInflo : public AtomicModel < MaleInflo >
 {
 public:
-    enum internals { BIOMASS, BIOMASS_HARVESTED, POTENTIAL_BIOMASS, ASSIMILATE_SUPPLY, DEMAND, TT_FLO_DURATION, INFLO_DEV_FACTOR };
+    enum internals { BIOMASS,
+                     BIOMASS_HARVESTED,
+                     POTENTIAL_BIOMASS,
+                     ASSIMILATE_SUPPLY,
+                     DEMAND,
+                     TT_FLO_DURATION,
+                     INFLO_DEV_FACTOR };
 
     enum externals { FR_RESTE,
                      TEFF,
-                     TT_INI_FLOWERING,
+//                     TT_INI_FLOWERING,
                      TT_SINCE_APPEARANCE,
                      INFLO_STATUS
                    };
@@ -66,7 +72,7 @@ public:
         External(FR_RESTE, &MaleInflo::fr_reste);
         External(TEFF, &MaleInflo::Teff);
         //        External(TT_CORRIGE, &MaleInflo::TT_corrige);
-        External (TT_INI_FLOWERING, &MaleInflo::TT_ini_flowering);
+//        External (TT_INI_FLOWERING, &MaleInflo::TT_ini_flowering);
         External(TT_SINCE_APPEARANCE, &MaleInflo::TT_since_appearance);
     }
 
@@ -106,6 +112,7 @@ public:
             biomass = MASSE_INFLO_MALE_ADULTE * inflo_dev_factor * fr_growth;
             demand = MASSE_INFLO_MALE_ADULTE * REPRO_CONSTRUCTION_COST * inflo_dev_factor * ( TEff_ini / TT_flowering_duration );
         }
+
         if (inflo_status.is(inflo::SENESCENCE) ) {
             biomass_harvested=biomass;
             biomass=0;
@@ -117,17 +124,20 @@ public:
     void compute(double t, bool /* update */)
     {
 
+
+        // growth();
+        assimilate_supply = demand * fr_reste;
+        biomass += assimilate_supply / REPRO_CONSTRUCTION_COST;
+        potential_biomass += demand/ REPRO_CONSTRUCTION_COST;
+        demand=0;
+
         if (inflo_status.is(inflo::FLOWERING)){
-            assimilate_supply = demand * fr_reste;
-            biomass += assimilate_supply / REPRO_CONSTRUCTION_COST;
-            potential_biomass += demand / REPRO_CONSTRUCTION_COST;
             demand = MASSE_INFLO_MALE_ADULTE * REPRO_CONSTRUCTION_COST * inflo_dev_factor * ( Teff / TT_flowering_duration );
 
         }
         else if (inflo_status.is(inflo::SENESCENCE)){
             biomass_harvested=biomass;
             biomass = 0;
-            demand = 0;
         }
     }
 };

@@ -85,15 +85,18 @@ private:
     //    double ICabort_RANG_DEBUT;
     //    double ICabort_RANG_FIN;
     double PERIOD_ABORTION;
-    double Seuil_IC_sex;
+//    double Seuil_IC_sex;
     double SENSITIVITY_SEX;
     double Seuil_IC_abort;
     double ABORTION_RATE_MAX;
+    double  ABORTION_RATE_REF;
     double SEX_RATIO_MIN;
+    double SEX_RATIO_REF;
     double SEED;
     double FRACTION_PERIOD_OLEOSYNTHESIS;
-    double INI_SEX_RATIO;
-    double INI_TAUX_D_AVORTEMENT;
+//    double INI_SEX_RATIO;
+
+//    double INI_TAUX_D_AVORTEMENT;
 
     //     submodels
     std::unique_ptr < Peduncle > peduncle;
@@ -284,16 +287,21 @@ public:
         //        ICabort_RANG_FIN = parameters.get("ICabort_RANG_FIN");
         PERIOD_ABORTION = parameters.get("PERIOD_ABORTION");
 
-        Seuil_IC_sex = parameters.get("Seuil_IC_sex");
+//        Seuil_IC_sex = parameters.get("Seuil_IC_sex");
+        SEX_RATIO_REF = parameters.get("SEX_RATIO_REF");
+        SEX_RATIO_MIN = parameters.get("SEX_RATIO_MIN");
         SENSITIVITY_SEX = parameters.get("SENSITIVITY_SEX");
         Seuil_IC_abort = parameters.get("Seuil_IC_abort");
 
         //        SENSITIVITY_ABORTION = parameters.get("SENSITIVITY_ABORTION");
         ABORTION_RATE_MAX = parameters.get("ABORTION_RATE_MAX");
+        ABORTION_RATE_REF = parameters.get("ABORTION_RATE_REF");
+
         FRACTION_PERIOD_OLEOSYNTHESIS = parameters.get("FRACTION_PERIOD_OLEOSYNTHESIS");
         SEED = parameters.get("SEED");
-        INI_SEX_RATIO=parameters.get("INI_SEX_RATIO");
-        INI_TAUX_D_AVORTEMENT= parameters.get("INI_TAUX_D_AVORTEMENT");
+
+//        INI_SEX_RATIO=parameters.get("INI_SEX_RATIO");
+//        INI_TAUX_D_AVORTEMENT= parameters.get("INI_TAUX_D_AVORTEMENT");
         PERIOD_FRUIT_SET=parameters.get("PERIOD_FRUIT_SET");
 
         //predim
@@ -327,8 +335,8 @@ public:
         IC_spikelet_tot = 0;
         IC_spikelet = 0;
 
-        abortion_rate=INI_TAUX_D_AVORTEMENT;
-        sex_ratio=INI_SEX_RATIO;
+        abortion_rate=ABORTION_RATE_REF;
+        sex_ratio=SEX_RATIO_REF;
 
         //var
         biomass= 0;
@@ -355,7 +363,7 @@ public:
         //        double RATIO_DUREE_JEUNES_OLEO = parameters.get("RATIO_DUREE_JEUNES_OLEO");
 
         //set seed TODO remove after debug
-        srand(SEED);
+//        srand(SEED);
 
         TT_since_appearance= parameters.get("T_EFF_INI") * phytomer_age;
         TT_ini_oleo = TT_ini_flowering +(1-FRACTION_PERIOD_OLEOSYNTHESIS)*(TT_ini_harvest - TT_ini_flowering);
@@ -472,7 +480,7 @@ public:
         //            return;
 
         //set seed TODO remove after debug
-        srand(SEED);
+//        srand(SEED);
 
         if(status.is(inflo::ABORTED))
             return;
@@ -518,6 +526,7 @@ public:
         if (status.is(inflo::MALE) && status.is(inflo::NON_ABORTED)) {
             male->put<double>(t, MaleInflo::TEFF, TEff);
             male->put<inflo::inflo_states>(t, MaleInflo::INFLO_STATUS, status);
+            male->put<double>(t, MaleInflo::TT_SINCE_APPEARANCE, TT_since_appearance);
             male->put<double>(t, MaleInflo::FR_RESTE, fr_reste);
             (*male)(t);
 
@@ -568,7 +577,7 @@ public:
             IC_sex_tot += tree_IC;
             IC_sex = IC_sex_tot / nb_joursICsex;
         }
-        sex_ratio = min(1.0, SEX_RATIO_MIN+IC_sex*(Seuil_IC_sex-SEX_RATIO_MIN));
+        sex_ratio =max(0.0, min(1.0, SEX_RATIO_MIN+IC_sex*(SEX_RATIO_REF-SEX_RATIO_MIN)));
 
         //IC on abortion
         if (TT_corrige >= TT_ini_sex && TT_corrige < TT_ini_abortion) {
@@ -576,7 +585,7 @@ public:
             IC_abort_tot += tree_IC;
             IC_abort = IC_abort_tot / nb_joursICabort;
         }
-        abortion_rate = min(ABORTION_RATE_MAX, ABORTION_RATE_MAX+IC_abort*(Seuil_IC_abort-ABORTION_RATE_MAX));
+        abortion_rate =max(0.0, min(ABORTION_RATE_MAX, ABORTION_RATE_MAX+IC_abort*(ABORTION_RATE_REF-ABORTION_RATE_MAX)));
 
         //IC on spikelet biomass
         if (TT_corrige >= TT_ini_abortion && TT_corrige < TT_ini_flowering){

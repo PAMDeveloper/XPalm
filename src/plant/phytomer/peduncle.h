@@ -195,18 +195,6 @@ public:
                 demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * min(1.0, IC_spikelet) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration; //TODO, test with TT_corrige, correct 1.0 if plasticity
                 /*demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration;*/
             }
-
-
-        //        if (TT_corrige > TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
-        //            demand = inflo_dev_factor * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed) * Teff;
-        //        else
-        //            demand = 0;
-
-        //        //compute_pot_demand
-        //        if (TT_since_appearance > TT_ini_flowering - RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed)
-        //            demand_pot = inflo_dev_factor * COUT_STRUCTURE_REGIME * potential_biomass / (RANG_DEBUT_CROISSANCE_PEDUNCULE/production_speed) * Teff;
-        //        else
-        //            demand_pot = 0;
     }
 
 
