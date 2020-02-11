@@ -17,7 +17,7 @@ public:
                      DEMAND,
                      OIL_DEMAND,
                      NONOIL_DEMAND,
-                     NONOIL_DEMAND_POT,
+//                     NONOIL_DEMAND_POT,
                      OIL_ASSIMILATE_SUPPLY,
                      NONOIL_ASSIMILATE_SUPPLY,
                      OIL_BIOMASS,
@@ -45,7 +45,7 @@ private:
     double COUT_OIL;
     double REPRO_CONSTRUCTION_COST;
     double SENSIVITY_IC_SPIKELET;
-//    double IC_spikelet_RANG_FIN;
+    //    double IC_spikelet_RANG_FIN;
     double SENSIVITY_IC_SETTING;
     double PERIOD_FRUIT_SET;
 
@@ -63,7 +63,7 @@ private:
     double demand;
     double oil_demand;
     double nonoil_demand;
-    double nonoil_demand_pot;
+    //    double nonoil_demand_pot;
     double oil_assimilate_supply;
     double nonoil_assimilate_supply;
     double oil_biomass;
@@ -101,7 +101,7 @@ public:
         Internal(DEMAND, &Bunch::demand);
         Internal(OIL_DEMAND, &Bunch::oil_demand);
         Internal(NONOIL_DEMAND, &Bunch::nonoil_demand);
-        Internal(NONOIL_DEMAND_POT, &Bunch::nonoil_demand_pot);
+        //        Internal(NONOIL_DEMAND_POT, &Bunch::nonoil_demand_pot);
         Internal(OIL_ASSIMILATE_SUPPLY, &Bunch::oil_assimilate_supply);
         Internal(NONOIL_ASSIMILATE_SUPPLY, &Bunch::nonoil_assimilate_supply);
         Internal(OIL_BIOMASS, &Bunch::oil_biomass);
@@ -145,7 +145,7 @@ public:
         COUT_OIL = parameters.get("COUT_OIL");
         REPRO_CONSTRUCTION_COST = parameters.get("REPRO_CONSTRUCTION_COST");
         SENSIVITY_IC_SPIKELET = parameters.get("SENSIVITY_IC_SPIKELET");
-//        IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
+        //        IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
         SENSIVITY_IC_SETTING = parameters.get("SENSIVITY_IC_SETTING");
         PERIOD_FRUIT_SET= parameters.get("PERIOD_FRUIT_SET");
 
@@ -156,7 +156,7 @@ public:
         double IND_FRUIT_WEIGHT = parameters.get("IND_FRUIT_WEIGHT");
         double MEAN_FRUIT_NUMBER_ADULTE = parameters.get("MEAN_FRUIT_NUMBER_ADULTE");
         masse_ind_max = IND_FRUIT_WEIGHT / 1000;
-        pot_fruits_number = inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE;
+        pot_fruits_number = int (inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE);
 
         //        double RATIO_DUREE_JEUNES_OLEO = parameters.get("RATIO_DUREE_JEUNES_OLEO");
         //        double PRODUCTION_SPEED_ADULT = parameters.get("PRODUCTION_SPEED_ADULT");
@@ -170,7 +170,7 @@ public:
         fruit_number=0;
         oil_assimilate_supply = 0;
         nonoil_assimilate_supply = 0;
-        nonoil_demand_pot=0;
+        //        nonoil_demand_pot=0;
         oil_biomass = 0;
         oil_biomass_harvested = 0;
         nonoil_biomass = 0;
@@ -183,10 +183,13 @@ public:
         demand = 0;
 
 
-        if (inflo_status.is(inflo::NON_ABORTED))
-            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pot_fruits_number;
-        else
-            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pow(IC_setting, SENSIVITY_IC_SETTING) * pot_fruits_number;
+        if (inflo_status.is(inflo::NON_ABORTED)){
+            if (TT_corrige>=TT_ini_flowering)
+                fruit_number = min (1.0, IC_spikelet) * min (1.0, IC_setting) * pot_fruits_number; //TODO change 1.0 in 1+x% of potential increase du to plasticity
+            //            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pot_fruits_number;
+        }
+        //        else
+        //            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pow(IC_setting, SENSIVITY_IC_SETTING) * pot_fruits_number;
 
 
         if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)) {
@@ -218,7 +221,7 @@ public:
         //        growth();
         //compute oil and nonoil biomass
 
-        nonoil_assimilate_supply = nonoil_demand_pot * fr_fruits;
+        nonoil_assimilate_supply = nonoil_demand * fr_fruits;
         nonoil_biomass += nonoil_assimilate_supply / REPRO_CONSTRUCTION_COST;
         oil_assimilate_supply = oil_demand * fr_fruits;
         oil_biomass += oil_assimilate_supply / COUT_OIL;
@@ -234,30 +237,36 @@ public:
         else
             ratio_huile_mesocarp = oil_biomass / (nonoil_biomass + oil_biomass);
 
-
-
-
         //        growth_demand();
 
-        //        if (rank > IC_spikelet_RANG_FIN) {
-        if (TT_corrige>=TT_ini_flowering+ PERIOD_FRUIT_SET)
-            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pow(IC_setting, SENSIVITY_IC_SETTING) * pot_fruits_number;
-        else if (TT_corrige>=TT_ini_flowering){
-            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pot_fruits_number;
+        if (TT_corrige>=TT_ini_flowering)
+            //            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pow(IC_setting, SENSIVITY_IC_SETTING) * pot_fruits_number;
+            fruit_number = min (1.0, IC_spikelet) * min (1.0, IC_setting) * pot_fruits_number;
+
+
+        if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)) {
+            double fr_bunch_dev = min (1.0 , (TT_corrige - TT_ini_flowering) / TT_bunch_dev_duration);
+            nonoil_biomass = fruit_number * masse_ind_max * (1 - OIL_CONTENT ) * fr_bunch_dev;
+            nonoil_demand = fruit_number * masse_ind_max * (1 - OIL_CONTENT ) * REPRO_CONSTRUCTION_COST  * ( Teff / TT_bunch_dev_duration );
+
+            if(inflo_status.is(inflo::OLEOSYNTHESIS)) {
+                double fr_oleo = min (1.0, (TT_corrige - TT_ini_oleo) / TT_oleo_duration);
+                final_oil_mass = fruit_number * masse_ind_max * OIL_CONTENT;
+                oil_biomass =  final_oil_mass * fr_oleo;
+                oil_demand = final_oil_mass * COUT_OIL  * ( Teff / TT_oleo_duration );
+            }
+
         }
-        //    }
-
-        oil_demand = final_oil_mass * COUT_OIL  * ( Teff / TT_oleo_duration );
-        nonoil_demand = fruit_number * masse_ind_max * (1 - OIL_CONTENT ) * REPRO_CONSTRUCTION_COST  * ( Teff / TT_bunch_dev_duration );
-
-
-        if (inflo_status.is(inflo::HARVEST)){
+        else  if (inflo_status.is(inflo::HARVEST)){
             oil_biomass_harvested=oil_biomass;
             nonoil_biomass_harvested=nonoil_biomass;
             oil_biomass=0;
             nonoil_biomass=0;
             oil_demand=0;
             nonoil_demand=0;
+        }
+        else{
+            oil_demand=0;
         }
 
         demand = oil_demand + nonoil_demand;

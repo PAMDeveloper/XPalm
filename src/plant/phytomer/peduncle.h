@@ -192,7 +192,8 @@ public:
         else
 
             if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)){
-                demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration;
+                demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * min(1.0, IC_spikelet) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration; //TODO, test with TT_corrige, correct 1.0 if plasticity
+                /*demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration;*/
             }
 
 

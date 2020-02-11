@@ -79,10 +79,10 @@ FIN_ABLATION_REGIME =   3500
 POURC_ABLATION_REGIME = 0
 RANG_D_ABLATION_REGIME = 25
 INI_SEX_RATIO = 0.8  ###si rd <INI_SEX_RATIO  --> femelle
-INI_TAUX_D_AVORTEMENT = 0.2 ###si rd INI_TAUX_D_AVORTEMENT --> aborted
+INI_TAUX_D_AVORTEMENT = 0.2 ###si rd <INI_TAUX_D_AVORTEMENT --> aborted
 REPRO_CONSTRUCTION_COST = 1.44 ###construction cost of reproductive organs (gCH2O/gDM)
 RANG_DEBUT_CROISSANCE_PEDUNCULE = 8  # nombre de rangs avant floraison # 11.5
-COUT_RESPI_MAINTENANCE_BUNCH =  0.0044
+COUT_RESPI_MAINTENANCE_REPRO =  0.0044
 RATIO_DUREE_JEUNES_OLEO = 1
 RANG_D_ABLATION = 50   #l appeler rang de mort
 #ICsex_RANG_DEBUT = -28
@@ -95,7 +95,8 @@ ICabort_RANG_FIN = 12           # 12 #n'est plus utilisé
 PERIOD_ABORTION = 1350  # 15days * 9° *10 rang period before flowering (spathe appearence) when abortion is triggered (in TT)  
 SENSITIVITY_ABORTION = 2
 Seuil_IC_abort = 1
-
+ABORTION_RATE_MAX = 0.8  ###maximal abortion rate (when IC=0)
+SEX_RATIO_MIN = 0.2; ###minimal sex ratio (female/male+female) 
 
 ##### MALE INFLO PARAMS #########
 MASSE_INFLO_MALE_ADULTE = 1.2

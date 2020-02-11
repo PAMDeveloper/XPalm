@@ -20,7 +20,7 @@ public:
     enum externals { FR_RESTE,
                      TEFF,
                      TT_INI_FLOWERING,
-                     TT_CORRIGE,
+                     TT_SINCE_APPEARANCE,
                      INFLO_STATUS
                    };
 
@@ -44,8 +44,8 @@ private:
     double fr_reste;
     double Teff;
     double TT_ini_flowering;
-    //    double TT_since_appearance;
-    double TT_corrige;
+    double TT_since_appearance;
+    //    double TT_corrige;
 
 
 
@@ -65,9 +65,9 @@ public:
         External(INFLO_STATUS, &MaleInflo::inflo_status);
         External(FR_RESTE, &MaleInflo::fr_reste);
         External(TEFF, &MaleInflo::Teff);
-        External(TT_CORRIGE, &MaleInflo::TT_corrige);
+        //        External(TT_CORRIGE, &MaleInflo::TT_corrige);
         External (TT_INI_FLOWERING, &MaleInflo::TT_ini_flowering);
-        //        External(TT_SINCE_APPEARANCE, &MaleInflo::TT_since_appearance);
+        External(TT_SINCE_APPEARANCE, &MaleInflo::TT_since_appearance);
     }
 
     virtual ~MaleInflo() {}
@@ -77,7 +77,7 @@ public:
     {
         //        AtomicModel<MaleInflo>::init(t, parameters);
 
-        last_time = t-1;
+        last_time = t;
 
         //        parameters
         MASSE_INFLO_MALE_ADULTE = parameters.get("MASSE_INFLO_MALE_ADULTE");
@@ -98,17 +98,17 @@ public:
         TT_flowering_duration=(TT_ini_male_senescence-TT_ini_flowering);
 
         double TEff_ini = parameters.get("T_EFF_INI");
-        double TT_corrige = TEff_ini * phytomer_age;
+        //        double TT_since_appearan = TEff_ini * phytomer_age;
 
         //init structure
         if (inflo_status.is(inflo::FLOWERING) ) {
-            double fr_growth = min(1.0, (TT_ini_flowering - TT_corrige) / TT_flowering_duration );
+            double fr_growth = min(1.0, (TT_ini_flowering - TT_since_appearance) / TT_flowering_duration );
             biomass = MASSE_INFLO_MALE_ADULTE * inflo_dev_factor * fr_growth;
             demand = MASSE_INFLO_MALE_ADULTE * REPRO_CONSTRUCTION_COST * inflo_dev_factor * ( TEff_ini / TT_flowering_duration );
         }
         if (inflo_status.is(inflo::SENESCENCE) ) {
             biomass_harvested=biomass;
-            biomass==0;
+            biomass=0;
         }
 
         potential_biomass = biomass;
