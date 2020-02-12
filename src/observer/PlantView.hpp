@@ -40,6 +40,10 @@ public:
     PlantView()
     {
         //METEO
+//        selector("RG", artis::kernel::DOUBLE, {
+//                     Meteo::RG});
+//        selector("RAIN", artis::kernel::DOUBLE, {
+//                     Meteo::RAIN});
         selector("FTSW", artis::kernel::DOUBLE, {
                      Tree::BH,
                      WaterBalance::FTSW});
@@ -60,6 +64,7 @@ public:
         selector("LAI", artis::kernel::DOUBLE,{Tree::LAI});
         selector("MALE_BIOMASS", artis::kernel::DOUBLE,{Tree::MALE_BIOMASS});
         selector("RESPIRABLE_REPRO_BIOMASS", artis::kernel::DOUBLE,{Tree::RESPIRABLE_REPRO_BIOMASS});
+        selector("RESPI_MAINTENANCE", artis::kernel::DOUBLE,{Tree::RESPI_MAINTENANCE});
         selector("PLANTLEAFAREA", artis::kernel::DOUBLE,{Tree::PLANTLEAFAREA});
         selector("TRUNK_BIOMASS", artis::kernel::DOUBLE,{Tree::TRUNK_BIOMASS});
         selector("RESERVE_BIOMASS", artis::kernel::DOUBLE,{Tree::RESERVE_BIOMASS});
@@ -67,7 +72,8 @@ public:
         selector("FR_FRUITS", artis::kernel::DOUBLE,{Tree::FR_FRUITS});
         selector("FR_RESTE", artis::kernel::DOUBLE,{Tree::FR_RESTE});
         selector("PHYTOMERNUMBER", artis::kernel::DOUBLE,{Tree::PHYTOMERNUMBER});
-        selector("SLW", artis::kernel::DOUBLE,{Tree::SLW});
+        selector("NEWPHYTOMEREMERGENCE", artis::kernel::DOUBLE,{Tree::NEWPHYTOMEREMERGENCE});
+
 
 
         //BIOMASS

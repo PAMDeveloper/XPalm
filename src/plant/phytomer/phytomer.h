@@ -134,7 +134,7 @@ public:
 
         //submodels
         leaf->init(t, parameters, rank, state, TT_since_appearance, SF_fin);
-        internode->init(t, parameters, age, tree_age_at_creation, production_speed);
+        internode->init(t, parameters, age, TT_since_appearance, tree_age_at_creation, production_speed);
         inflo->init(t, parameters, age, rank, TT_since_appearance, production_speed, TT_ini_flowering, harv_tt, tt_ini_sen, inflo_factor);
         inflo_status = inflo->get<inflo::inflo_states, Inflo>(t, Inflo::STATUS);
     }
@@ -167,15 +167,17 @@ public:
         leaf->put<double>(t, Leaf::TT_SINCE_APPEARANCE, TT_since_appearance);
         leaf->put<phytomer::phytomer_state>(t, Leaf::PHYTOMER_STATE, state);
         leaf->put<inflo::inflo_states>(t, Leaf::INFLO_STATUT, inflo_status);
-        leaf->put<double>(t, Leaf::TEFF, TEff);
+//        leaf->put<double>(t, Leaf::TEFF, TEff); //done by tree
         (*leaf)(t);
 
-        internode->put<double>(t, Internode::TEFF, TEff); //TODO passer dans tree
+//        internode->put<double>(t, Internode::TEFF, TEff); //TODO passer dans tree
+        internode->put<double>(t, Internode::TT_SINCE_APPEARANCE, TT_since_appearance);
+//        internode->put<double>(t, Internode::FR_RESTE, fr_reste); //done by tree
         //set by tree
-//        internode->put<double>(t, Internode::FR_RESTE, fr_reste);
+
         (*internode)(t);
 
-        inflo->put<double>(t, Inflo::TEFF, TEff);
+//        inflo->put<double>(t, Inflo::TEFF, TEff); //set by tree
         inflo->put<double>(t, Inflo::RANK, rank);
         inflo->put<double>(t, Inflo::NUMBER, number);
         inflo->put<double>(t, Inflo::TT_SINCE_APPEARANCE, TT_since_appearance);

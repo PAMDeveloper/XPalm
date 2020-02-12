@@ -31,8 +31,8 @@ AGE = 8   ### 8 - adulte | 3 - normal
 AGE_ADULT = 8
 AGE_PLANTING = 3
 AGE_START_PROD = 2
-PRODUCTION_SPEED_INITIAL = 0.0145### 1/(10*6.75) 1leaf every 10 days ## MINIMAL_PRODUCTION_SPEED - adulte  - (rank.DD-1)
-PRODUCTION_SPEED_ADULT = 0.0096 #=1/(15*6.75) 1leaf every 15 days(rank.DD-1)
+PRODUCTION_SPEED_INITIAL = 0.01111111 ### 1/(10*9) 1leaf every 10 days ## MINIMAL_PRODUCTION_SPEED - adulte  - (rank.DD-1)
+PRODUCTION_SPEED_ADULT = 0.007407407 #=1/(15*9) 1leaf every 15 days(rank.DD-1)
 LOCAL_LIGHT_INTERCEPTION = 0  ## 1 pour mettre le mode actif
 a_loi_beta_interception = 1.4   ### plus a est petit plus le haut intercepte beaucoup
 b_loi_beta_interception = 7
@@ -45,7 +45,7 @@ seuil_FTSW_pour_red_a_long_termes_de_Pn = 0.4
 SENS_REMANESCENCE = 2.5 ### exposant pour rendre compte de la sensibilite au stress
 RANG_DEBUT_SENS_PN_LONG_TERMES = -3
 RANG_FIN_SENS_PN_LONG_TERMES = 3
-EFFICIENCE_BIOLOGIQUE = 4.8
+EFFICIENCE_BIOLOGIQUE = 4.8   ##gCH2O.MJ-1
 SEUIL_PHOTO = 0.6  # seuil à partir duquel perte de conductance (assimilation réduite)
 K = 0.5
 KC = 1
@@ -54,10 +54,10 @@ AF_FRUITS = 1.5 # coefficient d affinite pour les fruits
 
 
 #####  INTERNODE PARAMS #########
-INITIAL_HEIGHT = 400 # (cm)
+#INITIAL_HEIGHT = 400 # (cm)
 STEM_APPARENT_DENSITY = 0.15  (g.cm-3)
 STEM_RAYON = 30 (cm)
-EN_LENGTH_INI = 0.1  # (cm)
+EN_LENGTH_INI = 1  # (cm)
 EN_LENGTH_ADULTE = 3 #(cm)
 DEBUT_CROISSANCE_EN = 4 # (annee)
 FIN_CROISSANCE_EN = 8 # (annee)

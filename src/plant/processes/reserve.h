@@ -64,6 +64,7 @@ private:
     double POURCENT_NSC_ST_MIN;
     double SLW_max;
     double SLW_min;
+    double SLW_ini;
     double POURC_FOLIOLE;
     double COUT_RESERVE;
     double REALL_COST;
@@ -122,15 +123,17 @@ public:
     {
     }
 
-
-    void init(double t, const xpalm::ModelParameters& parameters) //TODO externals in init ???
+    void init(double t, const xpalm::ModelParameters& parameters) {}
+    void init(double t, const xpalm::ModelParameters& parameters, double plantLeafArea_) //TODO externals in init ???
     {
+        init(t, parameters);
         last_time = t-1;
 
         //        parameters
         POURCENT_NSC_ST_MAX = parameters.get("POURCENT_NSC_ST_MAX");
         POURCENT_NSC_ST_MIN = parameters.get("POURCENT_NSC_ST_MIN");
         SLW_max = parameters.get("SLW_max") * 10; //kg.m-2
+        SLW_ini = parameters.get("SLW_ini") * 10; //kg.m-2
         SLW_min = parameters.get("SLW_min") * 10; //kg.m-2
         POURC_FOLIOLE = parameters.get("POURC_FOLIOLE");
         COUT_RESERVE = parameters.get("COUT_RESERVE");
@@ -144,7 +147,7 @@ public:
         trunk_biomass= STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * INITIAL_HEIGHT; //gDM
         assim_avai=0;
         leaves_res=0;
-        plantLeafArea=0;
+        plantLeafArea=plantLeafArea_;
 
         //internals
         double POURCENT_NSC_ST_INI = parameters.get("POURCENT_NSC_ST_INI");
@@ -165,6 +168,7 @@ public:
         reserve_pot = reserve_max - reserve_min;
         reserve_avai = leaves_res_avai + trunk_res_avai;
         mob_rate = ( MOB_RATE_MAX / reserve_pot ) * reserve_avai;
+
     }
 
 
@@ -222,9 +226,9 @@ public:
         }
 
 
-       //   allocate assim left to fulfill minimale reserves
+        //   allocate assim left to fulfill minimale reserves
 
-//        double assim_to_res_pot = tree_Assim * COUT_RESERVE;
+        //        double assim_to_res_pot = tree_Assim * COUT_RESERVE;
         trunk_res_avai = trunk_res - trunk_res_min;
         leaves_res_avai = leaves_res - leaves_res_min;
 
@@ -294,8 +298,8 @@ public:
 
     //    def compute_etat_test_min(self) :
     //     # avant tout il faut verifier qu'on est au dessus de la reserve mini. Ce cas-la peut arriver car
-//         # la reserve mini augmente et qu'on a jamais rien stocke dedans. Il existe donc cette demande ... Mais dans le cas
-//         # d'un deficit prolonge en assimilats d'ou peuvent bien venir ces assimilats ?
+    //         # la reserve mini augmente et qu'on a jamais rien stocke dedans. Il existe donc cette demande ... Mais dans le cas
+    //         # d'un deficit prolonge en assimilats d'ou peuvent bien venir ces assimilats ?
     //     # pour l'instant pour eviter des bugs si il n'y pas ces assimilats on les fait arriver ...
 };
 
