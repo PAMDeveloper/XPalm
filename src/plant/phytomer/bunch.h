@@ -17,7 +17,7 @@ public:
                      DEMAND,
                      OIL_DEMAND,
                      NONOIL_DEMAND,
-//                     NONOIL_DEMAND_POT,
+                     //                     NONOIL_DEMAND_POT,
                      OIL_ASSIMILATE_SUPPLY,
                      NONOIL_ASSIMILATE_SUPPLY,
                      OIL_BIOMASS,
@@ -33,7 +33,7 @@ public:
                      INFLO_STATUS_POT,
                      INFLO_STATUS,
                      TT_SINCE_APPEARANCE,
-                     TT_CORRIGE,
+                     //                     TT_CORRIGE,
                      FR_FRUITS,
                      IC_SPIKELET,
                      IC_SETTING,
@@ -80,7 +80,7 @@ private:
     inflo::inflo_states inflo_status_pot;
     double Teff;
     double TT_since_appearance;
-    double TT_corrige;
+    //    double TT_corrige;
     double fr_fruits;
     double IC_spikelet;
     double IC_setting;
@@ -119,7 +119,7 @@ public:
         External(INFLO_STATUS_POT, &Bunch::inflo_status_pot);
         External(INFLO_STATUS, &Bunch::inflo_status);
         External(TT_SINCE_APPEARANCE, &Bunch::TT_since_appearance);
-        External(TT_CORRIGE, &Bunch::TT_corrige);
+        //        External(TT_CORRIGE, &Bunch::TT_corrige);
         External(FR_FRUITS, &Bunch::fr_fruits);
         External(IC_SPIKELET, &Bunch::IC_spikelet);
         External(IC_SETTING, &Bunch::IC_setting);
@@ -133,7 +133,7 @@ public:
     {
     }
     void init(double t, const xpalm::ModelParameters& parameters) {}
-    void init(double t, const xpalm::ModelParameters& parameters, double production_speed, double flo_tt, double harv_tt, double TT_ini_oleo_, double inflo_dev_factor)
+    void init(double t, const xpalm::ModelParameters& parameters, double production_speed, double TT_since_appearance_, double flo_tt, double harv_tt, double TT_ini_oleo_, double inflo_dev_factor)
     {
         //        AtomicModel<Bunch>::init(t, parameters);
 
@@ -152,6 +152,7 @@ public:
         TT_ini_harvest = harv_tt;
         TT_ini_flowering = flo_tt;
         TT_ini_oleo = TT_ini_oleo_;
+        TT_since_appearance=TT_since_appearance_;
 
         double IND_FRUIT_WEIGHT = parameters.get("IND_FRUIT_WEIGHT");
         double MEAN_FRUIT_NUMBER_ADULTE = parameters.get("MEAN_FRUIT_NUMBER_ADULTE");
@@ -184,7 +185,7 @@ public:
 
 
         if (inflo_status.is(inflo::NON_ABORTED)){
-            if (TT_corrige>=TT_ini_flowering)
+            if (TT_since_appearance>=TT_ini_flowering)
                 fruit_number = min (1.0, IC_spikelet) * min (1.0, IC_setting) * pot_fruits_number; //TODO change 1.0 in 1+x% of potential increase du to plasticity
             //            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pot_fruits_number;
         }
@@ -239,18 +240,18 @@ public:
 
         //        growth_demand();
 
-        if (TT_corrige>=TT_ini_flowering)
+        if (TT_since_appearance>=TT_ini_flowering)
             //            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pow(IC_setting, SENSIVITY_IC_SETTING) * pot_fruits_number;
             fruit_number = min (1.0, IC_spikelet) * min (1.0, IC_setting) * pot_fruits_number;
 
 
         if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)) {
-            double fr_bunch_dev = min (1.0 , (TT_corrige - TT_ini_flowering) / TT_bunch_dev_duration);
+            double fr_bunch_dev = min (1.0 , (TT_since_appearance - TT_ini_flowering) / TT_bunch_dev_duration);
             nonoil_biomass = fruit_number * masse_ind_max * (1 - OIL_CONTENT ) * fr_bunch_dev;
             nonoil_demand = fruit_number * masse_ind_max * (1 - OIL_CONTENT ) * REPRO_CONSTRUCTION_COST  * ( Teff / TT_bunch_dev_duration );
 
             if(inflo_status.is(inflo::OLEOSYNTHESIS)) {
-                double fr_oleo = min (1.0, (TT_corrige - TT_ini_oleo) / TT_oleo_duration);
+                double fr_oleo = min (1.0, (TT_since_appearance - TT_ini_oleo) / TT_oleo_duration);
                 final_oil_mass = fruit_number * masse_ind_max * OIL_CONTENT;
                 oil_biomass =  final_oil_mass * fr_oleo;
                 oil_demand = final_oil_mass * COUT_OIL  * ( Teff / TT_oleo_duration );

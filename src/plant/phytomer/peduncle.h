@@ -43,10 +43,11 @@ public:
     enum externals {
         IC_SPIKELET,
         TEFF,
-        TT_CORRIGE,
+        //        TT_CORRIGE,
         TT_SINCE_APPEARANCE,
         FR_RESTE,
-        INFLO_STATUS
+        INFLO_STATUS,
+        RANK
     };
 
 private:
@@ -78,9 +79,10 @@ private:
     inflo::inflo_states inflo_status;
     double IC_spikelet;
     double Teff;
-    double TT_corrige;
+    //    double TT_corrige;
     double TT_since_appearance;
     double fr_reste;
+    double rank;
 
 public:
 
@@ -95,14 +97,14 @@ public:
         Internal(DEMAND_POT, &Peduncle::demand_pot);
         Internal(TT_PED_DEV_DURATION, &Peduncle::TT_ped_dev_duration);
 
-
         //          externals
         External(IC_SPIKELET, &Peduncle::IC_spikelet);
         External(TEFF, &Peduncle::Teff);
-        External(TT_CORRIGE, &Peduncle::TT_corrige);
+        //        External(TT_CORRIGE, &Peduncle::TT_corrige);
         External(TT_SINCE_APPEARANCE, &Peduncle::TT_since_appearance);
         External(FR_RESTE, &Peduncle::fr_reste);
         External(INFLO_STATUS, &Peduncle::inflo_status);
+        External(RANK, &Peduncle::rank);
     }
 
     virtual ~Peduncle()
@@ -110,7 +112,7 @@ public:
     }
 
     void init(double t, const xpalm::ModelParameters& parameters) {}
-    void init(double t, const xpalm::ModelParameters& parameters, double prod_speed, double flo_tt, double TT_ini_harvest_, double inflo_factor)
+    void init(double t, const xpalm::ModelParameters& parameters, double prod_speed, double TT_since_appearance_, double flo_tt, double TT_ini_harvest_, double inflo_factor)
     {
         init(t, parameters);
         //        AtomicModel<Peduncle>::init(t, parameters);
@@ -120,6 +122,7 @@ public:
         TT_ini_harvest=TT_ini_harvest_;
         inflo_dev_factor = inflo_factor;
         production_speed = prod_speed;
+        TT_since_appearance=TT_since_appearance_;
 
         //        parameters
         SENSIVITY_IC_SPIKELET = parameters.get("SENSIVITY_IC_SPIKELET");
@@ -187,14 +190,11 @@ public:
         if (inflo_status.is(inflo::HARVEST)){
             biomass_harvested=biomass;
             biomass = 0;
-
         }
-        else
-
-            if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)){
-                demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * min(1.0, IC_spikelet) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration; //TODO, test with TT_corrige, correct 1.0 if plasticity
-                /*demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration;*/
-            }
+        else if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)){
+            demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * min(1.0, IC_spikelet) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration; //TODO, test with TT_corrige, correct 1.0 if plasticity
+            /*demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration;*/
+        }
     }
 
 

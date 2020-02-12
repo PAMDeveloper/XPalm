@@ -42,8 +42,8 @@ public:
                      MALE_BIOMASS_HARVESTED,
                      //                     RED_VITESSE_FTSW,
                      RESPIRABLE_BIOMASS,
-//                     GAIN_TEFF_JOUR,
-                     TT_CORRIGE,
+                     //                     GAIN_TEFF_JOUR,
+                     //                     TT_CORRIGE,
                      DEMAND,
                      IC_SETTING,
                      IC_SPIKELET,
@@ -58,6 +58,7 @@ public:
 
     enum externals { FTSW,
                      RANK,
+                     NUMBER,
                      TEFF,
                      FR_RESTE,
                      FR_FRUITS,
@@ -85,7 +86,7 @@ private:
     //    double ICabort_RANG_DEBUT;
     //    double ICabort_RANG_FIN;
     double PERIOD_ABORTION;
-//    double Seuil_IC_sex;
+    //    double Seuil_IC_sex;
     double SENSITIVITY_SEX;
     double Seuil_IC_abort;
     double ABORTION_RATE_MAX;
@@ -94,9 +95,9 @@ private:
     double SEX_RATIO_REF;
     double SEED;
     double FRACTION_PERIOD_OLEOSYNTHESIS;
-//    double INI_SEX_RATIO;
+    //    double INI_SEX_RATIO;
 
-//    double INI_TAUX_D_AVORTEMENT;
+    //    double INI_TAUX_D_AVORTEMENT;
 
     //     submodels
     std::unique_ptr < Peduncle > peduncle;
@@ -134,7 +135,7 @@ private:
     //    double red_vitesse_FTSW;
     double respirable_biomass;
     //    double gain_TEff_jour;
-    double TT_corrige;
+    //    double TT_corrige;
     double demand;
     double bunch_demand;
     double peduncle_demand;
@@ -162,6 +163,7 @@ private:
     //     externals
     double ftsw;
     double rank;
+    double number;
     double TEff;
     double fr_reste;
     double fr_fruits;
@@ -204,7 +206,7 @@ public:
         //        Internal(RED_VITESSE_FTSW, &Inflo::red_vitesse_FTSW);
         Internal(RESPIRABLE_BIOMASS, &Inflo::respirable_biomass);
         //        Internal(GAIN_TEFF_JOUR, &Inflo::gain_TEff_jour);
-        Internal(TT_CORRIGE, &Inflo::TT_corrige);
+        //        Internal(TT_CORRIGE, &Inflo::TT_corrige);
         Internal(DEMAND, &Inflo::demand);
         Internal(IC_SETTING, &Inflo::IC_setting);
         Internal(IC_SPIKELET, &Inflo::IC_spikelet);
@@ -225,6 +227,7 @@ public:
         External(FR_FRUITS, &Inflo::fr_fruits);
         External(TT_SINCE_APPEARANCE, &Inflo::TT_since_appearance);
         External(TREE_IC, &Inflo::tree_IC);
+        External(NUMBER, &Inflo::number);
     }
 
     virtual ~Inflo()
@@ -261,7 +264,7 @@ public:
 
     void init(double t, const xpalm::ModelParameters& parameters){}
     void init(double t, const xpalm::ModelParameters& parameters, double phytomer_age_,
-              double rk, double prod_speed_,
+              double rk,double TT_since_appearance_, double prod_speed_,
               double TT_ini_flo, double TT_ini_harv,
               double TT_ini_senec, double inflo_dev_factor_)
     {
@@ -287,7 +290,7 @@ public:
         //        ICabort_RANG_FIN = parameters.get("ICabort_RANG_FIN");
         PERIOD_ABORTION = parameters.get("PERIOD_ABORTION");
 
-//        Seuil_IC_sex = parameters.get("Seuil_IC_sex");
+        //        Seuil_IC_sex = parameters.get("Seuil_IC_sex");
         SEX_RATIO_REF = parameters.get("SEX_RATIO_REF");
         SEX_RATIO_MIN = parameters.get("SEX_RATIO_MIN");
         SENSITIVITY_SEX = parameters.get("SENSITIVITY_SEX");
@@ -300,8 +303,8 @@ public:
         FRACTION_PERIOD_OLEOSYNTHESIS = parameters.get("FRACTION_PERIOD_OLEOSYNTHESIS");
         SEED = parameters.get("SEED");
 
-//        INI_SEX_RATIO=parameters.get("INI_SEX_RATIO");
-//        INI_TAUX_D_AVORTEMENT= parameters.get("INI_TAUX_D_AVORTEMENT");
+        //        INI_SEX_RATIO=parameters.get("INI_SEX_RATIO");
+        //        INI_TAUX_D_AVORTEMENT= parameters.get("INI_TAUX_D_AVORTEMENT");
         PERIOD_FRUIT_SET=parameters.get("PERIOD_FRUIT_SET");
 
         //predim
@@ -363,53 +366,38 @@ public:
         //        double RATIO_DUREE_JEUNES_OLEO = parameters.get("RATIO_DUREE_JEUNES_OLEO");
 
         //set seed TODO remove after debug
-//        srand(SEED);
+        //        srand(SEED);
 
-        TT_since_appearance= parameters.get("T_EFF_INI") * phytomer_age;
+        TT_since_appearance= TT_since_appearance_;
         TT_ini_oleo = TT_ini_flowering +(1-FRACTION_PERIOD_OLEOSYNTHESIS)*(TT_ini_harvest - TT_ini_flowering);
         TT_ini_abortion = TT_ini_flowering-PERIOD_DEV_SPIKELET;
         TT_ini_sex = TT_ini_abortion - PERIOD_SEX_DETERMINATION;
 
-        TT_corrige=TT_since_appearance;
+        //        TT_corrige=TT_since_appearance;
 
         step_state();
 
         //init IC coeff
-        if (TT_corrige>TT_ini_sex){
+        if (TT_since_appearance>TT_ini_sex){
             IC_sex=1;
         }
 
-        if (TT_corrige>TT_ini_abortion){
+        if (TT_since_appearance>TT_ini_abortion){
             IC_abort=1;
         }
 
-        if (TT_corrige>TT_ini_abortion){
+        if (TT_since_appearance>TT_ini_abortion){
             IC_spikelet=1;
         }
 
-        if (TT_corrige>TT_ini_flowering+ PERIOD_FRUIT_SET){
+        if (TT_since_appearance>TT_ini_flowering+ PERIOD_FRUIT_SET){
             IC_setting=1;
         }
 
-        if (status.is(inflo::FEMALE) && status.is(inflo::NON_ABORTED)) {
+        peduncle->init(t, parameters, production_speed,TT_since_appearance, TT_ini_flowering, TT_ini_harvest, inflo_dev_factor);
+        bunch->init(t, parameters, production_speed,TT_since_appearance, TT_ini_flowering, TT_ini_harvest, TT_ini_oleo, inflo_dev_factor);
+        male->init(t, parameters, phytomer_age, TT_since_appearance, inflo_dev_factor, TT_ini_flowering, TT_ini_male_senescence);
 
-            peduncle->put<double>(t, Peduncle::IC_SPIKELET, IC_spikelet);
-            peduncle->put<double>(t, Peduncle::TT_SINCE_APPEARANCE, TT_since_appearance);
-            peduncle->put<inflo::inflo_states>(t, Peduncle::INFLO_STATUS, status);
-            peduncle->init(t, parameters, production_speed, TT_ini_flowering, TT_ini_harvest, inflo_dev_factor);
-
-            bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS, status);
-            bunch->put<double>(t, Bunch::IC_SPIKELET, IC_spikelet);
-            bunch->put<double>(t, Bunch::IC_SETTING, IC_setting);
-            bunch->put<double>(t, Bunch::TT_CORRIGE, TT_corrige);
-            bunch->put<double>(t, Bunch::TT_SINCE_APPEARANCE, TT_since_appearance);
-            bunch->init(t, parameters, production_speed, TT_ini_flowering, TT_ini_harvest, TT_ini_oleo, inflo_dev_factor);
-        }
-        if (status.is(inflo::MALE) && status.is(inflo::NON_ABORTED)) {
-            male->put<inflo::inflo_states>(t, MaleInflo::INFLO_STATUS, status);
-            male->put<double>(t, MaleInflo::TT_SINCE_APPEARANCE, TT_since_appearance);
-            male->init(t, parameters, phytomer_age, inflo_dev_factor, TT_ini_flowering, TT_ini_male_senescence);
-        }
 
 
     }
@@ -421,7 +409,7 @@ public:
 
         // define sex
         double rd_sex = (double) rand() / RAND_MAX;
-        if (TT_corrige >= TT_ini_sex && !status.is(inflo::FEMALE) &&  !status.is(inflo::MALE) ) {
+        if (TT_since_appearance >= TT_ini_sex && !status.is(inflo::FEMALE) &&  !status.is(inflo::MALE) ) {
             if(rd_sex < sex_ratio) {
                 status.add(inflo::FEMALE);
             } else {
@@ -432,7 +420,7 @@ public:
         // set abortion
         double rd_abort = (double) rand() / RAND_MAX;
         //        if (rank > ICabort_RANG_FIN) {
-        if (TT_corrige >= TT_ini_abortion && !status.is(inflo::ABORTED) && !status.is(inflo::NON_ABORTED)) {
+        if (TT_since_appearance >= TT_ini_abortion && !status.is(inflo::ABORTED) && !status.is(inflo::NON_ABORTED)) {
             if( rd_abort <abortion_rate)
                 status.replace(inflo::INITIATED, inflo::ABORTED);
             else status.replace(inflo::INITIATED, inflo::NON_ABORTED);
@@ -443,28 +431,28 @@ public:
 
             //femelle
             if (status.is(inflo::FEMALE)){
-                if( TT_corrige >= TT_ini_harvest) {
+                if( TT_since_appearance >= TT_ini_harvest) {
                     status.add(inflo::HARVEST);
                     status.del(inflo::OLEOSYNTHESIS);
                     status.del(inflo::FLOWERING);
                 }
-                else if( TT_corrige >= TT_ini_oleo ) {
+                else if( TT_since_appearance >= TT_ini_oleo ) {
                     status.add(inflo::OLEOSYNTHESIS);
                     status.del(inflo::FLOWERING);
                 }
 
-                else if( TT_corrige >= TT_ini_flowering) {
+                else if( TT_since_appearance >= TT_ini_flowering) {
                     status.add(inflo::FLOWERING);
                 }
 
             }
             //male
             else if (status.is(inflo::MALE)) {
-                if( TT_corrige >= TT_ini_male_senescence) {
+                if( TT_since_appearance >= TT_ini_male_senescence) {
                     status.add(inflo::SENESCENCE);
                     status.del(inflo::FLOWERING);
                 }
-                else if( TT_corrige >= TT_ini_flowering) {
+                else if( TT_since_appearance >= TT_ini_flowering) {
                     status.add( inflo::FLOWERING);
                 }
             }
@@ -480,7 +468,7 @@ public:
         //            return;
 
         //set seed TODO remove after debug
-//        srand(SEED);
+        //        srand(SEED);
 
         if(status.is(inflo::ABORTED))
             return;
@@ -489,12 +477,14 @@ public:
 
         if (status.is(inflo::FEMALE) && status.is(inflo::NON_ABORTED)) {
 
+
             //compute perduncle
             peduncle->put<double>(t, Peduncle::IC_SPIKELET, IC_spikelet);
             peduncle->put<double>(t, Peduncle::TEFF, TEff);
             peduncle->put<double>(t, Peduncle::TT_SINCE_APPEARANCE, TT_since_appearance);
-            peduncle->put<double>(t, Peduncle::TT_CORRIGE, TT_corrige);
+            //            peduncle->put<double>(t, Peduncle::TT_CORRIGE, TT_corrige);
             peduncle->put<double>(t, Peduncle::FR_RESTE, fr_reste);
+            peduncle->put<double>(t, Peduncle::RANK, rank);
             peduncle->put<inflo::inflo_states>(t, Peduncle::INFLO_STATUS, status);
             (*peduncle)(t);
 
@@ -506,7 +496,7 @@ public:
             bunch->put<double>(t, Bunch::TEFF, TEff);
             bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS_POT, status_pot);
             bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS, status);
-            bunch->put<double>(t, Bunch::TT_CORRIGE, TT_corrige);
+            //            bunch->put<double>(t, Bunch::TT_CORRIGE, TT_corrige);
             bunch->put<double>(t, Bunch::TT_SINCE_APPEARANCE, TT_since_appearance);
             bunch->put<double>(t, Bunch::FR_FRUITS, fr_fruits);
             bunch->put<double>(t, Bunch::IC_SPIKELET, IC_spikelet);
@@ -528,6 +518,7 @@ public:
             male->put<inflo::inflo_states>(t, MaleInflo::INFLO_STATUS, status);
             male->put<double>(t, MaleInflo::TT_SINCE_APPEARANCE, TT_since_appearance);
             male->put<double>(t, MaleInflo::FR_RESTE, fr_reste);
+            male->put<double>(t, MaleInflo::RANK, rank);
             (*male)(t);
 
             male_biomass = male->get< double >(t, MaleInflo::BIOMASS);
@@ -572,7 +563,7 @@ public:
 
 
         //IC on sex determination
-        if (TT_corrige >= TT_ini_sex-PERIOD_SEX_DETERMINATION && TT_corrige < TT_ini_sex ) {
+        if (TT_since_appearance >= TT_ini_sex-PERIOD_SEX_DETERMINATION && TT_since_appearance < TT_ini_sex ) {
             nb_joursICsex += 1;
             IC_sex_tot += tree_IC;
             IC_sex = IC_sex_tot / nb_joursICsex;
@@ -580,7 +571,7 @@ public:
         sex_ratio =max(0.0, min(1.0, SEX_RATIO_MIN+IC_sex*(SEX_RATIO_REF-SEX_RATIO_MIN)));
 
         //IC on abortion
-        if (TT_corrige >= TT_ini_sex && TT_corrige < TT_ini_abortion) {
+        if (TT_since_appearance >= TT_ini_sex && TT_since_appearance < TT_ini_abortion) {
             nb_joursICabort += 1;
             IC_abort_tot += tree_IC;
             IC_abort = IC_abort_tot / nb_joursICabort;
@@ -588,14 +579,14 @@ public:
         abortion_rate =max(0.0, min(ABORTION_RATE_MAX, ABORTION_RATE_MAX+IC_abort*(ABORTION_RATE_REF-ABORTION_RATE_MAX)));
 
         //IC on spikelet biomass
-        if (TT_corrige >= TT_ini_abortion && TT_corrige < TT_ini_flowering){
+        if (TT_since_appearance >= TT_ini_abortion && TT_since_appearance < TT_ini_flowering){
             nb_joursIC_spikelet += 1;
             IC_spikelet_tot += tree_IC;
             IC_spikelet = IC_spikelet_tot / nb_joursIC_spikelet;
         }
 
         //IC on fruit set
-        if (TT_corrige >= TT_ini_flowering && TT_corrige < TT_ini_flowering+ PERIOD_FRUIT_SET) {
+        if (TT_since_appearance >= TT_ini_flowering && TT_since_appearance < TT_ini_flowering+ PERIOD_FRUIT_SET) {
             nb_joursIC_setting += 1;
             IC_setting_tot += tree_IC;
             IC_setting = (IC_setting_tot) / nb_joursIC_setting;

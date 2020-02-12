@@ -25,9 +25,10 @@ public:
 
     enum externals { FR_RESTE,
                      TEFF,
-//                     TT_INI_FLOWERING,
+                     //                     TT_INI_FLOWERING,
                      TT_SINCE_APPEARANCE,
-                     INFLO_STATUS
+                     INFLO_STATUS,
+                     RANK
                    };
 
 private:
@@ -51,6 +52,7 @@ private:
     double Teff;
     double TT_ini_flowering;
     double TT_since_appearance;
+    double rank;
     //    double TT_corrige;
 
 
@@ -72,14 +74,15 @@ public:
         External(FR_RESTE, &MaleInflo::fr_reste);
         External(TEFF, &MaleInflo::Teff);
         //        External(TT_CORRIGE, &MaleInflo::TT_corrige);
-//        External (TT_INI_FLOWERING, &MaleInflo::TT_ini_flowering);
+        //        External (TT_INI_FLOWERING, &MaleInflo::TT_ini_flowering);
         External(TT_SINCE_APPEARANCE, &MaleInflo::TT_since_appearance);
+        External(RANK, &MaleInflo::rank);
     }
 
     virtual ~MaleInflo() {}
 
     void init(double t, const xpalm::ModelParameters& parameters) {}
-    void init(double t, const xpalm::ModelParameters& parameters, double phytomer_age, double inflo_dev_factor_, double TT_ini_flowering_, double TT_ini_male_senescence)
+    void init(double t, const xpalm::ModelParameters& parameters, double phytomer_age, double TT_since_appearance_, double inflo_dev_factor_, double TT_ini_flowering_, double TT_ini_male_senescence)
     {
         //        AtomicModel<MaleInflo>::init(t, parameters);
 
@@ -97,11 +100,12 @@ public:
         potential_biomass = 0;
         inflo_dev_factor = inflo_dev_factor_;
         TT_ini_flowering = TT_ini_flowering_;
-
+        TT_since_appearance=TT_since_appearance_;
+        TT_flowering_duration=(TT_ini_male_senescence-TT_ini_flowering);
         //        double RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
         //        TT_flowering_duration = RANG_DEBUT_CROISSANCE_PEDUNCULE / production_speed;
 
-        TT_flowering_duration=(TT_ini_male_senescence-TT_ini_flowering);
+
 
         double TEff_ini = parameters.get("T_EFF_INI");
         //        double TT_since_appearan = TEff_ini * phytomer_age;

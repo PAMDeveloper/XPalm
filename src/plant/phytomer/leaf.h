@@ -17,7 +17,7 @@ public:
                      SLW,
                      GAIN_TEFF_JOUR,
                      TT_SINCE_LEAF_EXPAND,
-                     TT_CORRIGE,
+//                     TT_CORRIGE,
                      VITESSE_EXP,
                      LEAF_DEMAND,
                      CAPACITE_RESERVE_MAX,
@@ -64,7 +64,7 @@ private:
     double slw;
     double gain_TEff_jour;
     double TT_since_leaf_expand;
-    double TT_corrige;
+//    double TT_corrige;
     double vitesse_exp;
     double leaf_demand;
     double capacite_reserve_max;
@@ -98,7 +98,7 @@ public:
         Internal(LEAF_TOTAL_BIOMASS, &Leaf::leaf_total_biomass);
         Internal(SLW, &Leaf::slw);
         Internal(GAIN_TEFF_JOUR, &Leaf::gain_TEff_jour);
-        Internal(TT_CORRIGE, &Leaf::TT_corrige);
+//        Internal(TT_CORRIGE, &Leaf::TT_corrige);
         Internal(TT_SINCE_LEAF_EXPAND, &Leaf::TT_since_leaf_expand);
         Internal(VITESSE_EXP, &Leaf::vitesse_exp);
         Internal(LEAF_DEMAND, &Leaf::leaf_demand);
@@ -151,7 +151,7 @@ public:
         TT_since_leaf_expand=0;
         gain_TEff_jour = 0;
         TT_since_appearance = TT_since_appearance_;
-        TT_corrige = 0;
+//        TT_corrige = 0;
         vitesse_exp = 0;
         leaf_demand = 0;
         leaf_total_biomass = 0;

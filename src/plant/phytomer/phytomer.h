@@ -135,7 +135,7 @@ public:
         //submodels
         leaf->init(t, parameters, rank, state, TT_since_appearance, SF_fin);
         internode->init(t, parameters, age, tree_age_at_creation, production_speed);
-        inflo->init(t, parameters, age, rank, production_speed, TT_ini_flowering, harv_tt, tt_ini_sen, inflo_factor);
+        inflo->init(t, parameters, age, rank, TT_since_appearance, production_speed, TT_ini_flowering, harv_tt, tt_ini_sen, inflo_factor);
         inflo_status = inflo->get<inflo::inflo_states, Inflo>(t, Inflo::STATUS);
     }
 
@@ -177,6 +177,7 @@ public:
 
         inflo->put<double>(t, Inflo::TEFF, TEff);
         inflo->put<double>(t, Inflo::RANK, rank);
+        inflo->put<double>(t, Inflo::NUMBER, number);
         inflo->put<double>(t, Inflo::TT_SINCE_APPEARANCE, TT_since_appearance);
         inflo->put<double>(t, Inflo::TREE_IC, tree_IC);
 
