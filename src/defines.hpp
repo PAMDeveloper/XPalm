@@ -206,8 +206,8 @@ enum inflo_state {
     , FLOWERING = 32
     , OLEOSYNTHESIS = 64
     , HARVEST = 128
-    , DEAD = 256
-    , SENESCENCE = 512
+    , SENESCENCE = 256
+//    ,  DEAD = 512
 };
 
 

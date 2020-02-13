@@ -30,7 +30,7 @@ public:
                      FRUIT_NUMBER};
 
     enum externals { TEFF,
-                     INFLO_STATUS_POT,
+                     //                     INFLO_STATUS_POT,
                      INFLO_STATUS,
                      TT_SINCE_APPEARANCE,
                      //                     TT_CORRIGE,
@@ -48,6 +48,9 @@ private:
     //    double IC_spikelet_RANG_FIN;
     double SENSIVITY_IC_SETTING;
     double PERIOD_FRUIT_SET;
+    double IND_FRUIT_WEIGHT;
+    double MEAN_FRUIT_NUMBER_ADULTE;
+
 
     //     internals
     //predim
@@ -77,7 +80,7 @@ private:
 
     //     externals
     inflo::inflo_states inflo_status;
-    inflo::inflo_states inflo_status_pot;
+    //    inflo::inflo_states inflo_status_pot;
     double Teff;
     double TT_since_appearance;
     //    double TT_corrige;
@@ -116,7 +119,7 @@ public:
 
         //          externals
         External(TEFF, &Bunch::Teff);
-        External(INFLO_STATUS_POT, &Bunch::inflo_status_pot);
+        //        External(INFLO_STATUS_POT, &Bunch::inflo_status_pot);
         External(INFLO_STATUS, &Bunch::inflo_status);
         External(TT_SINCE_APPEARANCE, &Bunch::TT_since_appearance);
         //        External(TT_CORRIGE, &Bunch::TT_corrige);
@@ -133,7 +136,7 @@ public:
     {
     }
     void init(double t, const xpalm::ModelParameters& parameters) {}
-    void init(double t, const xpalm::ModelParameters& parameters, double production_speed, double TT_since_appearance_, double flo_tt, double harv_tt, double TT_ini_oleo_, double inflo_dev_factor)
+    void init(double t, const xpalm::ModelParameters& parameters, double TT_since_appearance_, double flo_tt, double harv_tt, double TT_ini_oleo_, double inflo_dev_factor)
     {
         //        AtomicModel<Bunch>::init(t, parameters);
 
@@ -154,8 +157,8 @@ public:
         TT_ini_oleo = TT_ini_oleo_;
         TT_since_appearance=TT_since_appearance_;
 
-        double IND_FRUIT_WEIGHT = parameters.get("IND_FRUIT_WEIGHT");
-        double MEAN_FRUIT_NUMBER_ADULTE = parameters.get("MEAN_FRUIT_NUMBER_ADULTE");
+        IND_FRUIT_WEIGHT = parameters.get("IND_FRUIT_WEIGHT");
+        MEAN_FRUIT_NUMBER_ADULTE = parameters.get("MEAN_FRUIT_NUMBER_ADULTE");
         masse_ind_max = IND_FRUIT_WEIGHT / 1000;
         pot_fruits_number = int (inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE);
 
@@ -184,14 +187,12 @@ public:
         demand = 0;
 
 
-        if (inflo_status.is(inflo::NON_ABORTED)){
-            if (TT_since_appearance>=TT_ini_flowering)
-                fruit_number = min (1.0, IC_spikelet) * min (1.0, IC_setting) * pot_fruits_number; //TODO change 1.0 in 1+x% of potential increase du to plasticity
-            //            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pot_fruits_number;
-        }
-        //        else
-        //            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pow(IC_setting, SENSIVITY_IC_SETTING) * pot_fruits_number;
+        //        if (inflo_status.is(inflo::NON_ABORTED)){
+        //            if (TT_since_appearance>=TT_ini_flowering)
+        //                fruit_number = min (1.0, IC_spikelet) * min (1.0, IC_setting) * pot_fruits_number; //TODO change 1.0 in 1+x% of potential increase du to plasticity
+        //        }
 
+        fruit_number = pot_fruits_number; //TODO change 1.0 in 1+x% of potential increase du to plasticity
 
         if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)) {
             double fr_bunch_dev = min (1.0 , (TT_since_appearance - TT_ini_flowering) / TT_bunch_dev_duration);
@@ -203,16 +204,21 @@ public:
                 final_oil_mass = fruit_number * masse_ind_max * OIL_CONTENT;
                 oil_biomass =  final_oil_mass * fr_oleo;
                 oil_demand = final_oil_mass * COUT_OIL  * ( Teff / TT_oleo_duration );
+
             }
 
         }
 
         if (inflo_status.is(inflo::HARVEST)){
+            oil_biomass = fruit_number * masse_ind_max * OIL_CONTENT;
             oil_biomass_harvested=oil_biomass;
             nonoil_biomass_harvested=nonoil_biomass;
             oil_biomass=0;
             nonoil_biomass=0;
         }
+
+
+
 
     }
 
@@ -226,10 +232,12 @@ public:
         nonoil_biomass += nonoil_assimilate_supply / REPRO_CONSTRUCTION_COST;
         oil_assimilate_supply = oil_demand * fr_fruits;
         oil_biomass += oil_assimilate_supply / COUT_OIL;
+        nonoil_demand=0;
+        oil_demand=0;
 
         //compute ind mass
         if (fruit_number != 0)
-            masse_ind  = ((oil_biomass + nonoil_biomass) / fruit_number) * 1000; //en grammes
+            masse_ind  = ((oil_biomass + nonoil_biomass) / fruit_number); //en grammes
         else
             masse_ind  = 0;
 
@@ -240,9 +248,10 @@ public:
 
         //        growth_demand();
 
-        if (TT_since_appearance>=TT_ini_flowering)
-            //            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pow(IC_setting, SENSIVITY_IC_SETTING) * pot_fruits_number;
-            fruit_number = min (1.0, IC_spikelet) * min (1.0, IC_setting) * pot_fruits_number;
+        //        if (TT_since_appearance>=TT_ini_flowering)
+        //            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pow(IC_setting, SENSIVITY_IC_SETTING) * pot_fruits_number;
+
+        fruit_number = min (1.0, IC_spikelet) * min (1.0, IC_setting) * pot_fruits_number;
 
 
         if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)) {
@@ -265,9 +274,6 @@ public:
             nonoil_biomass=0;
             oil_demand=0;
             nonoil_demand=0;
-        }
-        else{
-            oil_demand=0;
         }
 
         demand = oil_demand + nonoil_demand;

@@ -35,6 +35,7 @@ private:
     //      parameters
     double MASSE_INFLO_MALE_ADULTE;
     double REPRO_CONSTRUCTION_COST;
+    double TEFF_INI;
 
     //     internals
     double biomass;
@@ -82,7 +83,7 @@ public:
     virtual ~MaleInflo() {}
 
     void init(double t, const xpalm::ModelParameters& parameters) {}
-    void init(double t, const xpalm::ModelParameters& parameters, double phytomer_age, double TT_since_appearance_, double inflo_dev_factor_, double TT_ini_flowering_, double TT_ini_male_senescence)
+    void init(double t, const xpalm::ModelParameters& parameters, double TT_since_appearance_, double inflo_dev_factor_, double TT_ini_flowering_, double TT_ini_male_senescence)
     {
         //        AtomicModel<MaleInflo>::init(t, parameters);
 
@@ -91,7 +92,7 @@ public:
         //        parameters
         MASSE_INFLO_MALE_ADULTE = parameters.get("MASSE_INFLO_MALE_ADULTE");
         REPRO_CONSTRUCTION_COST = parameters.get("REPRO_CONSTRUCTION_COST");
-
+        TEFF_INI = parameters.get("T_EFF_INI");
         //       internals
         biomass = 0;
         biomass_harvested=0;
@@ -102,19 +103,20 @@ public:
         TT_ini_flowering = TT_ini_flowering_;
         TT_since_appearance=TT_since_appearance_;
         TT_flowering_duration=(TT_ini_male_senescence-TT_ini_flowering);
+
         //        double RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
         //        TT_flowering_duration = RANG_DEBUT_CROISSANCE_PEDUNCULE / production_speed;
 
 
 
-        double TEff_ini = parameters.get("T_EFF_INI");
+
         //        double TT_since_appearan = TEff_ini * phytomer_age;
 
         //init structure
         if (inflo_status.is(inflo::FLOWERING) ) {
             double fr_growth = min(1.0, (TT_ini_flowering - TT_since_appearance) / TT_flowering_duration );
             biomass = MASSE_INFLO_MALE_ADULTE * inflo_dev_factor * fr_growth;
-            demand = MASSE_INFLO_MALE_ADULTE * REPRO_CONSTRUCTION_COST * inflo_dev_factor * ( TEff_ini / TT_flowering_duration );
+            demand = MASSE_INFLO_MALE_ADULTE * REPRO_CONSTRUCTION_COST * inflo_dev_factor * ( TEFF_INI / TT_flowering_duration );
         }
 
         if (inflo_status.is(inflo::SENESCENCE) ) {

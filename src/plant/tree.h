@@ -109,7 +109,8 @@ private:
     double TT_FLOWERING_ADULT;
     double TT_HARVEST_INITIAL;
     double TT_HARVEST_ADULT;
-    double TT_MALE_SENESCENCE;
+//    double TT_MALE_SENESCENCE;
+    double PERIOD_MALE_INFLO;
     double MAXIMAL_SFIND;
     double INITIAL_SFIND;
     double DENS;
@@ -289,7 +290,8 @@ public:
         TT_FLOWERING_ADULT = parameters.get("TT_FLOWERING_ADULT");
         TT_HARVEST_INITIAL = parameters.get("TT_HARVEST_INITIAL");
         TT_HARVEST_ADULT = parameters.get("TT_HARVEST_ADULT");
-        TT_MALE_SENESCENCE = parameters.get("TT_MALE_SENESCENCE");
+//        TT_MALE_SENESCENCE = parameters.get("TT_MALE_SENESCENCE");
+        PERIOD_MALE_INFLO =parameters.get("PERIOD_MALE_INFLO");
         MAXIMAL_SFIND  = parameters.get("MAXIMAL_SFIND");
         INITIAL_SFIND  = parameters.get("INITIAL_SFIND");
 
@@ -425,7 +427,8 @@ public:
         double TT_ini_flowering = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_FLOWERING_INITIAL, TT_FLOWERING_ADULT);
         double TT_ini_harvest = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_HARVEST_INITIAL, TT_HARVEST_ADULT);
         double inflo_dev_factor = age_relative_var(age_at_creation, AGE_START_PROD, AGE_ADULT, 0, 1);
-        double TT_ini_male_senescence = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_FLOWERING_INITIAL, TT_FLOWERING_INITIAL + TT_MALE_SENESCENCE);
+//        double TT_ini_male_senescence = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_FLOWERING_INITIAL, TT_FLOWERING_INITIAL + TT_MALE_SENESCENCE);
+        double TT_ini_male_senescence = TT_ini_flowering +PERIOD_MALE_INFLO;
 
         //        Leaf area increase with plant age
         double SF_ind = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, INITIAL_SFIND , MAXIMAL_SFIND);

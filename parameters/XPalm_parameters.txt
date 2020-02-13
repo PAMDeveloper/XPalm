@@ -43,12 +43,14 @@ a_sigmoide_declin_pn = 13 ### sigmoide pour le declin de pn en fonction du stres
 b_sigmoide_declin_pn = 6  ### depend du nombre de jours au dessus d un certain seuil de FTSW
 seuil_FTSW_pour_red_a_long_termes_de_Pn = 0.4
 SENS_REMANESCENCE = 2.5 ### exposant pour rendre compte de la sensibilite au stress
+
 RANG_DEBUT_SENS_PN_LONG_TERMES = -3
 RANG_FIN_SENS_PN_LONG_TERMES = 3
 EFFICIENCE_BIOLOGIQUE = 4.8   ##gCH2O.MJ-1
 SEUIL_PHOTO = 0.6  # seuil à partir duquel perte de conductance (assimilation réduite)
 K = 0.5
 KC = 1
+
 INACTIVE_PHYTOMER_NUMBER = 60
 AF_FRUITS = 1.5 # coefficient d affinite pour les fruits
 
@@ -67,13 +69,14 @@ COUT_RESPI_INTERNODE = 1.44 #(gCH2O/gDM)
 
 
 #####  INFLO PARAMS #########
-TT_FLOWERING_ADULT = 9430 ### depuis rank 1: 2640   
-TT_FLOWERING_INITIAL = 6300 ### depuis rank 1: 1500
+TT_FLOWERING_ADULT = 9430 ###  9°*15*70rang
+TT_FLOWERING_INITIAL = 6300 ### 9°*10*70rang
 TT_HARVEST_ADULT = 12150 ### depuis rank 1: 4095
 TT_HARVEST_INITIAL = 8100 ### depuis rank 1:3000
 FRACTION_PERIOD_OLEOSYNTHESIS = 0.8 ### fraction de la période du développement du régime correspondant à l'oléosynthèse
 FRACTION_PERIOD_DEV_PEDUNCLE = 0.2 ### fraction de la période du développement du régime correspondant à l'oléosynthèse
-TT_MALE_SENESCENCE = 6350 ### depuis rank 1:1520
+#TT_MALE_SENESCENCE = 6350 ### 
+PERIOD_MALE_INFLO = 900 duration of inlfo male from spathe appearance to scenecence 10j*9°*10rang
 DEBUT_ABLATION_REGIME = 2500
 FIN_ABLATION_REGIME =   3500
 POURC_ABLATION_REGIME = 0

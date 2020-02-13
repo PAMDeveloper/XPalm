@@ -394,9 +394,14 @@ public:
             IC_setting=1;
         }
 
+        peduncle->put<inflo::inflo_states>(t, Peduncle::INFLO_STATUS, status);
         peduncle->init(t, parameters, production_speed,TT_since_appearance, TT_ini_flowering, TT_ini_harvest, inflo_dev_factor);
-        bunch->init(t, parameters, production_speed,TT_since_appearance, TT_ini_flowering, TT_ini_harvest, TT_ini_oleo, inflo_dev_factor);
-        male->init(t, parameters, phytomer_age, TT_since_appearance, inflo_dev_factor, TT_ini_flowering, TT_ini_male_senescence);
+
+        bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS, status);
+        bunch->init(t, parameters,TT_since_appearance, TT_ini_flowering, TT_ini_harvest, TT_ini_oleo, inflo_dev_factor);
+
+        male->put<inflo::inflo_states>(t, MaleInflo::INFLO_STATUS, status);
+        male->init(t, parameters, TT_since_appearance, inflo_dev_factor, TT_ini_flowering, TT_ini_male_senescence);
 
 
 
@@ -477,7 +482,6 @@ public:
 
         if (status.is(inflo::FEMALE) && status.is(inflo::NON_ABORTED)) {
 
-
             //compute perduncle
             peduncle->put<double>(t, Peduncle::IC_SPIKELET, IC_spikelet);
             peduncle->put<double>(t, Peduncle::TEFF, TEff);
@@ -494,7 +498,7 @@ public:
 
             //compute bunch
             bunch->put<double>(t, Bunch::TEFF, TEff);
-            bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS_POT, status_pot);
+            //            bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS_POT, status_pot);
             bunch->put<inflo::inflo_states>(t, Bunch::INFLO_STATUS, status);
             //            bunch->put<double>(t, Bunch::TT_CORRIGE, TT_corrige);
             bunch->put<double>(t, Bunch::TT_SINCE_APPEARANCE, TT_since_appearance);
@@ -527,32 +531,10 @@ public:
         }
 
 
-        //        compute_growth(t);
-
-        //        femelle_biomass = bunch_oil_biomass  + bunch_nonoil_biomass + peduncle_biomass;
-        //        biomass = bunch_oil_biomass + bunch_nonoil_biomass + peduncle_biomass + male_biomass;
+        // respi
         respirable_biomass = bunch_nonoil_biomass + peduncle_biomass + male_biomass;
-        //        bunch_biomass_harvested = bunch_oil_biomass_harvested  + bunch_nonoil_biomass_harvested + peduncle_biomass_harvested;
 
-
-        //        compute_demand(t);
-
-        //Demand //TODO get from tree
-        //        if (status.is(inflo::INITIATED))
-        //            red_vitesse_FTSW = pow((ftsw + 1 - SEUIL_MEDIAN_FTSW ), SENS_FTSW );
-        //        else
-        //            red_vitesse_FTSW = 1;
-
-        //        double correctedTEff = red_vitesse_FTSW * TEff;
-
-        //        gain_TEff_jour = correctedTEff;
-
-
-
-        //        Organ.growth_demand(self, correctedTEff);
-        //        if(rank > 0)
-        //        TT_since_appearance += gain_TEff_jour;
-
+        // demande
         demand = bunch_demand + peduncle_demand + male_demand;
 
         //        compute_TT_corrige()

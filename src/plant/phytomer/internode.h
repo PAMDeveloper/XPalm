@@ -110,7 +110,7 @@ public:
         //        TT_corrige = 0;
         //        gain_TEff_jour = 0;
         TT_since_appearance = TT_since_appearance_;
-        TT_ini_elongation= 90 / production_speed; //growth start at rank 30
+        TT_ini_elongation= 90 / production_speed; //growth start at rank 30 TODO convert into param if necessary
 
 
         // ini
