@@ -15,11 +15,11 @@ namespace model {
 class MaleInflo : public AtomicModel < MaleInflo >
 {
 public:
-    enum internals { BIOMASS,
-                     BIOMASS_HARVESTED,
+    enum internals { BIOMASS_MALE_INFLO,
+                     BIOMASS_MALE_INFLO_HARVESTED,
                      POTENTIAL_BIOMASS,
                      ASSIMILATE_SUPPLY,
-                     DEMAND,
+                     MALE_INFLO_DEMAND,
                      TT_FLO_DURATION,
                      INFLO_DEV_FACTOR };
 
@@ -28,7 +28,7 @@ public:
                      //                     TT_INI_FLOWERING,
                      TT_SINCE_APPEARANCE,
                      INFLO_STATUS,
-                     RANK
+//                     RANK
                    };
 
 private:
@@ -53,7 +53,7 @@ private:
     double Teff;
     double TT_ini_flowering;
     double TT_since_appearance;
-    double rank;
+//    double rank;
     //    double TT_corrige;
 
 
@@ -62,11 +62,11 @@ public:
     MaleInflo()
     {
         //         internals
-        Internal(BIOMASS, &MaleInflo::biomass);
-        Internal(BIOMASS_HARVESTED, &MaleInflo::biomass_harvested);
+        Internal(BIOMASS_MALE_INFLO, &MaleInflo::biomass);
+        Internal(BIOMASS_MALE_INFLO_HARVESTED, &MaleInflo::biomass_harvested);
         Internal(POTENTIAL_BIOMASS, &MaleInflo::potential_biomass);
         Internal(ASSIMILATE_SUPPLY, &MaleInflo::assimilate_supply);
-        Internal(DEMAND, &MaleInflo::demand);
+        Internal(MALE_INFLO_DEMAND, &MaleInflo::demand);
         Internal(TT_FLO_DURATION, &MaleInflo::TT_flowering_duration);
         Internal(INFLO_DEV_FACTOR, &MaleInflo::inflo_dev_factor);
 
@@ -77,7 +77,7 @@ public:
         //        External(TT_CORRIGE, &MaleInflo::TT_corrige);
         //        External (TT_INI_FLOWERING, &MaleInflo::TT_ini_flowering);
         External(TT_SINCE_APPEARANCE, &MaleInflo::TT_since_appearance);
-        External(RANK, &MaleInflo::rank);
+//        External(RANK, &MaleInflo::rank);
     }
 
     virtual ~MaleInflo() {}
@@ -114,7 +114,7 @@ public:
 
         //init structure
         if (inflo_status.is(inflo::FLOWERING) ) {
-            double fr_growth = min(1.0, (TT_ini_flowering - TT_since_appearance) / TT_flowering_duration );
+            double fr_growth = min(1.0, (TT_since_appearance - TT_ini_flowering) / TT_flowering_duration );
             biomass = MASSE_INFLO_MALE_ADULTE * inflo_dev_factor * fr_growth;
             demand = MASSE_INFLO_MALE_ADULTE * REPRO_CONSTRUCTION_COST * inflo_dev_factor * ( TEFF_INI / TT_flowering_duration );
         }

@@ -159,7 +159,7 @@ public:
 
         IND_FRUIT_WEIGHT = parameters.get("IND_FRUIT_WEIGHT");
         MEAN_FRUIT_NUMBER_ADULTE = parameters.get("MEAN_FRUIT_NUMBER_ADULTE");
-        masse_ind_max = IND_FRUIT_WEIGHT / 1000;
+        masse_ind_max = IND_FRUIT_WEIGHT;
         pot_fruits_number = int (inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE);
 
         //        double RATIO_DUREE_JEUNES_OLEO = parameters.get("RATIO_DUREE_JEUNES_OLEO");

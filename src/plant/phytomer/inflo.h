@@ -24,7 +24,7 @@ public:
     enum submodels { PEDUNCLE, FRUIT, MALEINFLO };
 
     enum internals { STATUS,
-                     STATUS_POT,
+//                     STATUS_POT,
                      TT_INI_OLEO,
                      TT_INI_SEX,
                      TT_INI_ABORTION,
@@ -185,7 +185,7 @@ public:
 
         //         internals
         Internal(STATUS, &Inflo::status);
-        Internal(STATUS_POT, &Inflo::status_pot);
+//        Internal(STATUS_POT, &Inflo::status_pot);
         Internal(TT_INI_FLOWERING, &Inflo::TT_ini_flowering);
         Internal(TT_INI_OLEO, &Inflo::TT_ini_oleo);
         Internal(TT_INI_SEX, &Inflo::TT_ini_sex);
@@ -311,6 +311,11 @@ public:
         TT_ini_flowering = TT_ini_flo;
         TT_ini_harvest = TT_ini_harv;
         TT_ini_male_senescence = TT_ini_senec;
+        TT_since_appearance= TT_since_appearance_;
+        TT_ini_oleo = TT_ini_flowering +(1-FRACTION_PERIOD_OLEOSYNTHESIS)*(TT_ini_harvest - TT_ini_flowering);
+        TT_ini_abortion = TT_ini_flowering-PERIOD_DEV_SPIKELET;
+        TT_ini_sex = TT_ini_abortion - PERIOD_SEX_DETERMINATION;
+
         rank = rk;
         production_speed = prod_speed_;
         inflo_dev_factor=inflo_dev_factor_;
@@ -368,10 +373,7 @@ public:
         //set seed TODO remove after debug
         //        srand(SEED);
 
-        TT_since_appearance= TT_since_appearance_;
-        TT_ini_oleo = TT_ini_flowering +(1-FRACTION_PERIOD_OLEOSYNTHESIS)*(TT_ini_harvest - TT_ini_flowering);
-        TT_ini_abortion = TT_ini_flowering-PERIOD_DEV_SPIKELET;
-        TT_ini_sex = TT_ini_abortion - PERIOD_SEX_DETERMINATION;
+
 
         //        TT_corrige=TT_since_appearance;
 
@@ -522,12 +524,12 @@ public:
             male->put<inflo::inflo_states>(t, MaleInflo::INFLO_STATUS, status);
             male->put<double>(t, MaleInflo::TT_SINCE_APPEARANCE, TT_since_appearance);
             male->put<double>(t, MaleInflo::FR_RESTE, fr_reste);
-            male->put<double>(t, MaleInflo::RANK, rank);
+//            male->put<double>(t, MaleInflo::RANK, rank);
             (*male)(t);
 
-            male_biomass = male->get< double >(t, MaleInflo::BIOMASS);
-            male_biomass_harvested = male->get< double >(t, MaleInflo::BIOMASS_HARVESTED);
-            male_demand = male->get< double >(t, MaleInflo::DEMAND);
+            male_biomass = male->get< double >(t, MaleInflo::BIOMASS_MALE_INFLO);
+            male_biomass_harvested = male->get< double >(t, MaleInflo::BIOMASS_MALE_INFLO_HARVESTED);
+            male_demand = male->get< double >(t, MaleInflo::MALE_INFLO_DEMAND);
         }
 
 

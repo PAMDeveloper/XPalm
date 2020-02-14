@@ -69,18 +69,18 @@ COUT_RESPI_INTERNODE = 1.44 #(gCH2O/gDM)
 
 
 #####  INFLO PARAMS #########
-TT_FLOWERING_ADULT = 9430 ###  9°*15*70rang
-TT_FLOWERING_INITIAL = 6300 ### 9°*10*70rang
+TT_FLOWERING_ADULT = 9430 ###  9°* 15* 70rang
+TT_FLOWERING_INITIAL = 6300 ### 9°*10* 70rang
 TT_HARVEST_ADULT = 12150 ### depuis rank 1: 4095
 TT_HARVEST_INITIAL = 8100 ### depuis rank 1:3000
 FRACTION_PERIOD_OLEOSYNTHESIS = 0.8 ### fraction de la période du développement du régime correspondant à l'oléosynthèse
 FRACTION_PERIOD_DEV_PEDUNCLE = 0.2 ### fraction de la période du développement du régime correspondant à l'oléosynthèse
 #TT_MALE_SENESCENCE = 6350 ### 
-PERIOD_MALE_INFLO = 900 duration of inlfo male from spathe appearance to scenecence 10j*9°*10rang
-DEBUT_ABLATION_REGIME = 2500
-FIN_ABLATION_REGIME =   3500
-POURC_ABLATION_REGIME = 0
-RANG_D_ABLATION_REGIME = 25
+PERIOD_MALE_INFLO = 1800 ### duration of inlfo male from spathe appearance to scenecence 10j*9°*20rang
+#DEBUT_ABLATION_REGIME = 2500
+#FIN_ABLATION_REGIME =   3500
+#POURC_ABLATION_REGIME = 0
+#RANG_D_ABLATION_REGIME = 25
 
 REPRO_CONSTRUCTION_COST = 1.44 ###construction cost of reproductive organs (gCH2O/gDM)
 RANG_DEBUT_CROISSANCE_PEDUNCULE = 8  # nombre de rangs avant floraison # 11.5
@@ -105,7 +105,7 @@ ABORTION_RATE_MAX = 0.8  ###maximal abortion rate (when IC=0)
 SEX_RATIO_MIN = 0.2 ###minimal sex ratio (female/male+female) 
 
 ##### MALE INFLO PARAMS #########
-MASSE_INFLO_MALE_ADULTE = 1.2
+MASSE_INFLO_MALE_ADULTE = 1200 ##g
 
 #####  PEDUNCLE PARAMS #########
 #IC_spikelet_RANG_DEBUT = -10
@@ -117,13 +117,13 @@ MASSE_MEAN_PEDUNCULE_ADULTE = 2.1
 #####  BUNCH PARAMS #########
 COUT_OIL = 3.2
 DUREE_OLEO = 634,9206349206349‬ ## (28-24)/ 0.0063  # recolte au rang 28 a peu pres et debut au rang 24 
-INITIAL_BIOMASS = 500   # non utilise
-RANG_DEBUT_OLEO = 24  # n est plus fonctionnel
+#INITIAL_BIOMASS = 500   # non utilise
+#RANG_DEBUT_OLEO = 24  # n est plus fonctionnel
 OIL_CONTENT = 0.73 
-IND_FRUIT_WEIGHT = 6.5 
+IND_FRUIT_WEIGHT = 6.5 ### g
 MEAN_FRUIT_NUMBER_ADULTE = 1600
-MASSE_REGIME_INI = 3.5    
-PERIOD_FRUIT_SET = 405# 3rg * 15 days * 9°C periode apres flowering pendant laquelle le taux de nouaison est modulable (TT)
+#MASSE_REGIME_INI = 3500    ###en g
+PERIOD_FRUIT_SET = 405 # 3 rangs * 15 days * 9°C periode apres flowering pendant laquelle le taux de nouaison est modulable (TT)
 # DEBUT_RANG_SENSITIVITY_NOUAISON = 3 # nombre de rang avant floraison pour le debut de determination du nombre de grains   
 FIN_RANG_SENSITIVITY_NOUAISON = 1  # nombre de rang avant floraison pour le debut de determination du nombre de grains
 SENSIVITY_IC_SETTING = 0.30   #0.05 0.5 ?
@@ -148,7 +148,7 @@ REALL_COST = 0.60
 #POURC_DEFOLIATON = 0  # en unite de 0,0.1,0.2,0.3 1
 MAXIMAL_SFIND = 12    
 INITIAL_SFIND = 2.5    
-INCREASE_OF_LEAF_AREA =  0.00419  # (cm2.Cd-1)
+#INCREASE_OF_LEAF_AREA =  0.00419  # (cm2.Cd-1)
 INFLEXION = 7425     # 15 days * 55 rangs * 9° (inflexion an rang -5) deux parametres rendant compte de la vitesse d expansion des feuilles
 COURBURE = 200
 COUT_RESPI_MAINTENANCE_LEAF = 0.0044 # (gCH2O/gDM)

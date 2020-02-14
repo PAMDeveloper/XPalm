@@ -45,7 +45,7 @@ private:
     double INFLEXION;
     double COURBURE;
     double POURC_FOLIOLE;
-    double INCREASE_OF_LEAF_AREA;
+//    double INCREASE_OF_LEAF_AREA;
     double SLW_ini;
     double PLASTICITY_LEAF_IC;
     double SLW_max;
@@ -138,7 +138,7 @@ public:
         SLW_ini = parameters.get("SLW_ini"); //g.cm-2
         COUT_RESPI_FEUILLE = parameters.get("COUT_RESPI_FEUILLE");
         POURC_FOLIOLE = parameters.get("POURC_FOLIOLE");
-        INCREASE_OF_LEAF_AREA = parameters.get("INCREASE_OF_LEAF_AREA");
+//        INCREASE_OF_LEAF_AREA = parameters.get("INCREASE_OF_LEAF_AREA");
         SEUIL_DUREE = parameters.get("SEUIL_DUREE");
         SEUIL_EXPAN = parameters.get("SEUIL_EXPAN");
         INFLEXION = parameters.get("INFLEXION");
@@ -188,13 +188,13 @@ public:
             TT_since_leaf_expand = TT_since_appearance;
             potLeafArea = (SF_fin / (1 + exp(-(TT_since_leaf_expand - INFLEXION) / COURBURE)));
 
-            leaf_structural_biomass = potLeafArea* 100 * SLW_min / POURC_FOLIOLE; // m2 x100 x g.cm-2=g
-            leaf_non_structural_biomass = potLeafArea * (SLW_ini - SLW_min) * 100 / POURC_FOLIOLE;
+            leaf_structural_biomass = potLeafArea * 10000* SLW_min / POURC_FOLIOLE; // m2 x10000 x g.cm-2=g
+            leaf_non_structural_biomass = potLeafArea *10000* (SLW_ini - SLW_min) / POURC_FOLIOLE;
 
 
 
             slw = (potLeafArea > 0)
-                    ? leaf_total_biomass * POURC_FOLIOLE / (potLeafArea*100) //g.cm-2
+                    ? leaf_total_biomass * POURC_FOLIOLE / (potLeafArea) //g.cm-2
                     : 0;
 
             leafArea = ( phytomer_state == phytomer::ACTIVE )
@@ -269,10 +269,10 @@ public:
 
         leaf_total_biomass = leaf_structural_biomass + leaf_non_structural_biomass;
 
-        capacite_reserve_max = (SLW_max - SLW_min) * leafArea / POURC_FOLIOLE;
+        capacite_reserve_max = (SLW_max - SLW_min) * leafArea * 10000 / POURC_FOLIOLE;
 
         slw = ( leafArea > 0 )
-                ? leaf_total_biomass * POURC_FOLIOLE / leafArea
+                ? leaf_total_biomass * POURC_FOLIOLE / (leafArea *10000)
                 : 0;
 
     }

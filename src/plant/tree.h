@@ -336,11 +336,11 @@ public:
         //        age_at_creation -= 1 / (TTEff_init * production_speed);
         //    }
 
-        int nb_phyto = INACTIVE_PHYTOMER_NUMBER + RANG_D_ABLATION-1;
+        int nb_phyto = INACTIVE_PHYTOMER_NUMBER + RANG_D_ABLATION;
         //init age ate creation for the oldest phytomer
         double age_at_creation = age - (nb_phyto / (TEFF_INI * production_speed));
 
-        for ( int i = 0; i <= nb_phyto; ++i ) {
+        for ( int i = 0; i < nb_phyto; ++i ) {
             create_phytomer(t-1, i, phytomerNumber, age_at_creation);
             //update production speed for each phytomer
             production_speed = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);

@@ -133,10 +133,13 @@ public:
         TT_since_appearance = parameters.get("T_EFF_INI")*age;
 
         //submodels
-        leaf->init(t, parameters, rank, state, TT_since_appearance, SF_fin);
+
         internode->init(t, parameters, age, TT_since_appearance, tree_age_at_creation, production_speed);
         inflo->init(t, parameters, age, rank, TT_since_appearance, production_speed, TT_ini_flowering, harv_tt, tt_ini_sen, inflo_factor);
         inflo_status = inflo->get<inflo::inflo_states, Inflo>(t, Inflo::STATUS);
+
+        leaf->put<inflo::inflo_states>(t, Leaf::INFLO_STATUT, inflo_status);
+        leaf->init(t, parameters, rank, state, TT_since_appearance, SF_fin);
     }
 
 
