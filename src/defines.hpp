@@ -178,8 +178,8 @@ enum leaf_state   { COUPE = 0,
 
 namespace phytomer {
 enum phytomer_state {  ACTIVE = 0,
-                       INACTIVE = 1,
-                       DEAD = 2
+                       INACTIVE = 1
+//                       DEAD = 2
                     };
 }
 

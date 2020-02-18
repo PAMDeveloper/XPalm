@@ -41,6 +41,7 @@ private:
 
     //     parameters
     double INACTIVE_PHYTOMER_NUMBER;
+    double RANG_D_ABLATION;
 
     //     internals
     phytomer::phytomer_state state;
@@ -113,6 +114,7 @@ public:
 
         //parameters
         INACTIVE_PHYTOMER_NUMBER = parameters.get("INACTIVE_PHYTOMER_NUMBER");
+        RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
 
         //predim
         number = nb;
@@ -120,13 +122,23 @@ public:
         production_speed = prod_speed;
         SF_fin = SF_fin_;
         //var
-//        rank = rk;
-        rank = total_phyto_ - INACTIVE_PHYTOMER_NUMBER - nb - 1;
-//        state = st ? phytomer::INACTIVE : phytomer::ACTIVE;
+        //        rank = rk;
 
-        state= (rank > 0)
-                ? phytomer::ACTIVE
-                : phytomer::INACTIVE;
+        rank = (nb>0)
+                ? total_phyto_-RANG_D_ABLATION -INACTIVE_PHYTOMER_NUMBER-1 + (nb - INACTIVE_PHYTOMER_NUMBER-1)
+                : total_phyto_-RANG_D_ABLATION -INACTIVE_PHYTOMER_NUMBER - (nb + INACTIVE_PHYTOMER_NUMBER);
+
+
+        //        state = st ? phytomer::INACTIVE : phytomer::ACTIVE;
+
+        //        state= (rank > 0)
+        //                ? phytomer::ACTIVE
+        //                : phytomer::INACTIVE;
+
+        state=phytomer::ACTIVE;
+
+        if(rank > 60 && state == phytomer::ACTIVE)
+            state = phytomer::INACTIVE;
 
         tree_age_at_creation = tree_age_at_creation_;
         age = tree_age - tree_age_at_creation_;
@@ -147,49 +159,53 @@ public:
     {
 
 
-         rank = total_phytomer_number - INACTIVE_PHYTOMER_NUMBER - number - 1;
+        //         rank = total_phytomer_number - INACTIVE_PHYTOMER_NUMBER - number - 1;
 
-        if(rank > 0 && state == phytomer::INACTIVE)
-            state = phytomer::ACTIVE;
+        rank = (number>0)
+                ? total_phytomer_number-RANG_D_ABLATION -INACTIVE_PHYTOMER_NUMBER-1 + (number - INACTIVE_PHYTOMER_NUMBER-1)
+                : total_phytomer_number-RANG_D_ABLATION -INACTIVE_PHYTOMER_NUMBER - (number + INACTIVE_PHYTOMER_NUMBER);
+
+        //        if(rank > 0 && state == phytomer::INACTIVE)
+        //            state = phytomer::ACTIVE;
 
         if(rank > 60 && state == phytomer::ACTIVE)
-            state = phytomer::DEAD;
+            state = phytomer::INACTIVE;
 
-//        if(state == phytomer::DEAD) //TODO remove to include leaf/internode in demand when inactive
+        //        if(state == phytomer::DEAD) //TODO remove to include leaf/internode in demand when inactive
 
-//            return;
+        //            return;
 
         age++;
 
-         TT_since_appearance += TEff;
+        TT_since_appearance += TEff;
 
-//        if(state != phytomer::ACTIVE) //TODO remove to include leaf/internode in demand when inactive
-//            return;
+        //        if(state != phytomer::ACTIVE) //TODO remove to include leaf/internode in demand when inactive
+        //            return;
 
-        leaf->put<double>(t, Leaf::PHYTOMER_RANK, rank);
+        leaf->put<double>(t, Leaf::RANK, rank);
         leaf->put<double>(t, Leaf::TT_SINCE_APPEARANCE, TT_since_appearance);
         leaf->put<phytomer::phytomer_state>(t, Leaf::PHYTOMER_STATE, state);
         leaf->put<inflo::inflo_states>(t, Leaf::INFLO_STATUT, inflo_status);
-//        leaf->put<double>(t, Leaf::TEFF, TEff); //done by tree
+        //        leaf->put<double>(t, Leaf::TEFF, TEff); //done by tree
         (*leaf)(t);
 
-//        internode->put<double>(t, Internode::TEFF, TEff); //TODO passer dans tree
+        //        internode->put<double>(t, Internode::TEFF, TEff); //TODO passer dans tree
         internode->put<double>(t, Internode::TT_SINCE_APPEARANCE, TT_since_appearance);
-//        internode->put<double>(t, Internode::FR_RESTE, fr_reste); //done by tree
+        //        internode->put<double>(t, Internode::FR_RESTE, fr_reste); //done by tree
         //set by tree
 
         (*internode)(t);
 
-//        inflo->put<double>(t, Inflo::TEFF, TEff); //set by tree
+        //        inflo->put<double>(t, Inflo::TEFF, TEff); //set by tree
         inflo->put<double>(t, Inflo::RANK, rank);
         inflo->put<double>(t, Inflo::NUMBER, number);
         inflo->put<double>(t, Inflo::TT_SINCE_APPEARANCE, TT_since_appearance);
         inflo->put<double>(t, Inflo::TREE_IC, tree_IC);
 
         //set by tree
-//        inflo->put<double>(t, Inflo::FTSW, ftsw);
-//        inflo->put<double>(t, Inflo::FR_RESTE, fr_reste);
-//        inflo->put<double>(t, Inflo::FR_FRUITS, fr_fruits);
+        //        inflo->put<double>(t, Inflo::FTSW, ftsw);
+        //        inflo->put<double>(t, Inflo::FR_RESTE, fr_reste);
+        //        inflo->put<double>(t, Inflo::FR_FRUITS, fr_fruits);
         (*inflo)(t);
 
         inflo_status = inflo->get<inflo::inflo_states, Inflo>(t, Inflo::STATUS);

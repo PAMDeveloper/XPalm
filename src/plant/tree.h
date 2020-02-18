@@ -321,12 +321,12 @@ public:
         ic = 1;
         ei = 0;
 
-        plantLeafArea = slw = trunk_height  = total_leaves_biomass = total_leaves_biomass_harvested = trunk_biomass =
+        plantLeafArea = slw = trunk_height  = total_leaves_biomass = total_leaves_biomass_harvested = trunk_biomass = reserve_biomass=
                 leaves_non_structural_biomass = leaves_structural_biomass = leaves_structural_biomass_harvested = leaves_non_structural_biomass_harvested =
                 respirable_repro_biomass = bunch_oil_biomass =bunch_oil_biomass_harvested = bunch_non_oil_biomass= bunch_non_oil_biomass_harvested = Assim =
                 fr_fruits = fr_reste = offre_fruits = offre_nette = growth_demand = bunch_demand = internode_demand =
                 leaves_demand = male_demand  = male_biomass = male_biomass_harvested = peduncle_demand =offre_reste =
-                peduncle_biomass = peduncle_biomass_harvested= 0;
+                peduncle_biomass = peduncle_biomass_harvested=respi_maintenance= 0;
 
 
         //init structure
@@ -341,14 +341,23 @@ public:
 
         int nb_phyto = INACTIVE_PHYTOMER_NUMBER + RANG_D_ABLATION;
         //init age ate creation for the oldest phytomer  
-        double age_at_creation = age - (nb_phyto / (TEFF_INI * production_speed));
 
-        for ( int i = 0; i < nb_phyto; ++i ) {
-            create_phytomer(t-1, i, phytomerNumber, age_at_creation);
+//double age_at_creation = age - (nb_phyto / (TEFF_INI * production_speed));
+//        for ( int i = 0; i < nb_phyto; ++i ) {
+//            create_phytomer(t-1, i, phytomerNumber, age_at_creation);
+//            //update production speed for each phytomer
+//            production_speed = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
+//            //update age at phytomer creation
+//            age_at_creation += 1 / (TEFF_INI * production_speed);
+//        }
+
+        double age_at_creation = age;
+        for ( int i =0 ; i<nb_phyto ; ++i ) {
+            create_phytomer(t-1, -i, phytomerNumber, age_at_creation);
             //update production speed for each phytomer
             production_speed = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
             //update age at phytomer creation
-            age_at_creation += 1 / (TEFF_INI * production_speed);
+            age_at_creation -= 1 / (TEFF_INI * production_speed);
         }
 
         meteo->init(t, parameters);
@@ -456,7 +465,6 @@ public:
     void compute(double t, bool /* update */)
     {
         age = age + 1 ;
-
 
         compute_biomasse_non_structurale_allouee_aux_feuilles(t);
 
@@ -651,7 +659,7 @@ public:
         newPhytomerEmergence += TEff * production_speed;
         if (newPhytomerEmergence >= 1) {
             //            create_phytomer(t, phytomerNumber + 1, age);
-            create_phytomer(t, phytomerNumber, phytomerNumber+1, age);
+            create_phytomer(t, phytomerNumber-RANG_D_ABLATION-INACTIVE_PHYTOMER_NUMBER+1, phytomerNumber+1, age);
             phytomerNumber += 1;
             newPhytomerEmergence -= 1;
         }
@@ -671,7 +679,8 @@ public:
             auto it = phytomers.begin();
             while (it != phytomers.end()) {
                 Phytomer* phytomer = (*it);
-                if(phytomer->get < phytomer::phytomer_state, Phytomer >(t-1, Phytomer::STATE) == phytomer::ACTIVE) {
+                if(phytomer->get < phytomer::phytomer_state, Phytomer >(t-1, Phytomer::STATE) == phytomer::ACTIVE &&
+                        phytomer->leaf_model()->get <double>(t-1, Leaf::LEAFAREA) > 0) {
                     double capacite_reserve_max = phytomer->leaf_model()->get <double>(t-1, Leaf::CAPACITE_RESERVE_MAX);
                     double non_structural_biomass = phytomer->leaf_model()->get <double>(t-1, Leaf::LEAF_NON_STRUCTURAL_BIOMASS);
                     double capacite_reserve = capacite_reserve_max - non_structural_biomass;
@@ -690,7 +699,7 @@ public:
                 if(capacite_reserve_total <= 0 && phytomer->leaf_model()->get <double>(t-1, Leaf::LEAFAREA) > 0)
                     phytomer->leaf_model()->put<double>(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, 0);
 
-                else if(phytomer->get < phytomer::phytomer_state, Phytomer >(t-1, Phytomer::STATE) != phytomer::DEAD &&
+                else if(phytomer->get < phytomer::phytomer_state, Phytomer >(t-1, Phytomer::STATE) == phytomer::ACTIVE &&
                         phytomer->leaf_model()->get <double>(t-1, Leaf::LEAFAREA) > 0) {
                     double capacite_reserve_max = phytomer->leaf_model()->get <double>(t-1, Leaf::CAPACITE_RESERVE_MAX);
                     double non_structural_biomass = phytomer->leaf_model()->get <double>(t-1, Leaf::LEAF_NON_STRUCTURAL_BIOMASS);
@@ -710,7 +719,8 @@ public:
             auto it = phytomers.begin();
             while (it != phytomers.end()) {
                 Phytomer* phytomer = (*it);
-                if(phytomer->get < phytomer::phytomer_state, Phytomer >(t-1, Phytomer::STATE) == phytomer::ACTIVE) {
+                if(phytomer->get < phytomer::phytomer_state, Phytomer >(t-1, Phytomer::STATE) == phytomer::ACTIVE&&
+                        phytomer->leaf_model()->get <double>(t-1, Leaf::LEAFAREA) > 0) {
                     capacite_reserve_total += phytomer->leaf_model()->get <double>(t-1, Leaf::LEAF_NON_STRUCTURAL_BIOMASS);
                     //                    ++it;
                     //                    continue;
@@ -724,7 +734,7 @@ public:
 
                 if(capacite_reserve_total <= 0 && phytomer->leaf_model()->get <double>(t-1, Leaf::LEAFAREA) > 0)
                     phytomer->leaf_model()->put(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, 0);
-                else if(phytomer->get < phytomer::phytomer_state, Phytomer >(t-1, Phytomer::STATE) != phytomer::DEAD &&
+                else if(phytomer->get < phytomer::phytomer_state, Phytomer >(t-1, Phytomer::STATE) == phytomer::ACTIVE &&
                         phytomer->leaf_model()->get <double>(t-1, Leaf::LEAFAREA) > 0) {
                     double non_structural_biomass = phytomer->leaf_model()->get <double>(t-1, Leaf::LEAF_NON_STRUCTURAL_BIOMASS);
                     if(non_structural_biomass >= 0) {

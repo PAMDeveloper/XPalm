@@ -28,7 +28,7 @@ public:
 
     enum externals { TEFF,
                      TT_SINCE_APPEARANCE,
-                     PHYTOMER_RANK,
+                     RANK,
                      FTSW,
                      INFLO_STATUT,
                      PHYTOMER_STATE,
@@ -45,7 +45,7 @@ private:
     double INFLEXION;
     double COURBURE;
     double POURC_FOLIOLE;
-//    double INCREASE_OF_LEAF_AREA;
+    //    double INCREASE_OF_LEAF_AREA;
     double SLW_ini;
     double PLASTICITY_LEAF_IC;
     double SLW_max;
@@ -55,6 +55,7 @@ private:
 
     //     internals
     double leafArea; //m²
+    double leafArea_cor;
     double SF_fin;
     double leaf_structural_biomass;
     double leaf_non_structural_biomass;
@@ -112,7 +113,7 @@ public:
         External(INFLO_STATUT, &Leaf::inflo_status);
         External(PHYTOMER_STATE, &Leaf::phytomer_state);
         External(TEFF, &Leaf::TEff);
-        External(PHYTOMER_RANK, &Leaf::phytomer_rank);
+        External(RANK, &Leaf::phytomer_rank);
         External(TT_SINCE_APPEARANCE, &Leaf::TT_since_appearance);
         External(FTSW, &Leaf::ftsw);
         External(FR_RESTE, &Leaf::fr_reste);
@@ -138,7 +139,7 @@ public:
         SLW_ini = parameters.get("SLW_ini"); //g.cm-2
         COUT_RESPI_FEUILLE = parameters.get("COUT_RESPI_FEUILLE");
         POURC_FOLIOLE = parameters.get("POURC_FOLIOLE");
-//        INCREASE_OF_LEAF_AREA = parameters.get("INCREASE_OF_LEAF_AREA");
+        //        INCREASE_OF_LEAF_AREA = parameters.get("INCREASE_OF_LEAF_AREA");
         SEUIL_DUREE = parameters.get("SEUIL_DUREE");
         SEUIL_EXPAN = parameters.get("SEUIL_EXPAN");
         INFLEXION = parameters.get("INFLEXION");
@@ -152,6 +153,7 @@ public:
         gain_TEff_jour = 0;
         TT_since_appearance = TT_since_appearance_;
         //        TT_corrige = 0;
+        leafArea_cor=0;
         vitesse_exp = 0;
         leaf_demand = 0;
         leaf_total_biomass = 0;
@@ -160,6 +162,8 @@ public:
         potLeafArea = 0;
         increase_potleafArea = 0;
         fraction_non_str_biomasse_allouee = 0;
+        leaf_non_structural_biomass=0;
+        leaf_structural_biomass=0;
         leaf_structural_biomass_harvested = 0;
         leaf_non_structural_biomass_harvested =0;
         phytomer_state = state;
@@ -187,19 +191,21 @@ public:
 
             TT_since_leaf_expand = TT_since_appearance;
             potLeafArea = (SF_fin / (1 + exp(-(TT_since_leaf_expand - INFLEXION) / COURBURE)));
-
             leaf_structural_biomass = potLeafArea * 10000 * SLW_min / POURC_FOLIOLE; // m2 x10000 x g.cm-2=g
             leaf_non_structural_biomass = potLeafArea * 10000 * (SLW_ini - SLW_min) / POURC_FOLIOLE;
 
 
+            leafArea_cor=potLeafArea;
 
-            slw = (potLeafArea > 0)
+            leafArea = ( phytomer_rank >0 )
+                    ? potLeafArea
+                    : 0;
+
+            slw = (leafArea > 0)
                     ? leaf_total_biomass * POURC_FOLIOLE / (potLeafArea) //g.cm-2
                     : 0;
 
-            leafArea = ( phytomer_state == phytomer::ACTIVE )
-                    ? potLeafArea
-                    : 0;
+
         }
 
         leaf_total_biomass=leaf_structural_biomass+leaf_non_structural_biomass; //g
@@ -217,6 +223,7 @@ public:
             leaf_demand=0;
             assimilate_supply=0;
             leafArea=0;
+            leafArea_cor=0;
             vitesse_exp=0;
             increase_potleafArea=0;
             potLeafArea=0;
@@ -235,15 +242,19 @@ public:
                     : ftsw / SEUIL_EXPAN;
 
             potLeafArea += increase_potleafArea;
-            leafArea += increase_potleafArea * fr_reste * factor_decrease_expand;
+            leafArea_cor += increase_potleafArea * fr_reste * factor_decrease_expand;
+            //            leafArea += increase_potleafArea;
 
-            if (phytomer_state != phytomer::ACTIVE){
-                leafArea=0;
-            }
+            leafArea = ( phytomer_rank >0 )
+                    ? leafArea_cor
+                    : 0;
+
+//            leafArea =leafArea_cor;
 
             leaf_structural_biomass += assimilate_supply / COUT_RESPI_FEUILLE;
-            double reserve_biomass_allocated=fraction_non_str_biomasse_allouee * delta_biomasse_reserve_leaves;
-            if (leaf_non_structural_biomass + reserve_biomass_allocated < 0 )
+
+            double reserve_biomass_allocated = fraction_non_str_biomasse_allouee * delta_biomasse_reserve_leaves;
+            if (leaf_non_structural_biomass + reserve_biomass_allocated < 0 | leafArea<=0)
                 leaf_non_structural_biomass = 0;
             else
                 leaf_non_structural_biomass += reserve_biomass_allocated;
@@ -254,16 +265,16 @@ public:
 
             //        GROWTH DEMAND;
 
-//            gain_TEff_jour = TEff * (ftsw > SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
+            //            gain_TEff_jour = TEff * (ftsw > SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
 
             gain_TEff_jour = TEff;
             TT_since_leaf_expand += gain_TEff_jour;
 
 
-                            vitesse_exp = -SF_fin * (-exp(-(TT_since_leaf_expand-INFLEXION)/COURBURE)/COURBURE)/(pow( (1+exp(-(TT_since_leaf_expand-INFLEXION)/COURBURE)),2));
-//                            increase_potleafArea = gain_TEff_jour * vitesse_exp * ( ftsw >  SEUIL_EXPAN ? 1 : ftsw / SEUIL_EXPAN);
-                            increase_potleafArea = gain_TEff_jour * vitesse_exp;
-//            increase_potleafArea =  (SF_fin / (1 + exp(-(TT_since_leaf_expand - INFLEXION) / COURBURE)))-(SF_fin / (1 + exp(-(TT_since_leaf_expand-gain_TEff_jour - INFLEXION) / COURBURE)));
+            vitesse_exp = -SF_fin * (-exp(-(TT_since_leaf_expand-INFLEXION)/COURBURE)/COURBURE)/(pow( (1+exp(-(TT_since_leaf_expand-INFLEXION)/COURBURE)),2));
+            //                            increase_potleafArea = gain_TEff_jour * vitesse_exp * ( ftsw >  SEUIL_EXPAN ? 1 : ftsw / SEUIL_EXPAN);
+            increase_potleafArea = gain_TEff_jour * vitesse_exp;
+            //            increase_potleafArea =  (SF_fin / (1 + exp(-(TT_since_leaf_expand - INFLEXION) / COURBURE)))-(SF_fin / (1 + exp(-(TT_since_leaf_expand-gain_TEff_jour - INFLEXION) / COURBURE)));
             leaf_demand =  increase_potleafArea * 10000 *(SLW_min * COUT_RESPI_FEUILLE )/ POURC_FOLIOLE;
 
             //            }
