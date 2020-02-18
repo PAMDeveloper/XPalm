@@ -46,6 +46,7 @@ public:
 
     enum internals { TREE_AGE,
                      TRUNK_INITIAL_HEIGHT,
+                     TRUNK_INITIAL_BIOMASS,
                      LAI,
                      EI,
                      IC,
@@ -136,6 +137,7 @@ private:
 
     double age;
     double trunk_initial_height;
+    double trunk_initial_biomass;
     double lai;
     double ei;
     double ic;
@@ -203,6 +205,7 @@ public:
         //         internals
         Internal(TREE_AGE, &Tree::age);
         Internal(TRUNK_INITIAL_HEIGHT, &Tree::trunk_initial_height);
+        Internal(TRUNK_INITIAL_BIOMASS, &Tree::trunk_initial_biomass);
         Internal(LAI, &Tree::lai);
         Internal(EI, &Tree::ei);
         Internal(IC, &Tree::ic);
@@ -337,7 +340,7 @@ public:
         //    }
 
         int nb_phyto = INACTIVE_PHYTOMER_NUMBER + RANG_D_ABLATION;
-        //init age ate creation for the oldest phytomer
+        //init age ate creation for the oldest phytomer  
         double age_at_creation = age - (nb_phyto / (TEFF_INI * production_speed));
 
         for ( int i = 0; i < nb_phyto; ++i ) {
@@ -360,11 +363,9 @@ public:
         bh->put<double>(t, WaterBalance::TREE_EI, ei);
         bh->init(t, parameters);
 
-        //        init_structure(t);
 
-        //        compute_SF(t);
+        // plant leaf area
         auto it = phytomers.begin();
-        //        totalLeafArea = 0;
         while (it != phytomers.end()) {
             Phytomer* phytomer = (*it);
             plantLeafArea += phytomer->leaf_model()->get<double>(t-1, Leaf::LEAFAREA);
@@ -372,8 +373,6 @@ public:
         }
         lai = plantLeafArea * DENS / 10000;
         ei = 1 - exp(- K * lai);
-
-        reserve->init(t, parameters, plantLeafArea);
 
         //init trunk dim
         trunk_initial_height=0;
@@ -390,10 +389,12 @@ public:
                     EN_LENGTH_ADULTE*(age-FIN_CROISSANCE_EN)* TEFF_INI * PRODUCTION_SPEED_ADULT;
 
 
+        reserve->init(t, parameters, plantLeafArea, trunk_initial_height);
+
         double STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
         double STEM_RAYON = parameters.get("STEM_RAYON"); // cm
 
-        trunk_biomass = STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * trunk_height; //gDM
+        trunk_initial_biomass = STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * trunk_initial_height; //gDM
 
         double SLW_ini = parameters.get("SLW_ini") ; //g.cm-2
         double SLW_min = parameters.get("SLW_min") ; //g.cm-2
@@ -427,7 +428,6 @@ public:
         double TT_ini_flowering = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_FLOWERING_INITIAL, TT_FLOWERING_ADULT);
         double TT_ini_harvest = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_HARVEST_INITIAL, TT_HARVEST_ADULT);
         double inflo_dev_factor = age_relative_var(age_at_creation, AGE_START_PROD, AGE_ADULT, 0, 1);
-//        double TT_ini_male_senescence = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_FLOWERING_INITIAL, TT_FLOWERING_INITIAL + TT_MALE_SENESCENCE);
         double TT_ini_male_senescence = TT_ini_flowering +PERIOD_MALE_INFLO;
 
         //        Leaf area increase with plant age
@@ -519,7 +519,7 @@ public:
 
 
         //init biomass
-        trunk_biomass=0;
+        trunk_biomass= trunk_initial_biomass; //gDM;
         reserve_biomass=0;
         leaves_structural_biomass=0;
         leaves_non_structural_biomass=0;
@@ -631,7 +631,7 @@ public:
         (*reserve)(t);
 
         //       compute_offre_nette
-        offre_nette = reserve->get<double>(t, Reserve::ASSIM_AVAI); //TODO appliquer REALL_COST
+        offre_nette = reserve->get<double>(t, Reserve::GROWTH_OFFER); //TODO appliquer REALL_COST
         //        fraction_pour_croissance = offre_nette / (growth_demand);
 
         //       compute_fraction_oil_reste
@@ -656,6 +656,9 @@ public:
             newPhytomerEmergence -= 1;
         }
     }
+
+
+
 
 
     void compute_biomasse_non_structurale_allouee_aux_feuilles(double t) {

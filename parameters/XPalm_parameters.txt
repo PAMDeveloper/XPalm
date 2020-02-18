@@ -112,7 +112,7 @@ MASSE_INFLO_MALE_ADULTE = 1200 ##g
 #IC_spikelet_RANG_FIN = -5
 PERIOD_DEV_SPIKELET = 675 #5rg * 15 days * 9°C periode apres flowering pendant laquelle le taux de nouaison est modulable (TT)
 SENSIVITY_IC_SPIKELET =  0.30 #  0.05 0.5 ?
-MASSE_MEAN_PEDUNCULE_ADULTE = 2.1 
+MASSE_MEAN_PEDUNCULE_ADULTE = 2100 ##g
 
 #####  BUNCH PARAMS #########
 COUT_OIL = 3.2

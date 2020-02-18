@@ -33,7 +33,7 @@ class Reserve : public AtomicModel < Reserve >
 {
 public:
     enum internals { RESERVE,
-                     ASSIM_AVAI,
+                     GROWTH_OFFER,
                      MOB_RATE,
                      LEAVES_RES,
                      LEAVES_RES_MIN,
@@ -48,7 +48,7 @@ public:
                      RESERVE_MAX,
                      RESERVE_MIN,
                      RESERVE_POT,
-                     RESERVE_AVAI };
+                     RESERVE_AVAI};
 
     enum externals { PLANTLEAFAREA,
                      TRUNK_BIOMASS,
@@ -69,29 +69,33 @@ private:
     double COUT_RESERVE;
     double REALL_COST;
     double MOB_RATE_MAX;
+    double POURCENT_NSC_ST_INI;
 
     //     internals
     double reserve;
     double assim_avai;
+    double assim_res_avai;
     double mob_rate;
     double leaves_res, leaves_res_min, leaves_res_max, leaves_res_pot, leaves_res_avai;
     double trunk_res, trunk_res_min, trunk_res_max, trunk_res_pot, trunk_res_avai;
     double reserve_max, reserve_min, reserve_pot, reserve_avai;
+    double growth_offer;
 
     //     externals
     double plantLeafArea;
-    double trunk_biomass;
+    double trunk_initial_height;
     double leaves_non_structural_biomass;
     double maintenance_respi;
     double tree_growth_demand;
     double tree_Assim;
+    double trunk_biomass;
 
 public:
 
     Reserve()
     {
         //         internals
-        Internal(ASSIM_AVAI, &Reserve::assim_avai);
+        Internal(GROWTH_OFFER, &Reserve::growth_offer);
         Internal(MOB_RATE, &Reserve::mob_rate);
         Internal(LEAVES_RES, &Reserve::leaves_res);
         Internal(LEAVES_RES_MIN, &Reserve::leaves_res_min);
@@ -124,12 +128,13 @@ public:
     }
 
     void init(double t, const xpalm::ModelParameters& parameters) {}
-    void init(double t, const xpalm::ModelParameters& parameters, double plantLeafArea_) //TODO externals in init ???
+    void init(double t, const xpalm::ModelParameters& parameters, double plantLeafArea_, double trunk_initial_height_) //TODO externals in init ???
     {
         init(t, parameters);
         last_time = t-1;
 
         //        parameters
+        POURCENT_NSC_ST_INI = parameters.get("POURCENT_NSC_ST_INI");
         POURCENT_NSC_ST_MAX = parameters.get("POURCENT_NSC_ST_MAX");
         POURCENT_NSC_ST_MIN = parameters.get("POURCENT_NSC_ST_MIN");
         SLW_max = parameters.get("SLW_max") * 10; //kg.m-2
@@ -143,14 +148,18 @@ public:
         //externals
         double STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
         double STEM_RAYON = parameters.get("STEM_RAYON");
-        double INITIAL_HEIGHT = parameters.get("INITIAL_HEIGHT"); //cm
-        trunk_biomass= STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * INITIAL_HEIGHT; //gDM
+        //        double INITIAL_HEIGHT = parameters.get("INITIAL_HEIGHT"); //cm
+
+        //        trunk_biomass= STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * INITIAL_HEIGHT; //gDM
+
+        trunk_initial_height= trunk_initial_height_;
+        trunk_biomass= STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * trunk_initial_height;
         assim_avai=0;
         leaves_res=0;
         plantLeafArea=plantLeafArea_;
 
         //internals
-        double POURCENT_NSC_ST_INI = parameters.get("POURCENT_NSC_ST_INI");
+
         leaves_non_structural_biomass=0;
 
         trunk_res = POURCENT_NSC_ST_INI * trunk_biomass;
@@ -205,6 +214,7 @@ public:
 
         double trunk_mob_pct = reserve > 0 ? trunk_res / reserve : 0;
         double leaves_mob_pct = reserve > 0 ? leaves_res / reserve : 0;
+
         //            compute_etat_apres_respiration
         assim_avai = tree_Assim;
 
@@ -232,7 +242,7 @@ public:
         trunk_res_avai = trunk_res - trunk_res_min;
         leaves_res_avai = leaves_res - leaves_res_min;
 
-        double assim_res_avai = assim_avai * COUT_RESERVE;
+        assim_res_avai = assim_avai * COUT_RESERVE;
 
         if(leaves_res_avai < 0 && assim_res_avai > 0) {
             double delta = min(-leaves_res_avai, assim_res_avai);
@@ -256,6 +266,8 @@ public:
         mob_rate = ( MOB_RATE_MAX / reserve_pot ) * reserve_avai;
 
 
+        growth_offer=assim_avai;
+
         //compute reserve after growth
 
         if (assim_avai < tree_growth_demand) {
@@ -267,6 +279,7 @@ public:
             //reserve consumed for growth
             tree_growth_demand-=assim_avai;
             assim_avai = 0;
+
             double growth_reserve_consumed = min ( tree_growth_demand / REALL_COST, reserve_avai );
 
             trunk_res -= (growth_reserve_consumed * trunk_mob_pct);
@@ -282,13 +295,13 @@ public:
             assim_avai -= tree_growth_demand;
             tree_growth_demand=0;
 
-            double trunk_res_pot = trunk_res_max - trunk_res;
-            double leaves_res_pot = leaves_res_max - leaves_res;
-            double reserve_pot = trunk_res_pot + leaves_res_pot;
+            trunk_res_pot = trunk_res_max - trunk_res;
+            leaves_res_pot = leaves_res_max - leaves_res;
+            reserve_pot = trunk_res_pot + leaves_res_pot;
             double trunk_sink_pct = trunk_res_pot / reserve_pot;
             double leaves_sink_pct = leaves_res_pot / reserve_pot;
 
-            double assim_res_avai = min ( assim_avai * COUT_RESERVE, reserve_pot);
+            assim_res_avai = min ( assim_avai * COUT_RESERVE, reserve_pot);
             trunk_res += (assim_res_avai * trunk_sink_pct);
             leaves_res += (assim_res_avai * leaves_sink_pct);
 

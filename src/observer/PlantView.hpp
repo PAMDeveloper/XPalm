@@ -52,7 +52,7 @@ public:
                      Meteo::TEFF});
 
         //RESERVE
-        selector("ASSIM_AVAI", artis::kernel::DOUBLE,{Reserve::ASSIM_AVAI});
+//        selector("ASSIM_AVAI", artis::kernel::DOUBLE,{Reserve::ASSIM_AVAI});
         selector("LEAVES_RES_AVAI", artis::kernel::DOUBLE,{Reserve::LEAVES_RES_AVAI});
         selector("TRUNK_RES_AVAI", artis::kernel::DOUBLE,{Reserve::TRUNK_RES_AVAI});
 
@@ -60,6 +60,7 @@ public:
         //TREE
         selector("EI", artis::kernel::DOUBLE,{Tree::EI});
         selector("IC", artis::kernel::DOUBLE,{Tree::IC});
+         selector("OFFRE_NETTE", artis::kernel::DOUBLE,{Tree::OFFRE_NETTE});
         selector("TRUNK_HEIGHT", artis::kernel::DOUBLE,{Tree::TRUNK_HEIGHT});
         selector("LAI", artis::kernel::DOUBLE,{Tree::LAI});
         selector("MALE_BIOMASS", artis::kernel::DOUBLE,{Tree::MALE_BIOMASS});

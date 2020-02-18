@@ -188,8 +188,8 @@ public:
             TT_since_leaf_expand = TT_since_appearance;
             potLeafArea = (SF_fin / (1 + exp(-(TT_since_leaf_expand - INFLEXION) / COURBURE)));
 
-            leaf_structural_biomass = potLeafArea * 10000* SLW_min / POURC_FOLIOLE; // m2 x10000 x g.cm-2=g
-            leaf_non_structural_biomass = potLeafArea *10000* (SLW_ini - SLW_min) / POURC_FOLIOLE;
+            leaf_structural_biomass = potLeafArea * 10000 * SLW_min / POURC_FOLIOLE; // m2 x10000 x g.cm-2=g
+            leaf_non_structural_biomass = potLeafArea * 10000 * (SLW_ini - SLW_min) / POURC_FOLIOLE;
 
 
 
@@ -254,15 +254,17 @@ public:
 
             //        GROWTH DEMAND;
 
-            gain_TEff_jour = TEff * (ftsw > SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
+//            gain_TEff_jour = TEff * (ftsw > SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
 
+            gain_TEff_jour = TEff;
             TT_since_leaf_expand += gain_TEff_jour;
 
 
-            //                vitesse_exp = -SF_fin * (-exp(-(TT_since_leaf_expand-INFLEXION)/COURBURE)/COURBURE)/(pow( (1+exp(-(TT_since_leaf_expand-INFLEXION)/COURBURE)),2));
-            //                increase_potleafArea = gain_TEff_jour * vitesse_exp * ( ftsw >  SEUIL_EXPAN ? 1 : ftsw / SEUIL_EXPAN);
-            increase_potleafArea =  (SF_fin / (1 + exp(-(TT_since_leaf_expand - INFLEXION) / COURBURE)))-(SF_fin / (1 + exp(-(TT_since_leaf_expand-gain_TEff_jour - INFLEXION) / COURBURE)));
-            leaf_demand =  increase_potleafArea*(SLW_min * COUT_RESPI_FEUILLE )/ POURC_FOLIOLE;
+                            vitesse_exp = -SF_fin * (-exp(-(TT_since_leaf_expand-INFLEXION)/COURBURE)/COURBURE)/(pow( (1+exp(-(TT_since_leaf_expand-INFLEXION)/COURBURE)),2));
+//                            increase_potleafArea = gain_TEff_jour * vitesse_exp * ( ftsw >  SEUIL_EXPAN ? 1 : ftsw / SEUIL_EXPAN);
+                            increase_potleafArea = gain_TEff_jour * vitesse_exp;
+//            increase_potleafArea =  (SF_fin / (1 + exp(-(TT_since_leaf_expand - INFLEXION) / COURBURE)))-(SF_fin / (1 + exp(-(TT_since_leaf_expand-gain_TEff_jour - INFLEXION) / COURBURE)));
+            leaf_demand =  increase_potleafArea * 10000 *(SLW_min * COUT_RESPI_FEUILLE )/ POURC_FOLIOLE;
 
             //            }
         }
