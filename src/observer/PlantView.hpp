@@ -57,8 +57,10 @@ public:
         selector("TRUNK_RES_AVAI", artis::kernel::DOUBLE,{Reserve::TRUNK_RES_AVAI});
 
 
+
         //TREE
         selector("EI", artis::kernel::DOUBLE,{Tree::EI});
+        selector("LEAVES_RESERVE_SURPLUS", artis::kernel::DOUBLE,{Tree::LEAVES_RESERVE_SURPLUS});
         selector("IC", artis::kernel::DOUBLE,{Tree::IC});
          selector("OFFRE_NETTE", artis::kernel::DOUBLE,{Tree::OFFRE_NETTE});
         selector("TRUNK_HEIGHT", artis::kernel::DOUBLE,{Tree::TRUNK_HEIGHT});

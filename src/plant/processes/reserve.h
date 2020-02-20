@@ -55,7 +55,8 @@ public:
                      LEAVES_NON_STRUCTURAL_BIOMASS,
                      MAINTENANCE_RESPI,
                      TREE_GROWTH_DEMAND,
-                     TREE_ASSIM };
+                     TREE_ASSIM,
+                     LEAVES_RESERVE_SURPLUS};
 
 private:
 
@@ -89,6 +90,7 @@ private:
     double tree_growth_demand;
     double tree_Assim;
     double trunk_biomass;
+    double leaves_reserve_surplus;
 
 public:
 
@@ -120,6 +122,7 @@ public:
         External(MAINTENANCE_RESPI, &Reserve::maintenance_respi);
         External(TREE_GROWTH_DEMAND, &Reserve::tree_growth_demand);
         External(TREE_ASSIM, &Reserve::tree_Assim);
+        External(LEAVES_RESERVE_SURPLUS, &Reserve::leaves_reserve_surplus);
 
     }
 
@@ -155,13 +158,15 @@ public:
         trunk_initial_height= trunk_initial_height_;
         trunk_biomass= STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * trunk_initial_height;
         assim_avai=0;
+        assim_res_avai=0;
         leaves_res=0;
         plantLeafArea=plantLeafArea_;
+        growth_offer=0;
 
         //internals
 
         leaves_non_structural_biomass=0;
-
+        leaves_reserve_surplus=0;
         trunk_res = POURCENT_NSC_ST_INI * trunk_biomass;
         reserve = trunk_res + leaves_non_structural_biomass;
         leaves_res_max = (SLW_max - SLW_min) * plantLeafArea *10000 / POURC_FOLIOLE; //gDM
@@ -197,11 +202,14 @@ public:
         trunk_res_max = POURCENT_NSC_ST_MAX * trunk_biomass;
         trunk_res_pot = trunk_res_max - trunk_res_min;
 
+
         leaves_res_min = 0;
         leaves_res_max = plantLeafArea * 10000 * (SLW_max - SLW_min) / POURC_FOLIOLE; // m2 *10000 * (g.cm-2) = g
         leaves_res_pot = leaves_res_max - leaves_res_min;
+
         leaves_res = leaves_non_structural_biomass;
 
+        trunk_res = trunk_res + leaves_reserve_surplus;
         reserve = leaves_res + trunk_res;
         reserve_max = leaves_res_max + trunk_res_max;
         reserve_min = leaves_res_min + trunk_res_min;
@@ -242,28 +250,31 @@ public:
         trunk_res_avai = trunk_res - trunk_res_min;
         leaves_res_avai = leaves_res - leaves_res_min;
 
+
         assim_res_avai = assim_avai * COUT_RESERVE;
+
 
         if(leaves_res_avai < 0 && assim_res_avai > 0) {
             double delta = min(-leaves_res_avai, assim_res_avai);
             assim_res_avai -= delta;
             leaves_res += delta;
-            leaves_res_avai = leaves_res - leaves_res_min;
         }
 
         if(trunk_res_avai < 0 && assim_res_avai > 0) {
             double delta = min(-trunk_res_avai, assim_res_avai);
             assim_res_avai -= delta;
             trunk_res += delta;
-            trunk_res_avai = trunk_res - trunk_res_min;
         }
 
         assim_avai = assim_res_avai / COUT_RESERVE;
         reserve = leaves_res + trunk_res;
+
+        leaves_res_avai = leaves_res - leaves_res_min;
+        trunk_res_avai = trunk_res - trunk_res_min;
         reserve_avai = leaves_res_avai + trunk_res_avai;
 
         //            compute_actual_mob_rate
-        mob_rate = ( MOB_RATE_MAX / reserve_pot ) * reserve_avai;
+        //        mob_rate = ( MOB_RATE_MAX / reserve_pot ) * reserve_avai;
 
 
         growth_offer=assim_avai;
@@ -286,9 +297,6 @@ public:
             leaves_res -= (growth_reserve_consumed * leaves_mob_pct);
 
             reserve = leaves_res + trunk_res;
-            leaves_res_avai = leaves_res - leaves_res_min;
-            trunk_res_avai = trunk_res - trunk_res_min;
-            reserve_avai = leaves_res_avai + trunk_res_avai;
 
         } else {
 
@@ -298,15 +306,26 @@ public:
             trunk_res_pot = trunk_res_max - trunk_res;
             leaves_res_pot = leaves_res_max - leaves_res;
             reserve_pot = trunk_res_pot + leaves_res_pot;
+
             double trunk_sink_pct = trunk_res_pot / reserve_pot;
             double leaves_sink_pct = leaves_res_pot / reserve_pot;
 
             assim_res_avai = min ( assim_avai * COUT_RESERVE, reserve_pot);
+
+            //            if (assim_res_avai==reserve_pot){
+            //                reserve_pot=reserve_pot;
+            //            }
+
             trunk_res += (assim_res_avai * trunk_sink_pct);
             leaves_res += (assim_res_avai * leaves_sink_pct);
 
             assim_avai -= ( assim_res_avai / COUT_RESERVE );
         }
+
+
+        leaves_res_avai = leaves_res - leaves_res_min;
+        trunk_res_avai = trunk_res - trunk_res_min;
+        reserve_avai = leaves_res_avai + trunk_res_avai;
     }
 
     //    def compute_etat_test_min(self) :

@@ -8,7 +8,6 @@ class Leaf : public AtomicModel < Leaf >
 {
 public:
     enum internals { LEAFAREA,
-                     SF_FIN,
                      LEAF_STRUCTURAL_BIOMASS,
                      LEAF_NON_STRUCTURAL_BIOMASS,
                      LEAF_STRUCTURAL_BIOMASS_HARVESTED,
@@ -17,16 +16,18 @@ public:
                      SLW,
                      GAIN_TEFF_JOUR,
                      TT_SINCE_LEAF_EXPAND,
-                     //                     TT_CORRIGE,
                      VITESSE_EXP,
                      LEAF_DEMAND,
                      CAPACITE_RESERVE_MAX,
+                     CAPACITE_RESERVE_POT,
                      ASSIMILATE_SUPPLY,
                      POTLEAFAREA,
                      INCREASE_POTLEAFAREA,
-                     LEAF_STATE };
+                     LEAF_STATE,
+                     RESERVE_SURPLUS};
 
     enum externals { TEFF,
+                     SF_FIN,
                      TT_SINCE_APPEARANCE,
                      RANK,
                      FTSW,
@@ -56,7 +57,6 @@ private:
     //     internals
     double leafArea; //m²
     double leafArea_cor;
-    double SF_fin;
     double leaf_structural_biomass;
     double leaf_non_structural_biomass;
     double leaf_total_biomass;
@@ -69,12 +69,16 @@ private:
     double vitesse_exp;
     double leaf_demand;
     double capacite_reserve_max;
+    double capacite_reserve_pot;
     double assimilate_supply;
     double potLeafArea;
     double increase_potleafArea;
     leaf::leaf_state leaf_state;
+    double reserve_biomass_allocated;
+    double reserve_surplus;
 
     //     externals
+    double SF_fin;
     inflo::inflo_states inflo_status;
     phytomer::phytomer_state phytomer_state;
     double TEff;
@@ -91,7 +95,6 @@ public:
     {
         //         internals
         Internal(LEAFAREA, &Leaf::leafArea);
-        Internal(SF_FIN, &Leaf::SF_fin);
         Internal(LEAF_STRUCTURAL_BIOMASS, &Leaf::leaf_structural_biomass);
         Internal(LEAF_NON_STRUCTURAL_BIOMASS, &Leaf::leaf_non_structural_biomass);
         Internal(LEAF_STRUCTURAL_BIOMASS_HARVESTED, &Leaf::leaf_structural_biomass_harvested);
@@ -99,17 +102,19 @@ public:
         Internal(LEAF_TOTAL_BIOMASS, &Leaf::leaf_total_biomass);
         Internal(SLW, &Leaf::slw);
         Internal(GAIN_TEFF_JOUR, &Leaf::gain_TEff_jour);
-        //        Internal(TT_CORRIGE, &Leaf::TT_corrige);
         Internal(TT_SINCE_LEAF_EXPAND, &Leaf::TT_since_leaf_expand);
         Internal(VITESSE_EXP, &Leaf::vitesse_exp);
         Internal(LEAF_DEMAND, &Leaf::leaf_demand);
         Internal(CAPACITE_RESERVE_MAX, &Leaf::capacite_reserve_max);
+        Internal(CAPACITE_RESERVE_POT, &Leaf::capacite_reserve_pot);
         Internal(ASSIMILATE_SUPPLY, &Leaf::assimilate_supply);
         Internal(POTLEAFAREA, &Leaf::potLeafArea);
         Internal(INCREASE_POTLEAFAREA, &Leaf::increase_potleafArea);
         Internal(LEAF_STATE, &Leaf::leaf_state);
+        Internal(RESERVE_SURPLUS, &Leaf::reserve_surplus);
 
         //          externals
+        External(SF_FIN, &Leaf::SF_fin);
         External(INFLO_STATUT, &Leaf::inflo_status);
         External(PHYTOMER_STATE, &Leaf::phytomer_state);
         External(TEFF, &Leaf::TEff);
@@ -158,6 +163,7 @@ public:
         leaf_demand = 0;
         leaf_total_biomass = 0;
         capacite_reserve_max = 0;
+        capacite_reserve_pot = 0;
         assimilate_supply = 0;
         potLeafArea = 0;
         increase_potleafArea = 0;
@@ -168,7 +174,8 @@ public:
         leaf_non_structural_biomass_harvested =0;
         phytomer_state = state;
         leaf_state=leaf::NON_COUPE;
-
+        SF_fin=SF_fin_leaf; //m2
+        reserve_surplus=0;
 
         if ((phytomer_rank >= RANG_D_ABLATION) | (inflo_status.is(inflo::FEMALE) && !inflo_status.is(inflo::ABORTED)&& inflo_status.is(inflo::HARVEST))){
             leaf_state= leaf::COUPE;
@@ -187,12 +194,9 @@ public:
 
         if (leaf_state==leaf::NON_COUPE){
 
-            SF_fin=SF_fin_leaf; //m2
-
             TT_since_leaf_expand = TT_since_appearance;
             potLeafArea = (SF_fin / (1 + exp(-(TT_since_leaf_expand - INFLEXION) / COURBURE)));
-            leaf_structural_biomass = potLeafArea * 10000 * SLW_min / POURC_FOLIOLE; // m2 x10000 x g.cm-2=g
-            leaf_non_structural_biomass = potLeafArea * 10000 * (SLW_ini - SLW_min) / POURC_FOLIOLE;
+
 
 
             leafArea_cor=potLeafArea;
@@ -201,6 +205,9 @@ public:
                     ? potLeafArea
                     : 0;
 
+            leaf_structural_biomass = potLeafArea * 10000 * SLW_min / POURC_FOLIOLE; // m2 x10000 x g.cm-2=g
+            leaf_non_structural_biomass = leafArea * 10000 * (SLW_ini - SLW_min) / POURC_FOLIOLE;
+
             slw = (leafArea > 0)
                     ? leaf_total_biomass * POURC_FOLIOLE / (potLeafArea) //g.cm-2
                     : 0;
@@ -208,7 +215,10 @@ public:
 
         }
 
-        leaf_total_biomass=leaf_structural_biomass+leaf_non_structural_biomass; //g
+        capacite_reserve_max = (SLW_max - SLW_min) * leafArea * 10000 / POURC_FOLIOLE;
+        capacite_reserve_pot = capacite_reserve_max-leaf_non_structural_biomass;
+
+        leaf_total_biomass = leaf_structural_biomass+leaf_non_structural_biomass; //g
 
     }
 
@@ -232,6 +242,9 @@ public:
             leaf_non_structural_biomass_harvested = leaf_non_structural_biomass;
             leaf_structural_biomass=0;
             leaf_non_structural_biomass=0;
+            reserve_surplus=0;
+            capacite_reserve_pot=0;
+            capacite_reserve_max=0;
         }
 
         else{
@@ -249,22 +262,40 @@ public:
                     ? leafArea_cor
                     : 0;
 
-//            leafArea =leafArea_cor;
-
+            //            leafArea =leafArea_cor;
+            assimilate_supply = leaf_demand * fr_reste;
             leaf_structural_biomass += assimilate_supply / COUT_RESPI_FEUILLE;
 
-            double reserve_biomass_allocated = fraction_non_str_biomasse_allouee * delta_biomasse_reserve_leaves;
-            if (leaf_non_structural_biomass + reserve_biomass_allocated < 0 | leafArea<=0)
+            capacite_reserve_max = (SLW_max - SLW_min) * leafArea * 10000 / POURC_FOLIOLE;
+            reserve_biomass_allocated = fraction_non_str_biomasse_allouee * delta_biomasse_reserve_leaves;
+
+            if (leafArea<=0)
                 leaf_non_structural_biomass = 0;
             else
-                leaf_non_structural_biomass += reserve_biomass_allocated;
+                //                if(phytomer_rank==1)
+                //                    leaf_non_structural_biomass = leafArea * 10000 * (SLW_ini - SLW_min) / POURC_FOLIOLE;
+                if (leaf_non_structural_biomass+reserve_biomass_allocated>=capacite_reserve_max){
+                    reserve_surplus=leaf_non_structural_biomass+reserve_biomass_allocated-capacite_reserve_max; // surplus for reallocation
+                    reserve_biomass_allocated=capacite_reserve_max-leaf_non_structural_biomass;
+                    leaf_non_structural_biomass=capacite_reserve_max;
+                }
+                else
+                    leaf_non_structural_biomass += reserve_biomass_allocated;
 
 
-            assimilate_supply = leaf_demand * fr_reste;
+            capacite_reserve_pot = capacite_reserve_max - leaf_non_structural_biomass;
+
+//            if (capacite_reserve_pot<0){
+//                capacite_reserve_pot=capacite_reserve_pot;
+//            }
+
+
+            slw = ( leafArea > 0 )
+                    ? leaf_total_biomass * POURC_FOLIOLE / (leafArea *10000)
+                    : 0;
 
 
             //        GROWTH DEMAND;
-
             //            gain_TEff_jour = TEff * (ftsw > SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
 
             gain_TEff_jour = TEff;
@@ -282,11 +313,6 @@ public:
 
         leaf_total_biomass = leaf_structural_biomass + leaf_non_structural_biomass;
 
-        capacite_reserve_max = (SLW_max - SLW_min) * leafArea * 10000 / POURC_FOLIOLE;
-
-        slw = ( leafArea > 0 )
-                ? leaf_total_biomass * POURC_FOLIOLE / (leafArea *10000)
-                : 0;
 
     }
 

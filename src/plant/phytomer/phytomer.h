@@ -124,6 +124,10 @@ public:
         //var
         //        rank = rk;
 
+//                if(std::abs(SF_fin) > 10000) {
+//                    SF_fin = SF_fin;
+//                }
+
         rank = (nb>0)
                 ? total_phyto_-RANG_D_ABLATION -INACTIVE_PHYTOMER_NUMBER-1 + (nb - INACTIVE_PHYTOMER_NUMBER-1)
                 : total_phyto_-RANG_D_ABLATION -INACTIVE_PHYTOMER_NUMBER - (nb + INACTIVE_PHYTOMER_NUMBER);
@@ -183,9 +187,11 @@ public:
         //            return;
 
         leaf->put<double>(t, Leaf::RANK, rank);
+        leaf->put<double>(t, Leaf::SF_FIN, SF_fin);
         leaf->put<double>(t, Leaf::TT_SINCE_APPEARANCE, TT_since_appearance);
         leaf->put<phytomer::phytomer_state>(t, Leaf::PHYTOMER_STATE, state);
         leaf->put<inflo::inflo_states>(t, Leaf::INFLO_STATUT, inflo_status);
+
         //        leaf->put<double>(t, Leaf::TEFF, TEff); //done by tree
         (*leaf)(t);
 
