@@ -26,7 +26,8 @@ public:
                      TT_SINCE_APPEARANCE,
                      PRODUCTION_SPEED,
                      TT_INI_FLOWERING,
-                     SF_FIN
+                     SF_FIN,
+                     TT_INI_HARVEST
                    };
 
     enum external { TOTAL_PHYTOMER_NUMBER,
@@ -54,6 +55,7 @@ private:
     //predim
     double production_speed;
     double TT_ini_flowering;
+    double TT_ini_harvest;
     double SF_fin;
 
     //attr
@@ -86,6 +88,7 @@ public:
         //predim
         Internal(PRODUCTION_SPEED, &Phytomer::production_speed);
         Internal(TT_INI_FLOWERING, &Phytomer::TT_ini_flowering);
+        Internal(TT_INI_HARVEST, &Phytomer::TT_ini_harvest);
         Internal(SF_FIN, &Phytomer::SF_fin);
 
         // externals
@@ -121,6 +124,7 @@ public:
         TT_ini_flowering = flo_tt;
         production_speed = prod_speed;
         SF_fin = SF_fin_;
+        TT_ini_harvest=harv_tt;
         //var
         //        rank = rk;
 
@@ -129,8 +133,8 @@ public:
 //                }
 
         rank = (nb>0)
-                ? total_phyto_-RANG_D_ABLATION -INACTIVE_PHYTOMER_NUMBER-1 + (nb - INACTIVE_PHYTOMER_NUMBER-1)
-                : total_phyto_-RANG_D_ABLATION -INACTIVE_PHYTOMER_NUMBER - (nb + INACTIVE_PHYTOMER_NUMBER);
+                ? total_phyto_-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + nb) - INACTIVE_PHYTOMER_NUMBER
+                : total_phyto_-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + nb) + INACTIVE_PHYTOMER_NUMBER;
 
 
         //        state = st ? phytomer::INACTIVE : phytomer::ACTIVE;
@@ -151,8 +155,8 @@ public:
         //submodels
 
         internode->init(t, parameters, age, TT_since_appearance, tree_age_at_creation, production_speed);
-        inflo->init(t, parameters, age, rank, TT_since_appearance, production_speed, TT_ini_flowering, harv_tt, tt_ini_sen, inflo_factor);
-        inflo_status = inflo->get<inflo::inflo_states, Inflo>(t, Inflo::STATUS);
+        inflo->init(t, parameters, age, rank, TT_since_appearance, production_speed, TT_ini_flowering, TT_ini_harvest, tt_ini_sen, inflo_factor);
+        inflo_status = inflo->get<inflo::inflo_states, Inflo>(t, Inflo::INFLO_STATUS);
 
         leaf->put<inflo::inflo_states>(t, Leaf::INFLO_STATUT, inflo_status);
         leaf->init(t, parameters, rank, state, TT_since_appearance, SF_fin);
@@ -166,8 +170,8 @@ public:
         //         rank = total_phytomer_number - INACTIVE_PHYTOMER_NUMBER - number - 1;
 
         rank = (number>0)
-                ? total_phytomer_number-RANG_D_ABLATION -INACTIVE_PHYTOMER_NUMBER-1 + (number - INACTIVE_PHYTOMER_NUMBER-1)
-                : total_phytomer_number-RANG_D_ABLATION -INACTIVE_PHYTOMER_NUMBER - (number + INACTIVE_PHYTOMER_NUMBER);
+                ? total_phytomer_number- (RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + number) - INACTIVE_PHYTOMER_NUMBER
+                : total_phytomer_number-(RANG_D_ABLATION +INACTIVE_PHYTOMER_NUMBER + number) + INACTIVE_PHYTOMER_NUMBER;
 
         //        if(rank > 0 && state == phytomer::INACTIVE)
         //            state = phytomer::ACTIVE;
@@ -214,7 +218,7 @@ public:
         //        inflo->put<double>(t, Inflo::FR_FRUITS, fr_fruits);
         (*inflo)(t);
 
-        inflo_status = inflo->get<inflo::inflo_states, Inflo>(t, Inflo::STATUS);
+        inflo_status = inflo->get<inflo::inflo_states, Inflo>(t, Inflo::INFLO_STATUS);
     }
 
 

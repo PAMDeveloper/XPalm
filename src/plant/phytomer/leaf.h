@@ -154,9 +154,8 @@ public:
 
 
         //        internals
-        TT_since_leaf_expand=0;
+        TT_since_leaf_expand=TT_since_appearance_;
         gain_TEff_jour = 0;
-        TT_since_appearance = TT_since_appearance_;
         //        TT_corrige = 0;
         leafArea_cor=0;
         vitesse_exp = 0;
@@ -193,8 +192,6 @@ public:
 
 
         if (leaf_state==leaf::NON_COUPE){
-
-            TT_since_leaf_expand = TT_since_appearance;
             potLeafArea = (SF_fin / (1 + exp(-(TT_since_leaf_expand - INFLEXION) / COURBURE)));
 
 

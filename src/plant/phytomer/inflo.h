@@ -23,7 +23,7 @@ class Inflo : public CoupledModel < Inflo >
 public:
     enum submodels { PEDUNCLE, FRUIT, MALEINFLO };
 
-    enum internals { STATUS,
+    enum internals { INFLO_STATUS,
 //                     STATUS_POT,
                      TT_INI_OLEO,
                      TT_INI_SEX,
@@ -184,7 +184,7 @@ public:
         submodel(MALEINFLO, male.get());
 
         //         internals
-        Internal(STATUS, &Inflo::status);
+        Internal(INFLO_STATUS, &Inflo::status);
 //        Internal(STATUS_POT, &Inflo::status_pot);
         Internal(TT_INI_FLOWERING, &Inflo::TT_ini_flowering);
         Internal(TT_INI_OLEO, &Inflo::TT_ini_oleo);
@@ -371,13 +371,14 @@ public:
         //        double RATIO_DUREE_JEUNES_OLEO = parameters.get("RATIO_DUREE_JEUNES_OLEO");
 
         //set seed TODO remove after debug
-        //        srand(SEED);
+//                srand(SEED);
 
 
 
         //        TT_corrige=TT_since_appearance;
 
         step_state();
+
 
         //init IC coeff
         if (TT_since_appearance>TT_ini_sex){

@@ -202,7 +202,6 @@ public:
         trunk_res_max = POURCENT_NSC_ST_MAX * trunk_biomass;
         trunk_res_pot = trunk_res_max - trunk_res_min;
 
-
         leaves_res_min = 0;
         leaves_res_max = plantLeafArea * 10000 * (SLW_max - SLW_min) / POURC_FOLIOLE; // m2 *10000 * (g.cm-2) = g
         leaves_res_pot = leaves_res_max - leaves_res_min;
