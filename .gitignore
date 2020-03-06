@@ -1,1 +1,5 @@
 XPalm.pro.user*
+release/
+Makefile*
+.qmake.stash
+ui_mainwindow.h
