@@ -264,6 +264,10 @@ void MainWindow::displayData(observer::PlantView * view,
         QTextStream output(&data);
         for (int row = 0; row < results[0].length(); ++row) {
             QString line;
+            if(row == 0)
+                line += "Date;";
+            else
+                line += startDate.addDays(row-1).toString("yyyy-MM-dd") + ";";
             for (int col = 0; col < names.length(); ++col) {
                 if(row == 0)
                     line += names[col] + ";";
