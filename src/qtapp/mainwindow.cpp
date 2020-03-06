@@ -225,10 +225,13 @@ void MainWindow::displayData(observer::PlantView * view,
         }
     }
 
+    QStringList names;
+    QVector<QVector<double>> results;
     auto m = view->values();
     int j = 0;
     for(auto it = m.begin(); it != m.end(); ++it) {
         QString param = QString::fromStdString(it->first);
+        names.append(param);
         QtCharts::QLineSeries *series = new QtCharts::QLineSeries();
         series->setColor(getColor(j));
         QtCharts::QLineSeries * refSeries;
@@ -240,17 +243,40 @@ void MainWindow::displayData(observer::PlantView * view,
             outRefs.removeAll(refName);
         }
 
+        QVector<double> values;
         for (int i = 0; i < startDate.daysTo(endDate); ++i) {
             double value = view->get(startDate.addDays(i).toJulianDay(),
                                      param.toLocal8Bit().constData());
+            values.append(value);
             QDateTime momentInTime;
             momentInTime.setDate(startDate.addDays(i));
             series->append(momentInTime.toMSecsSinceEpoch(), value);
         }
 
+        results.append(values);
         addChart(j/numCol,j%numCol,series, refSeries, lay, param);
         j++;
     }
+
+    QFile data("results.csv");
+    if(data.open(QFile::WriteOnly |QFile::Truncate))
+    {
+        QTextStream output(&data);
+        for (int row = 0; row < results[0].length(); ++row) {
+            QString line;
+            for (int col = 0; col < names.length(); ++col) {
+                if(row == 0)
+                    line += names[col] + ";";
+                else
+                    line += QString::number(results[col][row-1]) + ";";
+            }
+            line.chop(1);
+            output << line << "\n";
+        }
+
+        data.close();
+    }
+
 }
 
 
