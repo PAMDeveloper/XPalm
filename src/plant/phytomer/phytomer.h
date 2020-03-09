@@ -132,10 +132,11 @@ public:
 //                    SF_fin = SF_fin;
 //                }
 
-        rank = (nb>0)
-                ? total_phyto_-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + nb) - INACTIVE_PHYTOMER_NUMBER
-                : total_phyto_-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER - nb) + INACTIVE_PHYTOMER_NUMBER;
+//        rank = (nb>0)
+//                ? total_phyto_-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + nb) - INACTIVE_PHYTOMER_NUMBER
+//                : total_phyto_-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + nb) + INACTIVE_PHYTOMER_NUMBER;
 
+        rank = total_phyto_-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER) - nb - INACTIVE_PHYTOMER_NUMBER;
 
         //        state = st ? phytomer::INACTIVE : phytomer::ACTIVE;
 
@@ -169,9 +170,11 @@ public:
 
         //         rank = total_phytomer_number - INACTIVE_PHYTOMER_NUMBER - number - 1;
 
-        rank = (number>0)
-                ? total_phytomer_number- (RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + number) - INACTIVE_PHYTOMER_NUMBER
-                : total_phytomer_number-(RANG_D_ABLATION +INACTIVE_PHYTOMER_NUMBER - number) + INACTIVE_PHYTOMER_NUMBER;
+//        rank = (number>0)
+//                ? total_phytomer_number- (RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + number) - INACTIVE_PHYTOMER_NUMBER
+//                : total_phytomer_number-(RANG_D_ABLATION +INACTIVE_PHYTOMER_NUMBER - number) + INACTIVE_PHYTOMER_NUMBER;
+
+        rank = total_phytomer_number-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER) - number - INACTIVE_PHYTOMER_NUMBER;
 
         //        if(rank > 0 && state == phytomer::INACTIVE)
         //            state = phytomer::ACTIVE;

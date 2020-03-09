@@ -26,7 +26,7 @@ SEUIL_TRANSPI = 0.5
 Z_INIT = 2000 
 
 #####  TREE PARAMS #########
-SEED = 1  ###Set the seed
+SEED = 3 ###Set the seed
 AGE = 8   ### 8 - adulte | 3 - normal
 AGE_ADULT = 8
 AGE_PLANTING = 3
@@ -142,13 +142,9 @@ MOB_RATE_MAX = 0.025 # % max de la biomasse dans les reserves qui peut etre dest
 REALL_COST = 0.60
 
 #####  LEAF PARAMS #########
-#DEBUT_DEFOLIATON = 2500 ### depuis rank 1:
-#FIN_DEFOLIATON =   3500 ### depuis rank 1:
-#RANG_DEFOLIATON = 15
-#POURC_DEFOLIATON = 0  # en unite de 0,0.1,0.2,0.3 1
+
 MAXIMAL_SFIND = 12    
 INITIAL_SFIND = 2.5    
-#INCREASE_OF_LEAF_AREA =  0.00419  # (cm2.Cd-1)
 INFLEXION = 6750 # 15 days * 50 rangs * 9° (inflexion an rang -5) deux parametres rendant compte de la vitesse d expansion des feuilles
 COURBURE = 100
 COUT_RESPI_MAINTENANCE_LEAF = 0.0044 # (gCH2O/gDM)
@@ -159,8 +155,12 @@ SLW_min = 0.008 # g.cm-2
 SLW_ini = 0.010 
 POURC_FOLIOLE = 0.35
 PLASTICITY_LEAF_IC = 0.7 # plasticite leaf au trophique entre 0 et 1 0 : tout plastique, 1 : pas plastique
-SEUIL_EXPAN = 0.2
+SEUIL_EXPAN = 0.3
 SEUIL_DUREE = 0.6 # ralentissement de la duree d expansion en stress (affecte aussi potential leaf development)
 SEUIL_ORGANO = 0.1
 VITESSE_SENSITIVITY = 0.15 #plasticite de la vitesse de prod a l'IC
-
+#DEBUT_DEFOLIATON = 2500 ### depuis rank 1:
+#FIN_DEFOLIATON =   3500 ### depuis rank 1:
+#RANG_DEFOLIATON = 15
+#POURC_DEFOLIATON = 0  # en unite de 0,0.1,0.2,0.3 1
+#INCREASE_OF_LEAF_AREA =  0.00419  # (cm2.Cd-1)

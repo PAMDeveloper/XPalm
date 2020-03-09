@@ -282,9 +282,9 @@ public:
 
             capacite_reserve_pot = capacite_reserve_max - leaf_non_structural_biomass;
 
-//            if (capacite_reserve_pot<0){
-//                capacite_reserve_pot=capacite_reserve_pot;
-//            }
+            //            if (capacite_reserve_pot<0){
+            //                capacite_reserve_pot=capacite_reserve_pot;
+            //            }
 
 
             slw = ( leafArea > 0 )
@@ -293,7 +293,7 @@ public:
 
 
             //        GROWTH DEMAND;
-            //            gain_TEff_jour = TEff * (ftsw > SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
+//            gain_TEff_jour = TEff * (ftsw > SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
 
             gain_TEff_jour = TEff;
             TT_since_leaf_expand += gain_TEff_jour;

@@ -125,6 +125,7 @@ private:
     double SEUIL_ORGANO;
     double SEUIL_PHOTO;
     double VITESSE_SENSITIVITY;
+    double SEED;
 
     //     submodels
     std::deque < Phytomer* > phytomers;
@@ -316,7 +317,7 @@ public:
         SEUIL_ORGANO = parameters.get("SEUIL_ORGANO");
         SEUIL_PHOTO = parameters.get("SEUIL_PHOTO");
         VITESSE_SENSITIVITY = parameters.get("VITESSE_SENSITIVITY");
-
+        SEED= parameters.get("SEED");
 
         //        internals
         newPhytomerEmergence = 0;
@@ -331,6 +332,9 @@ public:
                 leaves_demand = male_demand  = male_biomass = male_biomass_harvested = peduncle_demand =offre_reste =
                 peduncle_biomass = peduncle_biomass_harvested=respi_maintenance= leaves_reserve_surplus=0;
 
+
+        // init random generator
+        srand(SEED);
 
         //init structure
         double production_speed = age_relative_var(age, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
@@ -713,9 +717,9 @@ public:
                         double capacite_reserve_pot = phytomer->leaf_model()->get <double>(t-1, Leaf::CAPACITE_RESERVE_POT);
                         double fraction_non_str_biomasse_allouee = capacite_reserve_pot / capacite_reserve_total;
 
-                                            if (std::abs(fraction_non_str_biomasse_allouee)>0.1){
-                                                fraction_non_str_biomasse_allouee=fraction_non_str_biomasse_allouee;
-                                            }
+                        if (std::abs(fraction_non_str_biomasse_allouee)>0.1){
+                            fraction_non_str_biomasse_allouee=fraction_non_str_biomasse_allouee;
+                        }
 
                         phytomer->leaf_model()->put<double>(t, Leaf::FRACTION_NON_STR_BIOMASSE_ALLOUEE, fraction_non_str_biomasse_allouee);
                         fraction_non_str_biomass_total += fraction_non_str_biomasse_allouee;

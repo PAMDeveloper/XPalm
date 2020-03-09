@@ -370,8 +370,6 @@ public:
         //        double DUREE_OLEO = parameters.get("DUREE_OLEO");
         //        double RATIO_DUREE_JEUNES_OLEO = parameters.get("RATIO_DUREE_JEUNES_OLEO");
 
-        //set seed TODO remove after debug
-//                srand(SEED);
 
 
 
@@ -415,6 +413,9 @@ public:
 
         // init step state
 
+        //set seed TODO remove after debug
+//               srand(seed*number);
+
         // define sex
         double rd_sex = (double) rand() / RAND_MAX;
         if (TT_since_appearance >= TT_ini_sex && !status.is(inflo::FEMALE) &&  !status.is(inflo::MALE) ) {
@@ -426,6 +427,8 @@ public:
         }
 
         // set abortion
+//        srand((seed+1)*number);
+
         double rd_abort = (double) rand() / RAND_MAX;
         //        if (rank > ICabort_RANG_FIN) {
         if (TT_since_appearance >= TT_ini_abortion && !status.is(inflo::ABORTED) && !status.is(inflo::NON_ABORTED)) {
@@ -476,7 +479,7 @@ public:
         //            return;
 
         //set seed TODO remove after debug
-        //        srand(SEED);
+//                srand(SEED);
 
         if(status.is(inflo::ABORTED))
             return;
