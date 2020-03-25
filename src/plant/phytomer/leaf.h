@@ -223,6 +223,7 @@ public:
     void compute(double t, bool /* update */)
     {
         //        GROWTH;
+        reserve_surplus=0;
 
         //        compute_coupe_feuille_recolte
         if ((phytomer_rank >= RANG_D_ABLATION) | (inflo_status.is(inflo::FEMALE) && !inflo_status.is(inflo::ABORTED)&& inflo_status.is(inflo::HARVEST))){
@@ -239,7 +240,6 @@ public:
             leaf_non_structural_biomass_harvested = leaf_non_structural_biomass;
             leaf_structural_biomass=0;
             leaf_non_structural_biomass=0;
-            reserve_surplus=0;
             capacite_reserve_pot=0;
             capacite_reserve_max=0;
         }
@@ -266,8 +266,10 @@ public:
             capacite_reserve_max = (SLW_max - SLW_min) * leafArea * 10000 / POURC_FOLIOLE;
             reserve_biomass_allocated = fraction_non_str_biomasse_allouee * delta_biomasse_reserve_leaves;
 
-            if (leafArea<=0)
+            if (leafArea<=0){
                 leaf_non_structural_biomass = 0;
+            }
+
             else
                 //                if(phytomer_rank==1)
                 //                    leaf_non_structural_biomass = leafArea * 10000 * (SLW_ini - SLW_min) / POURC_FOLIOLE;
@@ -276,8 +278,9 @@ public:
                     reserve_biomass_allocated=capacite_reserve_max-leaf_non_structural_biomass;
                     leaf_non_structural_biomass=capacite_reserve_max;
                 }
-                else
+                else{
                     leaf_non_structural_biomass += reserve_biomass_allocated;
+                }
 
 
             capacite_reserve_pot = capacite_reserve_max - leaf_non_structural_biomass;
