@@ -206,7 +206,7 @@ public:
             leaf_non_structural_biomass = leafArea * 10000 * (SLW_ini - SLW_min) / POURC_FOLIOLE;
 
             slw = (leafArea > 0)
-                    ? leaf_total_biomass * POURC_FOLIOLE / (potLeafArea) //g.cm-2
+                    ? leaf_total_biomass * POURC_FOLIOLE / (potLeafArea * 1000) //g.cm-2
                     : 0;
 
 

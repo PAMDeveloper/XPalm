@@ -149,16 +149,18 @@ INFLEXION = 6750 # 15 days * 50 rangs * 9° (inflexion an rang -5) deux parametr
 COURBURE = 100
 COUT_RESPI_MAINTENANCE_LEAF = 0.0044 # (gCH2O/gDM)
 COUT_RESPI_FEUILLE = 1.44 # (gCH2O/gDM)
-SLW = 0.0125 # g.cm-2
+#SLW = 0.0125 # g.cm-2
 SLW_max = 0.0166 # g.cm-2
 SLW_min = 0.008 # g.cm-2
 SLW_ini = 0.010 
 POURC_FOLIOLE = 0.35
+
 PLASTICITY_LEAF_IC = 0.7 # plasticite leaf au trophique entre 0 et 1 0 : tout plastique, 1 : pas plastique
 SEUIL_EXPAN = 0.3
 SEUIL_DUREE = 0.6 # ralentissement de la duree d expansion en stress (affecte aussi potential leaf development)
 SEUIL_ORGANO = 0.1
 VITESSE_SENSITIVITY = 0.15 #plasticite de la vitesse de prod a l'IC
+
 #DEBUT_DEFOLIATON = 2500 ### depuis rank 1:
 #FIN_DEFOLIATON =   3500 ### depuis rank 1:
 #RANG_DEFOLIATON = 15

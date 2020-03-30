@@ -34,7 +34,6 @@ class Reserve : public AtomicModel < Reserve >
 public:
     enum internals { RESERVE,
                      GROWTH_OFFER,
-                     MOB_RATE,
                      LEAVES_RES,
                      LEAVES_RES_MIN,
                      LEAVES_RES_MAX,
@@ -48,14 +47,23 @@ public:
                      RESERVE_MAX,
                      RESERVE_MIN,
                      RESERVE_POT,
-                     RESERVE_AVAI};
+                     RESERVE_AVAI,
+                     ASSIM_TO_MIN_RES,
+                     ASSIM_TO_RESPI,
+                     RES_TO_RESPI,
+                     RES_TO_GROWTH,
+                     ASSIM_TO_GROWTH,
+                     ASSIM_TO_RES,
+                     SURPLUS_ASSIM,
+                     MAINTENANCE_RESPI_RES,
+                     GROWTH_DEMAND_RES};
 
     enum externals { PLANTLEAFAREA,
                      TRUNK_BIOMASS,
                      LEAVES_NON_STRUCTURAL_BIOMASS,
                      MAINTENANCE_RESPI,
-                     TREE_GROWTH_DEMAND,
-                     TREE_ASSIM,
+                     GROWTH_DEMAND,
+                     ASSIM,
                      LEAVES_RESERVE_SURPLUS};
 
 private:
@@ -71,24 +79,34 @@ private:
     double REALL_COST;
     double MOB_RATE_MAX;
     double POURCENT_NSC_ST_INI;
+    double STEM_APPARENT_DENSITY;
+    double STEM_RAYON;
 
     //     internals
     double reserve;
     double assim_avai;
     double assim_res_avai;
-    double mob_rate;
     double leaves_res, leaves_res_min, leaves_res_max, leaves_res_pot, leaves_res_avai;
     double trunk_res, trunk_res_min, trunk_res_max, trunk_res_pot, trunk_res_avai;
     double reserve_max, reserve_min, reserve_pot, reserve_avai;
     double growth_offer;
+    double assim_to_respi;
+    double res_to_respi;
+    double assim_to_min_res;
+    double assim_to_growth;
+    double assim_to_res;
+    double res_to_growth;
+    double surplus_assim;
+    double maintenance_respi_res;
+    double growth_demand_res;
 
     //     externals
     double plantLeafArea;
     double trunk_initial_height;
     double leaves_non_structural_biomass;
     double maintenance_respi;
-    double tree_growth_demand;
-    double tree_Assim;
+    double growth_demand;
+    double assim;
     double trunk_biomass;
     double leaves_reserve_surplus;
 
@@ -97,8 +115,8 @@ public:
     Reserve()
     {
         //         internals
+        Internal(RESERVE, &Reserve::reserve);
         Internal(GROWTH_OFFER, &Reserve::growth_offer);
-        Internal(MOB_RATE, &Reserve::mob_rate);
         Internal(LEAVES_RES, &Reserve::leaves_res);
         Internal(LEAVES_RES_MIN, &Reserve::leaves_res_min);
         Internal(LEAVES_RES_MAX, &Reserve::leaves_res_max);
@@ -113,15 +131,24 @@ public:
         Internal(RESERVE_MIN, &Reserve::reserve_min);
         Internal(RESERVE_POT, &Reserve::reserve_pot);
         Internal(RESERVE_AVAI, &Reserve::reserve_avai);
-        Internal(RESERVE, &Reserve::reserve);
+        Internal(ASSIM_TO_MIN_RES, &Reserve::assim_to_min_res);
+        Internal(ASSIM_TO_RESPI, &Reserve::assim_to_respi);
+        Internal(RES_TO_RESPI, &Reserve::res_to_respi);
+        Internal(RES_TO_GROWTH, &Reserve::res_to_growth);
+        Internal(ASSIM_TO_GROWTH, &Reserve::assim_to_growth);
+        Internal(ASSIM_TO_RES, &Reserve::assim_to_res);
+        Internal(SURPLUS_ASSIM, &Reserve::surplus_assim);
+        Internal(MAINTENANCE_RESPI_RES, &Reserve::maintenance_respi_res);
+        Internal(GROWTH_DEMAND_RES, &Reserve::growth_demand_res);
+
 
         //          externals
         External(PLANTLEAFAREA, &Reserve::plantLeafArea);
         External(TRUNK_BIOMASS, &Reserve::trunk_biomass);
         External(LEAVES_NON_STRUCTURAL_BIOMASS, &Reserve::leaves_non_structural_biomass);
         External(MAINTENANCE_RESPI, &Reserve::maintenance_respi);
-        External(TREE_GROWTH_DEMAND, &Reserve::tree_growth_demand);
-        External(TREE_ASSIM, &Reserve::tree_Assim);
+        External(GROWTH_DEMAND, &Reserve::growth_demand);
+        External(ASSIM, &Reserve::assim);
         External(LEAVES_RESERVE_SURPLUS, &Reserve::leaves_reserve_surplus);
 
     }
@@ -131,7 +158,7 @@ public:
     }
 
     void init(double t, const xpalm::ModelParameters& parameters) {}
-    void init(double t, const xpalm::ModelParameters& parameters, double plantLeafArea_, double trunk_initial_height_) //TODO externals in init ???
+    void init(double t, const xpalm::ModelParameters& parameters, double plantLeafArea_, double trunk_initial_height_,double total_leaves_initial_res_) //TODO externals in init ???
     {
         init(t, parameters);
         last_time = t-1;
@@ -147,32 +174,28 @@ public:
         COUT_RESERVE = parameters.get("COUT_RESERVE");
         REALL_COST = parameters.get("REALL_COST");
         MOB_RATE_MAX = parameters.get("MOB_RATE_MAX");
+        STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
+        STEM_RAYON = parameters.get("STEM_RAYON");
 
         //externals
-        double STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
-        double STEM_RAYON = parameters.get("STEM_RAYON");
-        //        double INITIAL_HEIGHT = parameters.get("INITIAL_HEIGHT"); //cm
-
-        //        trunk_biomass= STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * INITIAL_HEIGHT; //gDM
-
         trunk_initial_height= trunk_initial_height_;
         trunk_biomass= STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * trunk_initial_height;
         assim_avai=0;
         assim_res_avai=0;
-        leaves_res=0;
+        leaves_non_structural_biomass=0;
         plantLeafArea=plantLeafArea_;
         growth_offer=0;
 
         //internals
-
-        leaves_non_structural_biomass=0;
+        //        leaves_non_structural_biomass=0;
         leaves_reserve_surplus=0;
         trunk_res = POURCENT_NSC_ST_INI * trunk_biomass;
-        reserve = trunk_res + leaves_non_structural_biomass;
+        leaves_res = total_leaves_initial_res_;
+        reserve = trunk_res + leaves_res;
         leaves_res_max = (SLW_max - SLW_min) * plantLeafArea *10000 / POURC_FOLIOLE; //gDM
         leaves_res_min = 0;
         leaves_res_pot = leaves_res_max - leaves_res_min;
-        leaves_res_avai=0;
+        leaves_res_avai=leaves_res - leaves_res_min;
         trunk_res_min = POURCENT_NSC_ST_MIN * trunk_biomass;
         trunk_res_max = POURCENT_NSC_ST_MAX * trunk_biomass;
         trunk_res_pot = trunk_res_max - trunk_res_min;
@@ -181,7 +204,16 @@ public:
         reserve_max = leaves_res_max + trunk_res_max;
         reserve_pot = reserve_max - reserve_min;
         reserve_avai = leaves_res_avai + trunk_res_avai;
-        mob_rate = ( MOB_RATE_MAX / reserve_pot ) * reserve_avai;
+        assim_to_min_res=0;
+        assim_to_respi=0;
+        assim_to_res=0;
+        res_to_respi=0;
+        res_to_growth=0;
+        assim_to_growth=0;
+        surplus_assim=0;
+        maintenance_respi_res=0;
+        growth_demand_res=0;
+
 
     }
 
@@ -198,74 +230,80 @@ public:
 
 
         //            compute_reserve_max_min
-        trunk_res_min = POURCENT_NSC_ST_MIN * trunk_biomass;
-        trunk_res_max = POURCENT_NSC_ST_MAX * trunk_biomass;
-        trunk_res_pot = trunk_res_max - trunk_res_min;
 
         leaves_res_min = 0;
         leaves_res_max = plantLeafArea * 10000 * (SLW_max - SLW_min) / POURC_FOLIOLE; // m2 *10000 * (g.cm-2) = g
         leaves_res_pot = leaves_res_max - leaves_res_min;
-
         leaves_res = leaves_non_structural_biomass;
 
-        trunk_res = trunk_res + leaves_reserve_surplus;
+        trunk_res_min = POURCENT_NSC_ST_MIN * trunk_biomass;
+        trunk_res_max = POURCENT_NSC_ST_MAX * trunk_biomass;
+        trunk_res_pot = trunk_res_max - trunk_res_min;
+
         reserve = leaves_res + trunk_res;
         reserve_max = leaves_res_max + trunk_res_max;
         reserve_min = leaves_res_min + trunk_res_min;
         reserve_pot = reserve_max - reserve_min;
 
+        reserve_avai = leaves_res_avai + trunk_res_avai;
 
         //Maintenance respiration
 
-        //compute_capacite_de_mobilisation_biomasse_feuille_stipe;
+        double trunk_mob_pct = reserve > 0
+                ? trunk_res / reserve
+                : 0;
+        double leaves_mob_pct = reserve > 0
+                ? leaves_res / reserve
+                : 0;
 
-        double trunk_mob_pct = reserve > 0 ? trunk_res / reserve : 0;
-        double leaves_mob_pct = reserve > 0 ? leaves_res / reserve : 0;
+        //compute_etat_apres_respiration
+        res_to_respi=0;
+        assim_to_respi=0;
 
-        //            compute_etat_apres_respiration
-        assim_avai = tree_Assim;
+        assim_avai = assim;
+        maintenance_respi_res=maintenance_respi;
 
-        if(maintenance_respi > assim_avai) {
+        if(maintenance_respi_res > assim_avai) {
 
-            maintenance_respi-=assim_avai;
+            assim_to_respi=assim_avai;
+            maintenance_respi_res-=assim_avai;
             assim_avai = 0;
 
-            double respi_reserve_consumed = min ( maintenance_respi/ REALL_COST, reserve );
+            res_to_respi = min ( maintenance_respi_res/ REALL_COST, reserve ) * REALL_COST;
+            maintenance_respi_res -= (res_to_respi);
 
-            trunk_res -= (respi_reserve_consumed * trunk_mob_pct);
-            leaves_res -= (respi_reserve_consumed * leaves_mob_pct);
+            trunk_res -= (res_to_respi * trunk_mob_pct);
+            leaves_res -= (res_to_respi * leaves_mob_pct);
             reserve = leaves_res + trunk_res;
 
-            maintenance_respi -= ( respi_reserve_consumed * REALL_COST );
         } else {
-            assim_avai -= maintenance_respi;
-            maintenance_respi = 0;
+            assim_to_respi = maintenance_respi_res;
+            assim_avai -= maintenance_respi_res;
+            maintenance_respi_res = 0;
         }
 
 
         //   allocate assim left to fulfill minimale reserves
 
-        //        double assim_to_res_pot = tree_Assim * COUT_RESERVE;
         trunk_res_avai = trunk_res - trunk_res_min;
         leaves_res_avai = leaves_res - leaves_res_min;
 
-
-        assim_res_avai = assim_avai * COUT_RESERVE;
-
-
+        double delta_L=0;
         if(leaves_res_avai < 0 && assim_res_avai > 0) {
-            double delta = min(-leaves_res_avai, assim_res_avai);
-            assim_res_avai -= delta;
-            leaves_res += delta;
+            delta_L = min(-leaves_res_avai, assim_avai * COUT_RESERVE);
+            assim_avai -= delta_L;
+            leaves_res += delta_L;
         }
 
+        double delta_T=0;
         if(trunk_res_avai < 0 && assim_res_avai > 0) {
-            double delta = min(-trunk_res_avai, assim_res_avai);
-            assim_res_avai -= delta;
-            trunk_res += delta;
+            delta_T = min(-trunk_res_avai, assim_avai * COUT_RESERVE);
+            assim_avai -= delta_T;
+            trunk_res += delta_T;
         }
 
-        assim_avai = assim_res_avai / COUT_RESERVE;
+        assim_to_min_res =delta_L + delta_T;
+
         reserve = leaves_res + trunk_res;
 
         leaves_res_avai = leaves_res - leaves_res_min;
@@ -276,62 +314,88 @@ public:
         //        mob_rate = ( MOB_RATE_MAX / reserve_pot ) * reserve_avai;
 
 
-        growth_offer=assim_avai;
+        growth_offer = assim_avai + reserve_avai;
 
         //compute reserve after growth
 
-        if (assim_avai < tree_growth_demand) {
+        growth_demand_res = growth_demand;
+        assim_to_growth=0;
+        res_to_growth=0;
 
+        if (assim_avai < growth_demand_res) {
+
+            //assim consumed for growth
+            assim_to_growth = assim_avai;
+            growth_demand_res -= assim_avai;
+            assim_avai = 0;
+            assim_to_res=0;
+
+            //reserve consumed for growth
             //rate of reserve per compartment (trunk and leaved) than can be allocate for growth
             trunk_mob_pct = reserve_avai > 0 ? trunk_res_avai / reserve_avai : 0;
             leaves_mob_pct = reserve_avai > 0 ? leaves_res_avai / reserve_avai : 0;
+            res_to_growth = min ( growth_demand_res / REALL_COST, reserve_avai) * REALL_COST;
 
-            //reserve consumed for growth
-            tree_growth_demand-=assim_avai;
-            assim_avai = 0;
+            growth_demand_res -= res_to_growth;
 
-            double growth_reserve_consumed = min ( tree_growth_demand / REALL_COST, reserve_avai );
-
-            trunk_res -= (growth_reserve_consumed * trunk_mob_pct);
-            leaves_res -= (growth_reserve_consumed * leaves_mob_pct);
-
-            reserve = leaves_res + trunk_res;
+            trunk_res -= (res_to_growth * trunk_mob_pct);
+            leaves_res -= (res_to_growth * leaves_mob_pct);
 
         } else {
 
-            assim_avai -= tree_growth_demand;
-            tree_growth_demand=0;
+            assim_to_growth = growth_demand_res;
+            res_to_growth=0;
+
+            assim_avai -= growth_demand_res;
+            growth_demand_res = 0;
 
             trunk_res_pot = trunk_res_max - trunk_res;
             leaves_res_pot = leaves_res_max - leaves_res;
-            reserve_pot = trunk_res_pot + leaves_res_pot;
 
-            double trunk_sink_pct = trunk_res_pot / reserve_pot;
-            double leaves_sink_pct = leaves_res_pot / reserve_pot;
+            //version Benoit (no hierarchy)
+            //            reserve_pot = trunk_res_pot + leaves_res_pot;
+            //            double trunk_sink_pct = trunk_res_pot / reserve_pot;
+            //            double leaves_sink_pct = leaves_res_pot / reserve_pot;
+            //            assim_res_avai = min ( assim_avai * COUT_RESERVE, reserve_pot);
+            //            trunk_res += (assim_res_avai * trunk_sink_pct);
+            //            leaves_res += (assim_res_avai * leaves_sink_pct);
+            //            assim_avai -= ( assim_res_avai / COUT_RESERVE );
 
-            assim_res_avai = min ( assim_avai * COUT_RESERVE, reserve_pot);
 
-            //            if (assim_res_avai==reserve_pot){
-            //                reserve_pot=reserve_pot;
-            //            }
+            //first fill reserves in leaves
 
-            trunk_res += (assim_res_avai * trunk_sink_pct);
-            leaves_res += (assim_res_avai * leaves_sink_pct);
+            double assim_avai_res_L= min (assim_avai * COUT_RESERVE, leaves_res_pot);
+            leaves_res += assim_avai_res_L;
+            assim_avai -= assim_avai_res_L;
 
-            assim_avai -= ( assim_res_avai / COUT_RESERVE );
+            //then fill reserves in leaves
+
+            double assim_avai_res_T= min (assim_avai * COUT_RESERVE, trunk_res_pot);
+            trunk_res += assim_avai_res_T;
+            assim_avai -= assim_avai_res_T;
+
+            assim_to_res = assim_avai_res_L + assim_avai_res_T;
         }
 
+        // reserve surplus (roots??)
+        surplus_assim = assim_avai;
 
+        reserve = leaves_res + trunk_res;
         leaves_res_avai = leaves_res - leaves_res_min;
-        trunk_res_avai = trunk_res - trunk_res_min;
         reserve_avai = leaves_res_avai + trunk_res_avai;
+
+        leaves_res_pot = leaves_res_max - leaves_res;
+        trunk_res_avai = trunk_res - trunk_res_min;
+        trunk_res_pot = trunk_res_max - trunk_res;
+
+        double C_b1=assim-assim_to_respi;
+        double C_b2=C_b1-assim_to_min_res;
+        double C_b3=C_b2-assim_to_growth;
+        double C_b4=C_b3-assim_to_res;
+        double C_b5=C_b4-surplus_assim;
+
     }
 
-    //    def compute_etat_test_min(self) :
-    //     # avant tout il faut verifier qu'on est au dessus de la reserve mini. Ce cas-la peut arriver car
-    //         # la reserve mini augmente et qu'on a jamais rien stocke dedans. Il existe donc cette demande ... Mais dans le cas
-    //         # d'un deficit prolonge en assimilats d'ou peuvent bien venir ces assimilats ?
-    //     # pour l'instant pour eviter des bugs si il n'y pas ces assimilats on les fait arriver ...
 };
 
 } // namespace model
