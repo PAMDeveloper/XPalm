@@ -194,11 +194,11 @@ public:
         reserve = trunk_res + leaves_res;
         leaves_res_max = (SLW_max - SLW_min) * plantLeafArea *10000 / POURC_FOLIOLE; //gDM
         leaves_res_min = 0;
-        leaves_res_pot = leaves_res_max - leaves_res_min;
+        leaves_res_pot = leaves_res_max - leaves_res;
         leaves_res_avai=leaves_res - leaves_res_min;
         trunk_res_min = POURCENT_NSC_ST_MIN * trunk_biomass;
         trunk_res_max = POURCENT_NSC_ST_MAX * trunk_biomass;
-        trunk_res_pot = trunk_res_max - trunk_res_min;
+        trunk_res_pot = trunk_res_max - trunk_res;
         trunk_res_avai = trunk_res - trunk_res_min;
         reserve_min = trunk_res_min;
         reserve_max = leaves_res_max + trunk_res_max;
@@ -233,17 +233,14 @@ public:
 
         leaves_res_min = 0;
         leaves_res_max = plantLeafArea * 10000 * (SLW_max - SLW_min) / POURC_FOLIOLE; // m2 *10000 * (g.cm-2) = g
-        leaves_res_pot = leaves_res_max - leaves_res_min;
-        leaves_res = leaves_non_structural_biomass;
+        leaves_res = leaves_non_structural_biomass; // update to take into account the removed leaf and the new openned leaf
 
         trunk_res_min = POURCENT_NSC_ST_MIN * trunk_biomass;
         trunk_res_max = POURCENT_NSC_ST_MAX * trunk_biomass;
-        trunk_res_pot = trunk_res_max - trunk_res_min;
 
-        reserve = leaves_res + trunk_res;
         reserve_max = leaves_res_max + trunk_res_max;
         reserve_min = leaves_res_min + trunk_res_min;
-        reserve_pot = reserve_max - reserve_min;
+        reserve_pot = reserve_max - reserve;
 
         reserve_avai = leaves_res_avai + trunk_res_avai;
 
@@ -314,7 +311,7 @@ public:
         //        mob_rate = ( MOB_RATE_MAX / reserve_pot ) * reserve_avai;
 
 
-        growth_offer = assim_avai + reserve_avai;
+        growth_offer = assim_avai + reserve_avai* REALL_COST;
 
         //compute reserve after growth
 
@@ -368,7 +365,7 @@ public:
             leaves_res += assim_avai_res_L;
             assim_avai -= assim_avai_res_L;
 
-            //then fill reserves in leaves
+            //then fill reserves in trunk
 
             double assim_avai_res_T= min (assim_avai * COUT_RESERVE, trunk_res_pot);
             trunk_res += assim_avai_res_T;
@@ -388,11 +385,6 @@ public:
         trunk_res_avai = trunk_res - trunk_res_min;
         trunk_res_pot = trunk_res_max - trunk_res;
 
-        double C_b1=assim-assim_to_respi;
-        double C_b2=C_b1-assim_to_min_res;
-        double C_b3=C_b2-assim_to_growth;
-        double C_b4=C_b3-assim_to_res;
-        double C_b5=C_b4-surplus_assim;
 
     }
 

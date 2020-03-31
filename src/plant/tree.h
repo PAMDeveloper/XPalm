@@ -194,7 +194,7 @@ private:
     double growth_demand;
     double bunch_demand;
     double fraction_non_str_biomass_total;
-
+    double delta_reserve_leaves;
 
 public:
 
@@ -250,7 +250,6 @@ public:
         Internal(INTERNODE_DEMAND, &Tree::internode_demand);
         Internal(LEAVES_DEMAND, &Tree::leaves_demand);
         Internal(MALE_DEMAND, &Tree::male_demand);
-        //        Internal(INFLO_DEMAND, &Tree::inflo_demand);
         Internal(MALE_BIOMASS, &Tree::male_biomass);
         Internal(MALE_BIOMASS_HARVESTED, &Tree::male_biomass_harvested);
         Internal(PEDUNCLE_BIOMASS, &Tree::peduncle_biomass);
@@ -671,9 +670,11 @@ public:
 
         //                C_balance= respi_maintenance - assim_to_respi - res_to_respi;
         //                C_balance= growth_demand - assim_to_growth - res_to_growth;
-        //        C_balance= assim - assim_to_min_res - assim_to_respi - assim_to_growth - assim_to_res - surplus_assim;
+        C_balance= assim - assim_to_min_res - assim_to_respi - assim_to_growth - assim_to_res - surplus_assim;
 
-        C_balance= assim + res_to_growth + res_to_respi - growth_demand - respi_maintenance - surplus_assim - assim_to_res;
+        //        C_balance= delta_reserve_leaves;
+
+        //                C_balance= assim + res_to_growth + res_to_respi - growth_demand - respi_maintenance - surplus_assim - assim_to_res;
 
         //                if (C_balance>0.1){
         //                    C_balance=C_balance;
@@ -685,7 +686,6 @@ public:
         //        fraction_pour_croissance = offre_nette / (growth_demand);
 
         //       compute_fraction_oil_reste
-
         double sum_organs_demand = leaves_demand + internode_demand + male_demand + peduncle_demand;
         double bunch_demand_corrected = AF_FRUITS * bunch_demand;
         double fr_fruits_corrected= bunch_demand_corrected/(sum_organs_demand+bunch_demand_corrected);
@@ -709,16 +709,14 @@ public:
 
 
 
-
-
     void compute_biomasse_non_structurale_allouee_aux_feuilles(double t) {
         double capacite_reserve_total = 0;
         fraction_non_str_biomass_total = 0; //check must equal 1
 
         // compute total leaf reserve
-        double delta_biomasse_reserve_leaves = reserve->get<double>(t-1, Reserve::LEAVES_RES_AVAI);
+        double biomasse_reserve_leaves = reserve->get<double>(t-1, Reserve::LEAVES_RES_AVAI);
 
-        if  (delta_biomasse_reserve_leaves > 0) {
+        if  (biomasse_reserve_leaves > 0) {
             auto it = phytomers.begin();
             while (it != phytomers.end()) {
                 Phytomer* phytomer = (*it);
@@ -726,9 +724,9 @@ public:
                     //                    double capacite_reserve_max = phytomer->leaf_model()->get <double>(t-1, Leaf::CAPACITE_RESERVE_MAX);
                     //                    double non_structural_biomass = phytomer->leaf_model()->get <double>(t-1, Leaf::LEAF_NON_STRUCTURAL_BIOMASS);
                     //                    double capacite_reserve = capacite_reserve_max - non_structural_biomass;
-                    double capacite_reserve_pot = phytomer->leaf_model()->get <double>(t-1, Leaf::CAPACITE_RESERVE_POT);
+                    double capacite_reserve_max = phytomer->leaf_model()->get <double>(t-1, Leaf::CAPACITE_RESERVE_MAX);
                     //                    if(capacite_reserve_pot > 0) //TODO check if capacite is negative--> problem
-                    capacite_reserve_total += capacite_reserve_pot;
+                    capacite_reserve_total += capacite_reserve_max;
                 }
                 ++it;
             }
@@ -742,8 +740,8 @@ public:
 
                 else {
                     if(phytomer->leaf_model()->get<double>(t-1, Leaf::LEAFAREA)>0) {
-                        double capacite_reserve_pot = phytomer->leaf_model()->get <double>(t-1, Leaf::CAPACITE_RESERVE_POT);
-                        double fraction_non_str_biomasse_allouee = capacite_reserve_pot / capacite_reserve_total;
+                        double capacite_reserve_max = phytomer->leaf_model()->get <double>(t-1, Leaf::CAPACITE_RESERVE_MAX);
+                        double fraction_non_str_biomasse_allouee = capacite_reserve_max / capacite_reserve_total;
 
                         //                        if (std::abs(fraction_non_str_biomasse_allouee)>0.1){
                         //                            fraction_non_str_biomasse_allouee=fraction_non_str_biomasse_allouee;
@@ -767,70 +765,13 @@ public:
             }
         }
 
+        delta_reserve_leaves= capacite_reserve_total - biomasse_reserve_leaves;
+
+        //        if (fraction_non_str_biomass_total<0.9){
+        //            fraction_non_str_biomass_total=fraction_non_str_biomass_total;
+        //        }
+
     }
 
 };
-
-//    void update_organs(double t) {
-//        //       #### defiolation le jour de la mise en place des traitements
-//        if (t == DEBUT_DEFOLIATON ) {
-//            auto it = phytomers.begin();
-//            while (it != phytomers.end()) {
-//                Phytomer* phytomer = (*it);
-//                int rank = phytomer->get< double, Phytomer >(t, Phytomer::RANK);
-//                phytomer::phytomer_state state = phytomer->get < phytomer::phytomer_state, Phytomer >(t, Phytomer::STATE);
-//                if(rank > RANG_DEFOLIATON && state == phytomer::ACTIVE) {
-//                    ;//TODO ABLATION  phytomers[key].leaf.ablation = phytomers[key].leaf.defoliation_decision(POURC_DEFOLIATON)
-//                }
-//            }
-//        }
-
-//        // ### ablation des regimes le jour de la mise en place des traitements
-//        if (t == DEBUT_ABLATION_REGIME ) {
-//            auto it = phytomers.begin();
-//            while (it != phytomers.end()) {
-//                Phytomer* phytomer = (*it);
-//                int rank = phytomer->get < double, Phytomer >(t, Phytomer::RANK);
-//                inflo::inflo_states bunch_state = phytomer->inflo_model()->get <inflo::inflo_states, Inflo >(t, Inflo::STATUS);
-//                inflo::inflo_sex sex = phytomer->inflo_model()->get <inflo::inflo_sex, Inflo >(t, Inflo::SEX);
-//                inflo::inflo_sex avort = phytomer->inflo_model()->get <inflo::inflo_sex, Inflo >(t, Inflo::AVORT);
-//                if(rank >= RANG_D_ABLATION_REGIME
-//                        && bunch_state.is(inflo::RECOLTE)
-//                        && sex ==  inflo::FEMALE
-//                        && avort == inflo::NON_ABORTED)
-//                    ;//TODO ABLATION  phytomers[key].leaf.ablation = phytomers[key].leaf.defoliation_decision(POURC_DEFOLIATON)
-
-//            }
-//        }
-
-//        if (newPhytomerEmergence >= 1) {
-//            create_phytomer(phytomerNumber + 1, age);
-//            newPhytomerEmergence -= 1;
-//        }
-//    }
-
-// calcul fraction alloue aux demandes version Benoit
-//        double sum_organs_demand = leaves_demand + internode_demand + male_demand + peduncule_demand;
-//        double demand_growth_corrected = sum_organs_demand + (AF_FRUITS * bunch_demand);
-//        if (AF_FRUITS >= 1) {
-//            offre_fruits = min( ( AF_FRUITS * bunch_demand * offre_nette / demand_growth_corrected ), bunch_demand );
-
-//            if(bunch_demand==0) {
-//                fr_fruits = 1;
-//                offre_reste = offre_nette - offre_fruits;
-//                fr_reste = offre_nette / sum_organs_demand;
-//            }
-//            else {
-//                fr_fruits = offre_fruits/bunch_demand;
-//                offre_reste = offre_nette-offre_fruits;
-//                fr_reste = offre_reste / sum_organs_demand;
-//            }
-
-//        }
-//        else{
-//            offre_reste = min ( (sum_organs_demand * offre_reste / demand_growth_corrected), sum_organs_demand);
-//            fr_reste = offre_reste / sum_organs_demand;
-//            offre_fruits = offre_nette - offre_reste;
-//            fr_fruits = offre_fruits/ bunch_demand;
-//        }
 #endif // TREE_H

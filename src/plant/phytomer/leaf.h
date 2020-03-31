@@ -185,12 +185,6 @@ public:
         }
 
 
-        // init structure
-        //        double TTfeuille = phytomer_age * parameters.get("T_EFF_INI");
-        //        SFMax = min(INCREASE_OF_LEAF_AREA * phytomer_age + INITIAL_SFIND, MAXIMAL_SFIND);
-        //        SFMax = min(INCREASE_OF_LEAF_AREA * TT_since_appearance + INITIAL_SFIND, MAXIMAL_SFIND);
-
-
         if (leaf_state==leaf::NON_COUPE){
             potLeafArea = (SF_fin / (1 + exp(-(TT_since_leaf_expand - INFLEXION) / COURBURE)));
 
@@ -215,7 +209,7 @@ public:
         capacite_reserve_max = (SLW_max - SLW_min) * leafArea * 10000 / POURC_FOLIOLE;
         capacite_reserve_pot = capacite_reserve_max-leaf_non_structural_biomass;
 
-        leaf_total_biomass = leaf_structural_biomass+leaf_non_structural_biomass; //g
+        leaf_total_biomass = leaf_structural_biomass + leaf_non_structural_biomass; //g
 
     }
 
@@ -273,17 +267,15 @@ public:
             else
                 //                if(phytomer_rank==1)
                 //                    leaf_non_structural_biomass = leafArea * 10000 * (SLW_ini - SLW_min) / POURC_FOLIOLE;
-                if (leaf_non_structural_biomass+reserve_biomass_allocated>=capacite_reserve_max){
-                    reserve_surplus=leaf_non_structural_biomass+reserve_biomass_allocated-capacite_reserve_max; // surplus for reallocation
-                    reserve_biomass_allocated=capacite_reserve_max-leaf_non_structural_biomass;
-                    leaf_non_structural_biomass=capacite_reserve_max;
-                }
-                else{
-                    leaf_non_structural_biomass += reserve_biomass_allocated;
+                if (reserve_biomass_allocated>=capacite_reserve_max){
+                    reserve_surplus=reserve_biomass_allocated-capacite_reserve_max; // surplus for reallocation
+                    reserve_biomass_allocated=capacite_reserve_max;
                 }
 
+            leaf_non_structural_biomass=reserve_biomass_allocated;
 
-            capacite_reserve_pot = capacite_reserve_max - leaf_non_structural_biomass;
+
+//            capacite_reserve_pot = capacite_reserve_max - leaf_non_structural_biomass;
 
             //            if (capacite_reserve_pot<0){
             //                capacite_reserve_pot=capacite_reserve_pot;
@@ -296,7 +288,7 @@ public:
 
 
             //        GROWTH DEMAND;
-//            gain_TEff_jour = TEff * (ftsw > SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
+            //            gain_TEff_jour = TEff * (ftsw > SEUIL_DUREE ? 1 : ftsw / SEUIL_DUREE);
 
             gain_TEff_jour = TEff;
             TT_since_leaf_expand += gain_TEff_jour;
@@ -313,86 +305,7 @@ public:
 
         leaf_total_biomass = leaf_structural_biomass + leaf_non_structural_biomass;
 
-
     }
-
-
-
-
-
-
-
-
-
-    //    compute() {
-    //    ...
-    //        crown_position = int( (phytomer_rank - 1) / 3 ) + 1;
-
-    //        double a = A_LOI_INTERC;
-    //        double b = B_LOI_INTERC;
-    //        double nombre_max_crown_position = int( (RANG_D_ABLATION-1) / 3 ) + 1;
-
-    //        if (phytomer_state == phytomer::DEAD || bunch_statut.is(inflo::ABLATED))
-    //            niveau_d_eclairement_loi_beta = 0;
-    //        else if(bunch_statut.is(inflo::NON_ABLATED) && phytomer_state == phytomer::ACTIVE)
-    //            niveau_d_eclairement_loi_beta = pow((crown_position - 0.5 )/ (nombre_max_crown_position), a-1) * pow(1-(crown_position - 0.5 )/ (nombre_max_crown_position), b-1);
-
-
-
-    //        if (REMANENCE_STRESS == 1.)
-    //            compute_declin_photo();
-    //        else
-    //            assim_max =  EFFICIENCE_BIOLOGIQUE;
-    //    }
-
-    //    void compute_declin_photo(){
-    //        if (phytomer_rank >  RANG_DEBUT_SENS_PN_LONG_TERMES && phytomer_rank < RANG_FIN_SENS_PN_LONG_TERMES) {
-    //            if (ftsw < seuil_FTSW_pour_red_a_long_termes_de_Pn)
-    //                nb_jour_declin_photosynthese += 1 - 1/seuil_FTSW_pour_red_a_long_termes_de_Pn * ftsw;
-    //            //                        ### nombre de jours en dessous de 0.4 module par l intensite du stress !
-    //            //            on compte le nombre de jours ou il y a eu un stress fort endommageant la photosynthese
-    //        }
-
-    //        declin_photosynthese_stress = pow( (1 - fonction_impact_stress_fort_assim_pot(nb_jour_declin_photosynthese)), SENS_REMANESCENCE);
-    //        //        ### on calcule le declin de la photosynthese en fonction de ce nombre de jours
-
-    //        if (phytomer_state == phytomer::ACTIVE) //## ne sert rien de calculer si la feuille n est pas presente
-    //            declin_photosynthese_age = fonction_impact_age_assim_pot(phytomer_rank, rang_chute_pn_age, rang_pn_50);
-    //        //        ### on estime le declin de la pn en fonction de l age
-
-
-    //        if (phytomer_state == phytomer::DEAD)
-    //            assim_max = 0;
-    //        if (ablation == leaf::COUPE)
-    //            assim_max = 0;
-    //        if (ablation == leaf::NON_COUPE && phytomer_state == phytomer::ACTIVE)
-    //            assim_max = EFFICIENCE_BIOLOGIQUE * declin_photosynthese_stress * declin_photosynthese_age;
-    //        //                # l assim max est l assimilation maximale permise par les jours de stress forts rencontres
-    //        //                ### on multiplie ensuite celle-ci par sa quantite de lumiere absorbee pour avoir l assim de chacune des feuilles
-    //        //                ### cette assim_max peut aussi etre modifiee par l age de la feuille
-
-    //    }
-    //    double fonction_impact_stress_fort_assim_pot(double nbjours) {
-    //        double y;
-    //        if (nbjours == 0)
-    //            y = 0;
-    //        else
-    //            y = 1/(1 + exp(-(nbjours - a_sigmoide_declin_pn )/(b_sigmoide_declin_pn )));
-    //        return y;
-    //    }
-
-    //    //          ### attention cette fonction ne passe pas par 0 !!!
-    //    double fonction_impact_age_assim_pot(double rang, double rang_debut_chute, double rang_moitie_chute) {
-    //        if (rang > rang_chute_pn_age) {
-    //            if ( (0.5 - 1) / (rang_moitie_chute - rang_debut_chute) *(rang - rang_debut_chute ) + 1 < 0 )
-    //                return 0;
-    //            else
-    //                return (0.5 - 1) / (rang_moitie_chute - rang_debut_chute) *(rang - rang_debut_chute ) + 1;
-    //        } else
-    //            return 1;
-    //    }
-
-
 
 };
 } //namespace model

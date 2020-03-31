@@ -40,20 +40,19 @@ public:
     PlantView()
     {
         //METEO
-        //        selector("RG", artis::kernel::DOUBLE, {
-        //                     Meteo::RG});
-        //        selector("RAIN", artis::kernel::DOUBLE, {
-        //                     Meteo::RAIN});
-        //                selector("FTSW", artis::kernel::DOUBLE, {
-        //                             Tree::BH,
-        //                             WaterBalance::FTSW});
-        //        selector("TEFF", artis::kernel::DOUBLE, {
-        //                     Tree::METEO,
-        //                     Meteo::TEFF});
+        selector("RG", artis::kernel::DOUBLE, {Meteo::RG});
+        //                selector("RAIN", artis::kernel::DOUBLE, {
+        //                             Meteo::RAIN});
+        //                        selector("FTSW", artis::kernel::DOUBLE, {
+        //                                     Tree::BH,
+        //                                     WaterBalance::FTSW});
+        //                selector("TEFF", artis::kernel::DOUBLE, {
+        //                             Tree::METEO,
+        //                             Meteo::TEFF});
 
         //RESERVE
         //        selector("ASSIM_AVAI", artis::kernel::DOUBLE,{Reserve::ASSIM_AVAI});
-        //        selector("LEAVES_RES_AVAI", artis::kernel::DOUBLE,{Reserve::LEAVES_RES_AVAI});
+        //        selector("LEAVES_RES_POT", artis::kernel::DOUBLE,{Reserve::LEAVES_RES_POT});
         //        selector("TRUNK_RES_AVAI", artis::kernel::DOUBLE,{Reserve::TRUNK_RES_AVAI});
         //        selector("ASSIM_TO_RES_MIN", artis::kernel::DOUBLE,{Reserve::ASSIM_TO_MIN_RES});
         //        selector("ASSIM_TO_RESPI", artis::kernel::DOUBLE,{Reserve::ASSIM_TO_RESPI});
@@ -65,21 +64,25 @@ public:
         //        selector("SURPLUS_ASSIM", artis::kernel::DOUBLE,{Reserve::SURPLUS_ASSIM});
 
         //TREE
+        selector("LAI", artis::kernel::DOUBLE,{Tree::LAI});
+        selector("RESPI_MAINTENANCE", artis::kernel::DOUBLE,{Tree::RESPI_MAINTENANCE});
+        selector("C_BALANCE", artis::kernel::DOUBLE,{Tree::C_BALANCE});
+        selector("PLANTLEAFAREA", artis::kernel::DOUBLE,{Tree::PLANTLEAFAREA});
+        selector("LEAVES_RESERVE_SURPLUS", artis::kernel::DOUBLE,{Tree::LEAVES_RESERVE_SURPLUS});
+        selector("ASSIM", artis::kernel::DOUBLE,{Tree::ASSIM});
+        selector("GROWTH_DEMAND", artis::kernel::DOUBLE,{Tree::GROWTH_DEMAND});
+        selector("FRACTION_NON_STR_BIOMASS_TOTAL", artis::kernel::DOUBLE,{Tree::FRACTION_NON_STR_BIOMASS_TOTAL});
         //        selector("EI", artis::kernel::DOUBLE,{Tree::EI});
         //        selector("LEAVES_RESERVE_SURPLUS", artis::kernel::DOUBLE,{Tree::LEAVES_RESERVE_SURPLUS});
         //        selector("IC", artis::kernel::DOUBLE,{Tree::IC});
         //         selector("OFFRE_NETTE", artis::kernel::DOUBLE,{Tree::OFFRE_NETTE});
         //        selector("TRUNK_HEIGHT", artis::kernel::DOUBLE,{Tree::TRUNK_HEIGHT});
-        //        selector("LAI", artis::kernel::DOUBLE,{Tree::LAI});
+
         //        selector("MALE_BIOMASS", artis::kernel::DOUBLE,{Tree::MALE_BIOMASS});
         //        selector("RESPIRABLE_REPRO_BIOMASS", artis::kernel::DOUBLE,{Tree::RESPIRABLE_REPRO_BIOMASS});
-        selector("RESPI_MAINTENANCE", artis::kernel::DOUBLE,{Tree::RESPI_MAINTENANCE});
-        selector("C_BALANCE", artis::kernel::DOUBLE,{Tree::C_BALANCE});
-        //        selector("PLANTLEAFAREA", artis::kernel::DOUBLE,{Tree::PLANTLEAFAREA});
+
         //        selector("TRUNK_BIOMASS", artis::kernel::DOUBLE,{Tree::TRUNK_BIOMASS});
-        //        selector("RESERVE_BIOMASS", artis::kernel::DOUBLE,{Tree::RESERVE_BIOMASS});
-        selector("ASSIM", artis::kernel::DOUBLE,{Tree::ASSIM});
-        selector("GROWTH_DEMAND", artis::kernel::DOUBLE,{Tree::GROWTH_DEMAND});
+
         //        selector("FR_FRUITS", artis::kernel::DOUBLE,{Tree::FR_FRUITS});
         //        selector("FR_RESTE", artis::kernel::DOUBLE,{Tree::FR_RESTE});
         //        selector("PHYTOMERNUMBER", artis::kernel::DOUBLE,{Tree::PHYTOMERNUMBER});
@@ -109,14 +112,6 @@ public:
         //        selector("LEAVES_DEMAND", artis::kernel::DOUBLE,{Tree::LEAVES_DEMAND});
         //        selector("MALE_DEMAND", artis::kernel::DOUBLE,{Tree::MALE_DEMAND});
         //        selector("BUNCH_DEMAND", artis::kernel::DOUBLE,{Tree::BUNCH_DEMAND});
-
-
-
-
-
-
-
-
 
 
 
