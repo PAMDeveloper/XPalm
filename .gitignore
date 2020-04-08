@@ -3,3 +3,4 @@ release/
 Makefile*
 .qmake.stash
 ui_mainwindow.h
+.Rproj.user

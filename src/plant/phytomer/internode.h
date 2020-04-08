@@ -39,6 +39,7 @@ private:
     double PLASTICITY_INTERNODE_IC;
     double TEFF_INI ;
     double REPRO_CONSTRUCTION_COST;
+    double INACTIVE_PHYTOMER_NUMBER;
 
     //     internals
     double length_increase_pot;
@@ -100,6 +101,7 @@ public:
         STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY"); //(g cm-3)
         TEFF_INI = parameters.get("T_EFF_INI");
         REPRO_CONSTRUCTION_COST = parameters.get("REPRO_CONSTRUCTION_COST");
+        INACTIVE_PHYTOMER_NUMBER = parameters.get("INACTIVE_PHYTOMER_NUMBER");
 
         //        internals
         length_increase_pot = 0;
@@ -110,7 +112,7 @@ public:
         //        TT_corrige = 0;
         //        gain_TEff_jour = 0;
         TT_since_appearance = TT_since_appearance_;
-        TT_ini_elongation= 90 / production_speed; //growth start at rank 30 TODO convert into param if necessary
+        TT_ini_elongation= (INACTIVE_PHYTOMER_NUMBER+30) / production_speed; //growth start at rank 30 TODO convert into param if necessary
 
 
         // ini

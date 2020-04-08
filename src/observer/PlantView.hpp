@@ -40,15 +40,11 @@ public:
     PlantView()
     {
         //METEO
-        selector("RG", artis::kernel::DOUBLE, {Meteo::RG});
+        selector("RG", artis::kernel::DOUBLE, {Tree::METEO, Meteo::RG});
         //                selector("RAIN", artis::kernel::DOUBLE, {
         //                             Meteo::RAIN});
-        //                        selector("FTSW", artis::kernel::DOUBLE, {
-        //                                     Tree::BH,
-        //                                     WaterBalance::FTSW});
-        //                selector("TEFF", artis::kernel::DOUBLE, {
-        //                             Tree::METEO,
-        //                             Meteo::TEFF});
+        selector("FTSW", artis::kernel::DOUBLE, {Tree::BH,WaterBalance::FTSW});
+        selector("TEFF", artis::kernel::DOUBLE, {Tree::METEO,Meteo::TEFF});
 
         //RESERVE
         //        selector("ASSIM_AVAI", artis::kernel::DOUBLE,{Reserve::ASSIM_AVAI});
@@ -68,24 +64,20 @@ public:
         selector("RESPI_MAINTENANCE", artis::kernel::DOUBLE,{Tree::RESPI_MAINTENANCE});
         selector("C_BALANCE", artis::kernel::DOUBLE,{Tree::C_BALANCE});
         selector("PLANTLEAFAREA", artis::kernel::DOUBLE,{Tree::PLANTLEAFAREA});
-        selector("LEAVES_RESERVE_SURPLUS", artis::kernel::DOUBLE,{Tree::LEAVES_RESERVE_SURPLUS});
+        selector("LEAVES_RESERVE_EXCESS", artis::kernel::DOUBLE,{Tree::LEAVES_RESERVE_EXCESS});
         selector("ASSIM", artis::kernel::DOUBLE,{Tree::ASSIM});
         selector("GROWTH_DEMAND", artis::kernel::DOUBLE,{Tree::GROWTH_DEMAND});
         selector("FRACTION_NON_STR_BIOMASS_TOTAL", artis::kernel::DOUBLE,{Tree::FRACTION_NON_STR_BIOMASS_TOTAL});
-        //        selector("EI", artis::kernel::DOUBLE,{Tree::EI});
-        //        selector("LEAVES_RESERVE_SURPLUS", artis::kernel::DOUBLE,{Tree::LEAVES_RESERVE_SURPLUS});
-        //        selector("IC", artis::kernel::DOUBLE,{Tree::IC});
-        //         selector("OFFRE_NETTE", artis::kernel::DOUBLE,{Tree::OFFRE_NETTE});
-        //        selector("TRUNK_HEIGHT", artis::kernel::DOUBLE,{Tree::TRUNK_HEIGHT});
+        selector("LEAVES_RESERVE_EXCESS", artis::kernel::DOUBLE,{Tree::LEAVES_RESERVE_EXCESS});
 
-        //        selector("MALE_BIOMASS", artis::kernel::DOUBLE,{Tree::MALE_BIOMASS});
-        //        selector("RESPIRABLE_REPRO_BIOMASS", artis::kernel::DOUBLE,{Tree::RESPIRABLE_REPRO_BIOMASS});
+        selector("EI", artis::kernel::DOUBLE,{Tree::EI});
+        selector("IC", artis::kernel::DOUBLE,{Tree::IC});
 
-        //        selector("TRUNK_BIOMASS", artis::kernel::DOUBLE,{Tree::TRUNK_BIOMASS});
-
-        //        selector("FR_FRUITS", artis::kernel::DOUBLE,{Tree::FR_FRUITS});
-        //        selector("FR_RESTE", artis::kernel::DOUBLE,{Tree::FR_RESTE});
-        //        selector("PHYTOMERNUMBER", artis::kernel::DOUBLE,{Tree::PHYTOMERNUMBER});
+        selector("TRUNK_BIOMASS", artis::kernel::DOUBLE,{Tree::TRUNK_BIOMASS});
+        selector("TRUNK_HEIGHT", artis::kernel::DOUBLE,{Tree::TRUNK_HEIGHT});
+        selector("FR_FRUITS", artis::kernel::DOUBLE,{Tree::FR_FRUITS});
+        selector("FR_RESTE", artis::kernel::DOUBLE,{Tree::FR_RESTE});
+        selector("PHYTOMERNUMBER", artis::kernel::DOUBLE,{Tree::PHYTOMERNUMBER});
         //        selector("NEWPHYTOMEREMERGENCE", artis::kernel::DOUBLE,{Tree::NEWPHYTOMEREMERGENCE});
 
 
@@ -95,11 +87,11 @@ public:
         //        selector("LEAVES_STRUCTURAL_BIOMASS", artis::kernel::DOUBLE,{Tree::LEAVES_STRUCTURAL_BIOMASS});
         //        selector("LEAVES_NON_STRUCTURAL_BIOMASS", artis::kernel::DOUBLE,{Tree::LEAVES_NON_STRUCTURAL_BIOMASS});
         //         selector("LEAVES_STRUCTURAL_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::LEAVES_STRUCTURAL_BIOMASS_HARVESTED});
-        //        selector("LEAVES_NON_STRUCTURAL_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::LEAVES_NON_STRUCTURAL_BIOMASS_HARVESTED});
-        //        selector("BUNCH_OIL_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::BUNCH_OIL_BIOMASS_HARVESTED});
-        //        selector("BUNCH_NONOIL_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::BUNCH_NONOIL_BIOMASS_HARVESTED});
+        selector("LEAVES_NON_STRUCTURAL_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::LEAVES_NON_STRUCTURAL_BIOMASS_HARVESTED});
+        selector("BUNCH_OIL_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::BUNCH_OIL_BIOMASS_HARVESTED});
+        selector("BUNCH_NONOIL_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::BUNCH_NONOIL_BIOMASS_HARVESTED});
         //        selector("MALE_BIOMASS", artis::kernel::DOUBLE,{Tree::MALE_BIOMASS});
-        //        selector("MALE_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::MALE_BIOMASS_HARVESTED});
+        selector("MALE_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::MALE_BIOMASS_HARVESTED});
         //        selector("PEDUNCLE_BIOMASS", artis::kernel::DOUBLE,{Tree::PEDUNCLE_BIOMASS});
         //        selector("PEDUNCLE_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::PEDUNCLE_BIOMASS_HARVESTED});
         //        selector("C_BALANCE", artis::kernel::DOUBLE,{Tree::C_BALANCE});

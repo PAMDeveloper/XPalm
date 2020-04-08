@@ -148,17 +148,18 @@ public:
         COUT_OIL = parameters.get("COUT_OIL");
         REPRO_CONSTRUCTION_COST = parameters.get("REPRO_CONSTRUCTION_COST");
         SENSIVITY_IC_SPIKELET = parameters.get("SENSIVITY_IC_SPIKELET");
-        //        IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
         SENSIVITY_IC_SETTING = parameters.get("SENSIVITY_IC_SETTING");
         PERIOD_FRUIT_SET= parameters.get("PERIOD_FRUIT_SET");
+        IND_FRUIT_WEIGHT = parameters.get("IND_FRUIT_WEIGHT");
+        MEAN_FRUIT_NUMBER_ADULTE = parameters.get("MEAN_FRUIT_NUMBER_ADULTE");
 
+        //        IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
         TT_ini_harvest = harv_tt;
         TT_ini_flowering = flo_tt;
         TT_ini_oleo = TT_ini_oleo_;
         TT_since_appearance=TT_since_appearance_;
 
-        IND_FRUIT_WEIGHT = parameters.get("IND_FRUIT_WEIGHT");
-        MEAN_FRUIT_NUMBER_ADULTE = parameters.get("MEAN_FRUIT_NUMBER_ADULTE");
+
         masse_ind_max = IND_FRUIT_WEIGHT;
         pot_fruits_number = int (inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE);
 
@@ -186,11 +187,6 @@ public:
         nonoil_demand = 0;
         demand = 0;
 
-
-        //        if (inflo_status.is(inflo::NON_ABORTED)){
-        //            if (TT_since_appearance>=TT_ini_flowering)
-        //                fruit_number = min (1.0, IC_spikelet) * min (1.0, IC_setting) * pot_fruits_number; //TODO change 1.0 in 1+x% of potential increase du to plasticity
-        //        }
 
         fruit_number = pot_fruits_number; //TODO change 1.0 in 1+x% of potential increase du to plasticity
 
@@ -247,7 +243,6 @@ public:
             ratio_huile_mesocarp = oil_biomass / (nonoil_biomass + oil_biomass);
 
         //        growth_demand();
-
         //        if (TT_since_appearance>=TT_ini_flowering)
         //            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pow(IC_setting, SENSIVITY_IC_SETTING) * pot_fruits_number;
 

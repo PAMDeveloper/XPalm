@@ -24,7 +24,7 @@ public:
     enum submodels { PEDUNCLE, FRUIT, MALEINFLO };
 
     enum internals { INFLO_STATUS,
-//                     STATUS_POT,
+                     //                     STATUS_POT,
                      TT_INI_OLEO,
                      TT_INI_SEX,
                      TT_INI_ABORTION,
@@ -72,8 +72,8 @@ private:
     //      parameters
     double PLASTICITY_BUNCH_IC_APRES_FLORAISON;
     double PLASTICITY_BUNCH_IC_AVANT_FLORAISON;
-    double SENS_FTSW;
-    double SEUIL_MEDIAN_FTSW;
+    //    double SENS_FTSW;
+    //    double SEUIL_MEDIAN_FTSW;
     //    double DEBUT_RANG_SENSITIVITY_NOUAISON;
     //    double FIN_RANG_SENSITIVITY_NOUAISON;
     double PERIOD_FRUIT_SET;
@@ -88,7 +88,7 @@ private:
     double PERIOD_ABORTION;
     //    double Seuil_IC_sex;
     double SENSITIVITY_SEX;
-    double Seuil_IC_abort;
+//    double Seuil_IC_abort;
     double ABORTION_RATE_MAX;
     double  ABORTION_RATE_REF;
     double SEX_RATIO_MIN;
@@ -185,7 +185,7 @@ public:
 
         //         internals
         Internal(INFLO_STATUS, &Inflo::status);
-//        Internal(STATUS_POT, &Inflo::status_pot);
+        //        Internal(STATUS_POT, &Inflo::status_pot);
         Internal(TT_INI_FLOWERING, &Inflo::TT_ini_flowering);
         Internal(TT_INI_OLEO, &Inflo::TT_ini_oleo);
         Internal(TT_INI_SEX, &Inflo::TT_ini_sex);
@@ -271,41 +271,37 @@ public:
         _parameters = parameters;
         last_time = t;
 
-
-
         //        parameters
-        PLASTICITY_BUNCH_IC_APRES_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_APRES_FLORAISON");
-        PLASTICITY_BUNCH_IC_AVANT_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_AVANT_FLORAISON");
-        SENS_FTSW = parameters.get("SENS_FTSW");
-        SEUIL_MEDIAN_FTSW = parameters.get("SEUIL_MEDIAN_FTSW");
+        PERIOD_DEV_SPIKELET = parameters.get("PERIOD_DEV_SPIKELET");
+        PERIOD_SEX_DETERMINATION = parameters.get("PERIOD_SEX_DETERMINATION");
+        PERIOD_ABORTION = parameters.get("PERIOD_ABORTION");
+        SEX_RATIO_REF = parameters.get("SEX_RATIO_REF");
+        SEX_RATIO_MIN = parameters.get("SEX_RATIO_MIN");
+        SENSITIVITY_SEX = parameters.get("SENSITIVITY_SEX");
+        ABORTION_RATE_MAX = parameters.get("ABORTION_RATE_MAX");
+        ABORTION_RATE_REF = parameters.get("ABORTION_RATE_REF");
+        FRACTION_PERIOD_OLEOSYNTHESIS = parameters.get("FRACTION_PERIOD_OLEOSYNTHESIS");
+        PERIOD_FRUIT_SET=parameters.get("PERIOD_FRUIT_SET");
+        SEED = parameters.get("SEED");
+
+//        Seuil_IC_abort = parameters.get("Seuil_IC_abort");
+        //        PLASTICITY_BUNCH_IC_APRES_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_APRES_FLORAISON");
+        //        PLASTICITY_BUNCH_IC_AVANT_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_AVANT_FLORAISON");
+        //        SENS_FTSW = parameters.get("SENS_FTSW");
+        //        SEUIL_MEDIAN_FTSW = parameters.get("SEUIL_MEDIAN_FTSW");
         //        DEBUT_RANG_SENSITIVITY_NOUAISON = parameters.get("DEBUT_RANG_SENSITIVITY_NOUAISON");
         //        FIN_RANG_SENSITIVITY_NOUAISON = parameters.get("FIN_RANG_SENSITIVITY_NOUAISON");
         //        IC_spikelet_RANG_DEBUT = parameters.get("IC_spikelet_RANG_DEBUT");
         //        IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
-        PERIOD_DEV_SPIKELET = parameters.get("PERIOD_DEV_SPIKELET");
         //        ICsex_RANG_DEBUT = parameters.get("ICsex_RANG_DEBUT");
-        PERIOD_SEX_DETERMINATION = parameters.get("PERIOD_SEX_DETERMINATION");
         //        ICsex_RANG_FIN = parameters.get("ICsex_RANG_FIN");
         //        ICabort_RANG_DEBUT = parameters.get("ICabort_RANG_DEBUT");
         //        ICabort_RANG_FIN = parameters.get("ICabort_RANG_FIN");
-        PERIOD_ABORTION = parameters.get("PERIOD_ABORTION");
-
         //        Seuil_IC_sex = parameters.get("Seuil_IC_sex");
-        SEX_RATIO_REF = parameters.get("SEX_RATIO_REF");
-        SEX_RATIO_MIN = parameters.get("SEX_RATIO_MIN");
-        SENSITIVITY_SEX = parameters.get("SENSITIVITY_SEX");
-        Seuil_IC_abort = parameters.get("Seuil_IC_abort");
-
         //        SENSITIVITY_ABORTION = parameters.get("SENSITIVITY_ABORTION");
-        ABORTION_RATE_MAX = parameters.get("ABORTION_RATE_MAX");
-        ABORTION_RATE_REF = parameters.get("ABORTION_RATE_REF");
-
-        FRACTION_PERIOD_OLEOSYNTHESIS = parameters.get("FRACTION_PERIOD_OLEOSYNTHESIS");
-        SEED = parameters.get("SEED");
-
         //        INI_SEX_RATIO=parameters.get("INI_SEX_RATIO");
         //        INI_TAUX_D_AVORTEMENT= parameters.get("INI_TAUX_D_AVORTEMENT");
-        PERIOD_FRUIT_SET=parameters.get("PERIOD_FRUIT_SET");
+
 
         //predim
         TT_ini_flowering = TT_ini_flo;
@@ -404,17 +400,12 @@ public:
         male->put<inflo::inflo_states>(t, MaleInflo::INFLO_STATUS, status);
         male->init(t, parameters, TT_since_appearance, inflo_dev_factor, TT_ini_flowering, TT_ini_male_senescence);
 
-
-
     }
 
     void step_state() {//TODO add SEX_DETERMINATION, SPIKELET_DEV and  FRUIT_SET states
 
 
         // init step state
-
-        //set seed TODO remove after debug
-//               srand(seed*number);
 
         // define sex
         double rd_sex = (double) rand() / RAND_MAX;
@@ -427,8 +418,6 @@ public:
         }
 
         // set abortion
-//        srand((seed+1)*number);
-
         double rd_abort = (double) rand() / RAND_MAX;
         //        if (rank > ICabort_RANG_FIN) {
         if (TT_since_appearance >= TT_ini_abortion && !status.is(inflo::ABORTED) && !status.is(inflo::NON_ABORTED)) {
@@ -479,7 +468,7 @@ public:
         //            return;
 
         //set seed TODO remove after debug
-//                srand(SEED);
+        //                srand(SEED);
 
         if(status.is(inflo::ABORTED))
             return;
@@ -528,7 +517,7 @@ public:
             male->put<inflo::inflo_states>(t, MaleInflo::INFLO_STATUS, status);
             male->put<double>(t, MaleInflo::TT_SINCE_APPEARANCE, TT_since_appearance);
             male->put<double>(t, MaleInflo::FR_RESTE, fr_reste);
-//            male->put<double>(t, MaleInflo::RANK, rank);
+            //            male->put<double>(t, MaleInflo::RANK, rank);
             (*male)(t);
 
             male_biomass = male->get< double >(t, MaleInflo::BIOMASS_MALE_INFLO);

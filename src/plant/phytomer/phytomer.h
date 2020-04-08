@@ -119,24 +119,15 @@ public:
         INACTIVE_PHYTOMER_NUMBER = parameters.get("INACTIVE_PHYTOMER_NUMBER");
         RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
 
+
         //predim
         number = nb;
         TT_ini_flowering = flo_tt;
         production_speed = prod_speed;
         SF_fin = SF_fin_;
         TT_ini_harvest=harv_tt;
-        //var
-        //        rank = rk;
 
-//                if(std::abs(SF_fin) > 10000) {
-//                    SF_fin = SF_fin;
-//                }
-
-//        rank = (nb>0)
-//                ? total_phyto_-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + nb) - INACTIVE_PHYTOMER_NUMBER
-//                : total_phyto_-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + nb) + INACTIVE_PHYTOMER_NUMBER;
-
-        rank = total_phyto_-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER) - nb - INACTIVE_PHYTOMER_NUMBER;
+        rank = total_phyto_-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER) - number - INACTIVE_PHYTOMER_NUMBER;
 
         //        state = st ? phytomer::INACTIVE : phytomer::ACTIVE;
 
@@ -151,6 +142,7 @@ public:
 
         tree_age_at_creation = tree_age_at_creation_;
         age = tree_age - tree_age_at_creation_;
+
         TT_since_appearance = parameters.get("T_EFF_INI")*age;
 
         //submodels
@@ -160,6 +152,8 @@ public:
         inflo_status = inflo->get<inflo::inflo_states, Inflo>(t, Inflo::INFLO_STATUS);
 
         leaf->put<inflo::inflo_states>(t, Leaf::INFLO_STATUT, inflo_status);
+        leaf->put<double>(t, Leaf::NUMBER, number);
+        leaf->put<double>(t, Leaf::PRODUCTION_SPEED, production_speed);
         leaf->init(t, parameters, rank, state, TT_since_appearance, SF_fin);
     }
 
@@ -170,9 +164,9 @@ public:
 
         //         rank = total_phytomer_number - INACTIVE_PHYTOMER_NUMBER - number - 1;
 
-//        rank = (number>0)
-//                ? total_phytomer_number- (RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + number) - INACTIVE_PHYTOMER_NUMBER
-//                : total_phytomer_number-(RANG_D_ABLATION +INACTIVE_PHYTOMER_NUMBER - number) + INACTIVE_PHYTOMER_NUMBER;
+        //        rank = (number>0)
+        //                ? total_phytomer_number- (RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + number) - INACTIVE_PHYTOMER_NUMBER
+        //                : total_phytomer_number-(RANG_D_ABLATION +INACTIVE_PHYTOMER_NUMBER - number) + INACTIVE_PHYTOMER_NUMBER;
 
         rank = total_phytomer_number-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER) - number - INACTIVE_PHYTOMER_NUMBER;
 
@@ -194,6 +188,8 @@ public:
         //            return;
 
         leaf->put<double>(t, Leaf::RANK, rank);
+        leaf->put<double>(t, Leaf::NUMBER, number);
+        leaf->put<double>(t, Leaf::PRODUCTION_SPEED, production_speed);
         leaf->put<double>(t, Leaf::SF_FIN, SF_fin);
         leaf->put<double>(t, Leaf::TT_SINCE_APPEARANCE, TT_since_appearance);
         leaf->put<phytomer::phytomer_state>(t, Leaf::PHYTOMER_STATE, state);
