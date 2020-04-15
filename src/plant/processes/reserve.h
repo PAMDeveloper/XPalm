@@ -78,7 +78,7 @@ private:
     double POURC_FOLIOLE;
     double COUT_RESERVE;
     double REALL_COST;
-    double MOB_RATE_MAX;
+//    double MOB_RATE_MAX;
     double POURCENT_NSC_ST_INI;
     double STEM_APPARENT_DENSITY;
     double STEM_RAYON;
@@ -177,7 +177,7 @@ public:
         POURC_FOLIOLE = parameters.get("POURC_FOLIOLE");
         COUT_RESERVE = parameters.get("COUT_RESERVE");
         REALL_COST = parameters.get("REALL_COST");
-        MOB_RATE_MAX = parameters.get("MOB_RATE_MAX");
+//        MOB_RATE_MAX = parameters.get("MOB_RATE_MAX");
         STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
         STEM_RAYON = parameters.get("STEM_RAYON");
 

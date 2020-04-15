@@ -252,9 +252,6 @@ public:
         else{
 
 
-            //            double factor_decrease_expand=( ftsw >  SEUIL_EXPAN)
-            //                    ? 1
-            //                    : ftsw / SEUIL_EXPAN;
 
             potLeafArea += increase_potleafArea;
             //            leafArea_cor += increase_potleafArea * fr_reste * factor_decrease_expand;
@@ -291,9 +288,6 @@ public:
                                : ftsw / TRESH_SLOW_PHYLO );
 
             gain_TEff_jour = TEff * expan_slow;
-
-//                        gain_TEff_jour = TEff;
-
             TT_since_leaf_expand += gain_TEff_jour;
 
 

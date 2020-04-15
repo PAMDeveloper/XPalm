@@ -52,7 +52,6 @@ public:
                      IC,
                      ICS,
                      PLANTLEAFAREA,
-                     SLW,
                      TRUNK_HEIGHT,
                      TOTAL_LEAVES_BIOMASS,
                      TOTAL_LEAVES_BIOMASS_HARVESTED,
@@ -88,7 +87,8 @@ public:
                      PEDUNCLE_BIOMASS_HARVESTED,
                      PEDUNCLE_DEMAND,
                      C_BALANCE,
-                     FRACTION_NON_STR_BIOMASS_TOTAL};
+                     FRACTION_NON_STR_BIOMASS_TOTAL,
+                     ASSIM_EXCESS};
 
 private:
     xpalm::ModelParameters _parameters;
@@ -121,9 +121,9 @@ private:
     double COUT_RESPI_MAINTENANCE_LEAF;
     double COUT_RESPI_MAINTENANCE_STIPE;
     double EFFICIENCE_BIOLOGIQUE;
-    double SEUIL_ORGANO;
-//    double SEUIL_PHOTO;
-//    double VITESSE_SENSITIVITY;
+//    double SEUIL_ORGANO;
+    //    double SEUIL_PHOTO;
+    //    double VITESSE_SENSITIVITY;
     double SEED;
     double TRESH_SLOW_PHYLO;
 
@@ -167,7 +167,6 @@ private:
     double leaves_non_structural_biomass_harvested;
     double leaves_structural_biomass_harvested;
     double leaves_demand;
-    double slw;
     double male_biomass;
     double male_biomass_harvested;
     double male_demand;
@@ -183,6 +182,7 @@ private:
     double bunch_demand;
     double fraction_non_str_biomass_total;
     double delta_reserve_leaves;
+    double assim_excess;
 
 public:
 
@@ -207,7 +207,6 @@ public:
         Internal(IC, &Tree::ic);
         Internal(ICS, &Tree::ics);
         Internal(PLANTLEAFAREA, &Tree::plantLeafArea);
-        Internal(SLW, &Tree::slw);
         Internal(TRUNK_HEIGHT, &Tree::trunk_height);
         Internal(TOTAL_LEAVES_BIOMASS, &Tree::total_leaves_biomass);
         Internal(TOTAL_LEAVES_BIOMASS_HARVESTED, &Tree::total_leaves_biomass_harvested);
@@ -244,6 +243,8 @@ public:
         Internal(PEDUNCLE_DEMAND, &Tree::peduncle_demand);
         Internal(C_BALANCE, &Tree::C_balance);
         Internal(FRACTION_NON_STR_BIOMASS_TOTAL, &Tree::fraction_non_str_biomass_total);
+        Internal(ASSIM_EXCESS, &Tree::assim_excess);
+
     }
 
     virtual ~Tree()
@@ -294,9 +295,9 @@ public:
         EFFICIENCE_BIOLOGIQUE = parameters.get("EFFICIENCE_BIOLOGIQUE");
         RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
         INACTIVE_PHYTOMER_NUMBER = parameters.get("INACTIVE_PHYTOMER_NUMBER");
-//        SEUIL_ORGANO = parameters.get("SEUIL_ORGANO");
-//        SEUIL_PHOTO = parameters.get("SEUIL_PHOTO");
-//        VITESSE_SENSITIVITY = parameters.get("VITESSE_SENSITIVITY");
+        //        SEUIL_ORGANO = parameters.get("SEUIL_ORGANO");
+        //        SEUIL_PHOTO = parameters.get("SEUIL_PHOTO");
+        //        VITESSE_SENSITIVITY = parameters.get("VITESSE_SENSITIVITY");
         SEED= parameters.get("SEED");
         TRESH_SLOW_PHYLO=parameters.get("TRESH_SLOW_PHYLO");
 
@@ -306,7 +307,7 @@ public:
         ic = 1;
         ei = 0;
 
-        plantLeafArea = slw = trunk_height  = total_leaves_biomass = total_leaves_biomass_harvested = trunk_biomass =
+        plantLeafArea = trunk_height  = total_leaves_biomass = total_leaves_biomass_harvested = trunk_biomass =
                 leaves_non_structural_biomass = leaves_structural_biomass = leaves_structural_biomass_harvested = leaves_non_structural_biomass_harvested =
                 respirable_repro_biomass = bunch_oil_biomass =bunch_oil_biomass_harvested = bunch_non_oil_biomass= bunch_non_oil_biomass_harvested = assim =
                 offre_fruits = offre_nette = growth_demand = bunch_demand = internode_demand =
@@ -608,11 +609,9 @@ public:
         double assim_to_growth=reserve->get <double>(t, Reserve::ASSIM_TO_GROWTH);
         double res_to_growth=reserve->get <double>(t, Reserve::RES_TO_GROWTH);
         double assim_to_res=reserve->get <double>(t, Reserve::ASSIM_TO_RES);
-        double assim_excess=reserve->get <double>(t, Reserve::ASSIM_EXCESS);
+        assim_excess=reserve->get <double>(t, Reserve::ASSIM_EXCESS);
 
 
-        //                C_balance= respi_maintenance - assim_to_respi - res_to_respi;
-        //                C_balance= growth_demand - assim_to_growth - res_to_growth;
         C_balance= assim - assim_to_min_res - assim_to_respi - assim_to_growth - assim_to_res - assim_excess;
 
 
@@ -633,14 +632,14 @@ public:
         double bunch_demand_corrected = AF_FRUITS * bunch_demand;
         double fr_fruits_corrected= bunch_demand_corrected/(sum_organs_demand+bunch_demand_corrected);
 
-        offre_fruits=min( fr_fruits_corrected * offre_nette, bunch_demand );
-        offre_reste=offre_nette-offre_fruits;
-        fr_fruits=offre_fruits/(sum_organs_demand+offre_fruits);
+        offre_fruits = min( fr_fruits_corrected * offre_nette, bunch_demand );
+        offre_reste = offre_nette-offre_fruits;
+        fr_fruits = offre_fruits/(sum_organs_demand+offre_fruits);
         fr_reste=1-fr_fruits;
 
-                        if (fr_reste<0 | fr_reste>1){
-                            fr_reste=fr_reste;
-                        }
+//        if (fr_reste<0 | fr_reste>1){
+//            fr_reste=fr_reste;
+//        }
 
         double production_speed = age_relative_var(age, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
         //        newPhytomerEmergence += TEff * production_speed * pow(ic,VITESSE_SENSITIVITY) * ( ftsw > SEUIL_ORGANO ? 1 : ftsw / SEUIL_ORGANO);
