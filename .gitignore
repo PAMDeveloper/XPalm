@@ -1,5 +1,7 @@
 XPalm.pro.user*
 release/
+Simu/
+Outputs/
 Makefile*
 .qmake.stash
 ui_mainwindow.h
