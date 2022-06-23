@@ -38,7 +38,7 @@ myTheme <- theme(
 # test= data.table::fread(file =paste0('../Simu/Phyto_Indonesia_seed1.csv'),header=F)
 test= data.table::fread(file =paste0('../../bin/msvc14/x64/test.csv'),header=F)
 colnames(test)=c('date','construct','class','varval','V5')
-  
+
 
 # RANK,NUMBER,LEAFAREA,TT_SINCE_APPEARANCE,TT_SINCE_LEAF_EXPAND,TT_INI_HARVEST,TT_INI_FLOWERING,LEAF_STATE,INFLO_STATUS,SF_FIN
 
@@ -47,12 +47,17 @@ VARS=c('RANK','NUMBER','LEAFAREA','TT_SINCE_APPEARANCE','TT_SINCE_LEAF_EXPAND','
 
 
 
-don=test%>%  
+don_raw=test%>%  
   select(-V5)%>%
   filter(construct %in% c('after_compute'))%>%
   mutate(item=str_extract(class, "(?<=\\[).+?(?=\\])"))%>%
   separate(varval,c('var','value'),sep='=')%>%
-  mutate(value=as.numeric(value))%>%
+  mutate(value=as.numeric(value))
+
+
+unique(don_raw$var)
+
+don=don_raw%>%
   filter(var %in% VARS)%>%
   mutate(date=ymd(date))%>%
   tidyr::spread(var,value)
@@ -100,11 +105,36 @@ don_phyto=don_phyto%>%
 
 don_phyto=merge(don_phyto,table_state,all.x=T)
 
+
 don_phyto%>%
+  group_by(NUMBER)%>%
+  filter(LEAFAREA>0)%>%
+  summarise(SF_FIN=unique(LEAFAREA))%>%
+  ggplot(aes(x=NUMBER,y=SF_FIN))+
+  geom_point()
+
+
+ggplotly(don_phyto%>%
   group_by(date)%>%
-  summarise(totalLeafArea=sum(LEAFAREA,na.rm=T))%>%
-  ggplot(aes(x=date,y=totalLeafArea))+
-  geom_line()
+  filter(LEAFAREA>0)%>%
+  summarise(numberofLeaves=n(),
+            totalLeafArea=sum(LEAFAREA),
+            lastLeaf=max(NUMBER))%>%
+  ungroup()%>%
+  ggplot(aes(x=date,y=numberofLeaves,col=lastLeaf))+
+  geom_point())
+
+don_phyto%>%
+  group_by(date,sex)%>%
+  filter(LEAFAREA>0)%>%
+  summarise(NumberofLeaves=n())%>%
+  ungroup()%>%
+  tidyr::spread(sex,NumberofLeaves)%>%
+  mutate(NumberofLeaves=female+male)%>%
+  ggplot()+
+  geom_line(aes(x=date,y=male,col='male'))+
+  geom_line(aes(x=date,y=female,col='female'))+
+  geom_line(aes(x=date,y=NumberofLeaves))
 
 don_phyto%>%
   # filter(NUMBER %in% c(-76,-50,-11,5,10,15,24))%>%
@@ -132,12 +162,12 @@ don_phyto%>%
 sub=don_phyto%>%
   filter(NUMBER %in% c(-10))%>%
   select(date,NUMBER,RANK,TT_SINCE_APPEARANCE,TT_SINCE_LEAF_EXPAND,sex,state,LEAFAREA)
-  
 
 
-  
-  
-  
+
+
+
+
 
 
 

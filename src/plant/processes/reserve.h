@@ -124,7 +124,6 @@ public:
         Internal(LEAVES_RES_POT, &Reserve::leaves_res_pot);
         Internal(LEAVES_RES_AVAI, &Reserve::leaves_res_avai);
         Internal(LEAVES_RES_EXCESS, &Reserve::leaves_res_excess);
-
         Internal(TRUNK_RES, &Reserve::trunk_res);
         Internal(TRUNK_RES_MIN, &Reserve::trunk_res_min);
         Internal(TRUNK_RES_MAX, &Reserve::trunk_res_max);
@@ -171,9 +170,12 @@ public:
         POURCENT_NSC_ST_INI = parameters.get("POURCENT_NSC_ST_INI");
         POURCENT_NSC_ST_MAX = parameters.get("POURCENT_NSC_ST_MAX");
         POURCENT_NSC_ST_MIN = parameters.get("POURCENT_NSC_ST_MIN");
-        SLW_max = parameters.get("SLW_max") * 10; //kg.m-2
-        SLW_ini = parameters.get("SLW_ini") * 10; //kg.m-2
-        SLW_min = parameters.get("SLW_min") * 10; //kg.m-2
+//        SLW_max = parameters.get("SLW_max") * 10; //kg.m-2
+//        SLW_ini = parameters.get("SLW_ini") * 10; //kg.m-2
+//        SLW_min = parameters.get("SLW_min") * 10; //kg.m-2
+        SLW_max = parameters.get("SLW_max") * 10000; //g.cm-2 *100000 = g.m-2
+        SLW_ini = parameters.get("SLW_ini") * 10000; //g.m-2
+        SLW_min = parameters.get("SLW_min") * 10000; //g.m-2
         POURC_FOLIOLE = parameters.get("POURC_FOLIOLE");
         COUT_RESERVE = parameters.get("COUT_RESERVE");
         REALL_COST = parameters.get("REALL_COST");
@@ -183,7 +185,7 @@ public:
 
         //externals
         trunk_initial_height= trunk_initial_height_;
-        trunk_biomass= STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * trunk_initial_height;
+        trunk_biomass= STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * trunk_initial_height; //g.cm-3 * cm2 * cm = g
         assim_avai=0;
         leaves_non_structural_biomass=0;
         plantLeafArea=plantLeafArea_;
@@ -194,7 +196,7 @@ public:
         trunk_res = POURCENT_NSC_ST_INI * trunk_biomass;
         leaves_res = total_leaves_initial_res_;
         reserve = trunk_res + leaves_res;
-        leaves_res_max = (SLW_max - SLW_min) * plantLeafArea *10000 / POURC_FOLIOLE; //gDM
+        leaves_res_max = (SLW_max - SLW_min) * plantLeafArea/ POURC_FOLIOLE; //g.m-2 x m 2 = gDM
         leaves_res_min = 0;
         leaves_res_pot = leaves_res_max - leaves_res;
         leaves_res_avai=leaves_res - leaves_res_min;
@@ -235,7 +237,7 @@ public:
         //            compute_reserve_max_min
 
         leaves_res_min = 0;
-        leaves_res_max = plantLeafArea * 10000 * (SLW_max - SLW_min) / POURC_FOLIOLE; // m2 *10000 * (g.cm-2) = g
+        leaves_res_max = plantLeafArea * (SLW_max - SLW_min) / POURC_FOLIOLE; // m2  g.m-2) = g
         leaves_res = leaves_non_structural_biomass; // update to take into account the removed leaf and the new openned leaf
 
         trunk_res_min = POURCENT_NSC_ST_MIN * trunk_biomass;
@@ -331,7 +333,7 @@ public:
         assim_to_growth=0;
         res_to_growth=0;
 
-        if (assim_avai < growth_demand_res) {
+        if (growth_offer < growth_demand) {
 
             //assim consumed for growth
             assim_to_growth = assim_avai;
