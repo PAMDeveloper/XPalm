@@ -50,11 +50,11 @@ private:
     double POURC_FOLIOLE;
     //    double INCREASE_OF_LEAF_AREA;
     double SLW_ini;
-//    double PLASTICITY_LEAF_IC;
+    //    double PLASTICITY_LEAF_IC;
     double SLW_max;
     double COUT_RESPI_FEUILLE;
     double TRESH_SLOW_PHYLO;
-//    double SEUIL_EXPAN;
+    //    double SEUIL_EXPAN;
     double PRODUCTION_SPEED_ADULT;
 
     //     internals
@@ -156,7 +156,7 @@ public:
         POURC_FOLIOLE = parameters.get("POURC_FOLIOLE");
         TRESH_SLOW_PHYLO  = parameters.get("TRESH_SLOW_PHYLO");
         COURBURE = parameters.get("COURBURE");
-//        PLASTICITY_LEAF_IC = parameters.get("PLASTICITY_LEAF_IC");
+        //        PLASTICITY_LEAF_IC = parameters.get("PLASTICITY_LEAF_IC");
         RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
         PRODUCTION_SPEED_ADULT = parameters.get("PRODUCTION_SPEED_ADULT"); // (rank.DD-1)
 
@@ -206,11 +206,11 @@ public:
                     ? potLeafArea
                     : 0;
 
-            leaf_structural_biomass = potLeafArea * SLW_min / POURC_FOLIOLE; // m2  x g.m-2=g
+            leaf_structural_biomass = leafArea * SLW_min / POURC_FOLIOLE; // m2  x g.m-2=g
             leaf_non_structural_biomass = leafArea  * (SLW_ini - SLW_min) / POURC_FOLIOLE;
 
             slw = (leafArea > 0)
-                    ? leaf_total_biomass * POURC_FOLIOLE / (potLeafArea) // g.m-2
+                    ? leaf_total_biomass * POURC_FOLIOLE / leafArea // g.m-2
                     : 0;
 
 
@@ -242,8 +242,9 @@ public:
             potLeafArea=0;
             slw=0;
             leaf_structural_biomass_harvested = leaf_structural_biomass;
-            leaf_non_structural_biomass_harvested = leaf_non_structural_biomass;
             leaf_structural_biomass=0;
+            leaf_non_structural_biomass_harvested = leaf_non_structural_biomass;
+            leaf_non_structural_biomass=0;
             leaf_reserve_pot=0;
             leaf_reserve_max=0;
             reserve_allocated = 0;
@@ -256,7 +257,7 @@ public:
             potLeafArea += increase_potleafArea;
             //            leafArea_cor += increase_potleafArea * fr_reste * factor_decrease_expand;
             leafArea_cor += increase_potleafArea * fr_reste;
-//            leafArea_cor += increase_potleafArea;
+            //            leafArea_cor += increase_potleafArea;
             leafArea = ( phytomer_rank >0 )
                     ? leafArea_cor
                     : 0;

@@ -446,6 +446,7 @@ public:
                 }
 
             }
+
             //male
             else if (status.is(inflo::MALE)) {
                 if( TT_since_appearance >= TT_ini_male_senescence) {
@@ -545,7 +546,7 @@ public:
             IC_sex_tot += tree_IC;
             IC_sex = IC_sex_tot / nb_joursICsex;
         }
-        sex_ratio =max(0.0, min(1.0, SEX_RATIO_MIN+IC_sex*(SEX_RATIO_REF-SEX_RATIO_MIN)));
+        sex_ratio =max(0.0, min(0.9, SEX_RATIO_MIN+IC_sex*(SEX_RATIO_REF-SEX_RATIO_MIN)));
 
         //IC on abortion
         if (TT_since_appearance >= TT_ini_sex && TT_since_appearance < TT_ini_abortion) {

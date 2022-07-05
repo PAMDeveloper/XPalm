@@ -146,6 +146,10 @@ server<-function(input, output,session){
     x_var<- x_var()
     if (is.null(x_var)) return(NULL)
     
+    second_var<-  second_var()
+    if (is.null(second_var)) return(NULL)
+    
+    
     
     gr1=NULL
     
@@ -155,7 +159,7 @@ server<-function(input, output,session){
       
       gr1=res%>%
         # arrange(Date)%>%
-        ggplot(aes(x=get(x_var),y=get(y_var)))+
+        ggplot(aes(x=get(x_var),y=get(y_var),label=get(second_var)))+
         geom_line()+
         geom_point()+
         labs(x=paste(x_var),
@@ -179,6 +183,10 @@ server<-function(input, output,session){
     x_var<- x_var()
     if (is.null(x_var)) return(NULL)
     
+    y_var<- y_var()
+    if (is.null(y_var)) return(NULL)
+    
+    
     second_var<-  second_var()
     if (is.null(second_var)) return(NULL)
     
@@ -192,7 +200,7 @@ server<-function(input, output,session){
       
       gr2=res%>%
         # arrange(Date)%>%
-        ggplot(aes(x=get(x_var),y=get(second_var)))+
+        ggplot(aes(x=get(x_var),y=get(second_var),label=get(y_var)))+
         geom_line()+
         geom_point()+
       labs(x=paste(x_var),

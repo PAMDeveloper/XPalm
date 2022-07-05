@@ -50,11 +50,14 @@ public:
         selector("NB_LEAVES", artis::kernel::DOUBLE,{Tree::NB_LEAVES});
         selector("NB_MALES", artis::kernel::DOUBLE,{Tree::NB_MALES});
         selector("NB_BUNCHES", artis::kernel::DOUBLE,{Tree::NB_BUNCHES});
+        selector("NB_ABORTED", artis::kernel::DOUBLE,{Tree::NB_ABORTED});
         selector("LAI", artis::kernel::DOUBLE,{Tree::LAI});
         selector("NEWPHYTOMEREMERGENCE", artis::kernel::DOUBLE,{Tree::NEWPHYTOMEREMERGENCE});
         selector("PHYTOMERNUMBER", artis::kernel::DOUBLE,{Tree::PHYTOMERNUMBER});
         selector("PLANTLEAFAREA", artis::kernel::DOUBLE,{Tree::PLANTLEAFAREA});
+        selector("LASTLEAFAREA", artis::kernel::DOUBLE,{Tree::LASTLEAFAREA});
         selector("TREE_AGE", artis::kernel::DOUBLE,{Tree::TREE_AGE});
+        selector("NEWPHYTOMER", artis::kernel::DOUBLE,{Tree::NEWPHYTOMER});
         selector("TRUNK_HEIGHT", artis::kernel::DOUBLE,{Tree::TRUNK_HEIGHT});
 
         //TREE BIOMASS
@@ -75,19 +78,21 @@ public:
         selector("RES_STEM", artis::kernel::DOUBLE,{Tree::RES_STEM});
         selector("RES_LEAVES", artis::kernel::DOUBLE,{Tree::RES_LEAVES});
         selector("RES_TOTAL", artis::kernel::DOUBLE,{Tree::RES_TOTAL});
-        selector("BUNCH_DEMAND", artis::kernel::DOUBLE,{Tree::BUNCH_DEMAND});
+        selector("DEMAND_BUNCH", artis::kernel::DOUBLE,{Tree::BUNCH_DEMAND});
         selector("C_BALANCE", artis::kernel::DOUBLE,{Tree::C_BALANCE});
         selector("EI", artis::kernel::DOUBLE,{Tree::EI});
         selector("FR_FRUITS", artis::kernel::DOUBLE,{Tree::FR_FRUITS});
         selector("FR_RESTE", artis::kernel::DOUBLE,{Tree::FR_RESTE});
-        selector("GROWTH_DEMAND", artis::kernel::DOUBLE,{Tree::GROWTH_DEMAND});
+        selector("DEMAND_GROWTH", artis::kernel::DOUBLE,{Tree::GROWTH_DEMAND});
         selector("IC", artis::kernel::DOUBLE,{Tree::IC});
-        selector("INTERNODE_DEMAND", artis::kernel::DOUBLE,{Tree::INTERNODE_DEMAND});
-        selector("LEAVES_DEMAND", artis::kernel::DOUBLE,{Tree::LEAVES_DEMAND});
+        selector("DEMAND_INTERNODE", artis::kernel::DOUBLE,{Tree::INTERNODE_DEMAND});
+        selector("DEMAND_LEAVES", artis::kernel::DOUBLE,{Tree::LEAVES_DEMAND});
         selector("LEAVES_RESERVE_EXCESS", artis::kernel::DOUBLE,{Tree::LEAVES_RESERVE_EXCESS});
-        selector("MALE_DEMAND", artis::kernel::DOUBLE,{Tree::MALE_DEMAND});
-        selector("PEDUNCLE_DEMAND", artis::kernel::DOUBLE,{Tree::PEDUNCLE_DEMAND});
+        selector("DEMAND_MALE", artis::kernel::DOUBLE,{Tree::MALE_DEMAND});
+        selector("DEMAND_PEDUNCLE", artis::kernel::DOUBLE,{Tree::PEDUNCLE_DEMAND});
         selector("RESPI_MAINTENANCE", artis::kernel::DOUBLE,{Tree::RESPI_MAINTENANCE});
+        selector("AV_SEXRATIO", artis::kernel::DOUBLE,{Tree::AV_SEXRATIO});
+
 
 
 

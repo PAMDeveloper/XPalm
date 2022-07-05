@@ -42,9 +42,6 @@ colnames(test)=c('date','construct','class','varval','V5')
 
 # RANK,NUMBER,LEAFAREA,TT_SINCE_APPEARANCE,TT_SINCE_LEAF_EXPAND,TT_INI_HARVEST,TT_INI_FLOWERING,LEAF_STATE,INFLO_STATUS,SF_FIN
 
-VARS=c('RANK','NUMBER','LEAFAREA','TT_SINCE_APPEARANCE','TT_SINCE_LEAF_EXPAND','TT_INI_HARVEST','TT_INI_FLOWERING','LEAF_STATE','INFLO_STATUS','SF_FIN')
-
-
 
 
 don_raw=test%>%  
@@ -57,30 +54,48 @@ don_raw=test%>%
 
 unique(don_raw$var)
 
-don=don_raw%>%
+
+VARS=c('RANK','NUMBER','LEAFAREA','TT_SINCE_APPEARANCE','TT_SINCE_LEAF_EXPAND','TT_INI_HARVEST','TT_INI_FLOWERING','LEAF_STATE','INFLO_STATUS','SF_FIN')
+
+VARS_TREE=c('IC','PLANTLEAFAREA','NEWPHYTOMER')
+
+
+
+id_phyto=don_raw%>%
   filter(var %in% VARS)%>%
   mutate(date=ymd(date))%>%
-  tidyr::spread(var,value)
-
-
-id_phyto=don%>%
+  tidyr::spread(var,value)%>%
   filter(!is.na(NUMBER))%>%
   select(date,item,NUMBER,RANK,TT_SINCE_APPEARANCE,TT_INI_FLOWERING,TT_INI_HARVEST,SF_FIN)
 
+info_tree=don_raw%>%
+  filter(var %in% VARS_TREE)%>%
+  mutate(date=ymd(date))%>%
+  tidyr::spread(var,value)%>%
+  filter(!is.na(IC))%>%
+  select(date,VARS_TREE)
+  
 
-don_leaf=don%>%
+don_leaf=don_raw%>%
+  filter(var %in% VARS)%>%
+  mutate(date=ymd(date))%>%
+  tidyr::spread(var,value)%>%
   filter(!is.na(LEAFAREA))%>%
   select(date,item,LEAFAREA,LEAF_STATE,TT_SINCE_LEAF_EXPAND)
 
 don_leaf=merge(don_leaf,id_phyto,all.x=T)
 
-don_inflo=don%>%
+don_inflo=don_raw%>%
+  filter(var %in% VARS)%>%
+  mutate(date=ymd(date))%>%
+  tidyr::spread(var,value)%>%
   select(date,item,INFLO_STATUS)%>%
   na.omit()
 
 
-don_phyto=merge(don_leaf,don_inflo,all.x=T,all.y=F)
+don_phyto=merge(don_leaf%>%data.frame(),don_inflo,all.x=T,all.y=F)
 
+don_phyto=merge(don_phyto,info_tree,all.x=T)
 summary(don_phyto)
 
 
@@ -138,7 +153,7 @@ don_phyto%>%
 
 don_phyto%>%
   # filter(NUMBER %in% c(-76,-50,-11,5,10,15,24))%>%
-  filter(NUMBER %in% seq(-110,40,5))%>%
+  # filter(NUMBER %in% seq(-110,40,5))%>%
   mutate(num=paste('phyto #',sprintf( '%03d',NUMBER)))%>%
   arrange(date,NUMBER)%>%
   group_by(NUMBER)%>%
@@ -159,14 +174,43 @@ don_phyto%>%
 
 
 
-sub=don_phyto%>%
-  filter(NUMBER %in% c(-10))%>%
-  select(date,NUMBER,RANK,TT_SINCE_APPEARANCE,TT_SINCE_LEAF_EXPAND,sex,state,LEAFAREA)
+don_phyto%>%
+  # filter(NUMBER %in% c(-76,-50,-11,5,10,15,24))%>%
+  # filter(NUMBER %in% seq(-110,40,5))%>%
+  mutate(num=paste('phyto #',sprintf( '%03d',NUMBER)))%>%
+  arrange(date,NUMBER)%>%
+  group_by(NUMBER)%>%
+  # filter(RANK>-15 & RANK<65)%>%
+  ggplot(aes(x=RANK,y=NUMBER,col=state,shape=sex))+
+  # geom_hline(aes(yintercept =SF_FIN),col=2)+
+  geom_vline(aes(xintercept =0),lty=2)+
+  geom_vline(aes(xintercept =50),lty=2)+
+  # geom_vline(aes(xintercept =TT_INI_FLOWERING,lty='flow'))+
+  # facet_wrap(~NUMBER)+
+  geom_point(size=4)+
+  geom_line(aes(group=num))+
+  scale_color_viridis_d()+
+  ylab('# phytomer')+
+  xlab('Leaf rank')+
+  myTheme+
+  theme(legend.position='right')
 
 
 
 
 
+# sub=don_phyto%>%
+#   filter(NUMBER %in% c(-10))%>%
+#   select(date,NUMBER,RANK,TT_SINCE_APPEARANCE,TT_SINCE_LEAF_EXPAND,sex,state,LEAFAREA)
+# 
+
+
+
+don_phyto%>%
+  filter(NUMBER==-70)%>%
+  ggplot(aes(x=date,y=LEAFAREA,col=paste(state,sex)))+
+  geom_point()+
+  scale_color_viridis_d()
 
 
 
