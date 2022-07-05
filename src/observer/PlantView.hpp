@@ -94,8 +94,6 @@ public:
         selector("AV_SEXRATIO", artis::kernel::DOUBLE,{Tree::AV_SEXRATIO});
 
 
-
-
         //DEMAND
         //        selector("PEDUNCLE_DEMAND", artis::kernel::DOUBLE,{Tree::PEDUNCLE_DEMAND});
         //        selector("INTERNODE_DEMAND", artis::kernel::DOUBLE,{Tree::INTERNODE_DEMAND});

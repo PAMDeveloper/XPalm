@@ -164,7 +164,7 @@ don_phyto%>%
   geom_vline(aes(xintercept =50),lty=2)+
   # geom_vline(aes(xintercept =TT_INI_FLOWERING,lty='flow'))+
   # facet_wrap(~NUMBER)+
-  geom_point(size=4)+
+  geom_point(size=1)+
   geom_line(aes(group=num))+
   scale_color_viridis_d()+
   ylab('# phytomer')+
@@ -173,27 +173,6 @@ don_phyto%>%
   theme(legend.position='right')
 
 
-
-don_phyto%>%
-  # filter(NUMBER %in% c(-76,-50,-11,5,10,15,24))%>%
-  # filter(NUMBER %in% seq(-110,40,5))%>%
-  mutate(num=paste('phyto #',sprintf( '%03d',NUMBER)))%>%
-  arrange(date,NUMBER)%>%
-  group_by(NUMBER)%>%
-  # filter(RANK>-15 & RANK<65)%>%
-  ggplot(aes(x=RANK,y=NUMBER,col=state,shape=sex))+
-  # geom_hline(aes(yintercept =SF_FIN),col=2)+
-  geom_vline(aes(xintercept =0),lty=2)+
-  geom_vline(aes(xintercept =50),lty=2)+
-  # geom_vline(aes(xintercept =TT_INI_FLOWERING,lty='flow'))+
-  # facet_wrap(~NUMBER)+
-  geom_point(size=4)+
-  geom_line(aes(group=num))+
-  scale_color_viridis_d()+
-  ylab('# phytomer')+
-  xlab('Leaf rank')+
-  myTheme+
-  theme(legend.position='right')
 
 
 
@@ -204,13 +183,18 @@ don_phyto%>%
 #   select(date,NUMBER,RANK,TT_SINCE_APPEARANCE,TT_SINCE_LEAF_EXPAND,sex,state,LEAFAREA)
 # 
 
-
+v='LEAFAREA'
+nb=-50
 
 don_phyto%>%
-  filter(NUMBER==-70)%>%
-  ggplot(aes(x=date,y=LEAFAREA,col=paste(state,sex)))+
+  filter(NUMBER==nb)%>%
+  arrange(date)%>%
+  # filter(RANK>0)%>%
+  ggplot(aes(x=date,y=get(v),col=paste(state,sex),shape=sex))+
+  geom_line()+
   geom_point()+
-  scale_color_viridis_d()
+  scale_color_viridis_d()+
+  labs(y=v)
 
 
 

@@ -18,6 +18,8 @@ lapply(packs, InstIfNec)
 
 
 
+source('load_phyto_data.R')
+
 
 # meteo = data.table::fread('D:/PAMStudio/dev/git/XPalm/parameters/meteo.txt')
 params = data.table::fread('D:/PAMStudio/dev/git/XPalm/parameters/XPalm_parameters.txt',header=F)%>%
@@ -60,21 +62,33 @@ ui<-
                           )
                           
                  ),
+                 tabPanel("Yield",
+                          tags$hr(),
+                          fluidRow(
+                            column(12,
+                                   plotlyOutput('graphYield')
+                            )
+                          )
+                 ),
+                 
                  tabPanel("Phytomer data",
                           tags$hr(),
-                          # fluidRow(
-                          #   column(4,
-                          #          selectizeInput(inputId = 'x_var', label = 'Select X', choices =  '*', multiple = F)),
-                          #   column(4,
-                          #          selectizeInput(inputId = 'y_var', label = 'Select Y', choices =  '*', multiple = F)),
-                          #   column(4,
-                          #          selectizeInput(inputId = 'second_var', label = 'Select label variable', choices =  '*', multiple = F)),
-                          #   tags$hr(),
-                          #   fluidRow(
-                          #     column(12,
-                          #            plotlyOutput('graph')
-                          #     )
-                          #   )
+                          fluidRow(
+                            column(4,
+                                   selectizeInput(inputId = 'phytomerNumber', label = 'phytomer number', choices =  '*', multiple = T)),
+                            column(6,
+                                   selectizeInput(inputId = 'variablePhyto', label = 'Select phytomer variable', choices =  '*', multiple = F))),
+                          
+                          tags$hr(),
+                          fluidRow(
+                            # column(12,
+                            #        plotlyOutput('graphPhyto')
+                            # ),
+                            column(12,
+                                   plotlyOutput('graphPhyto2')
+                            )
+                            
+                          )
                           # )
                  ),
                  tabPanel("parameters",
@@ -106,6 +120,8 @@ server<-function(input, output,session){
     updateSelectInput(session = session, inputId = 'second_var', choices = names(res))
   })
   
+  
+  
   x_var<- reactive({
     input$x_var
   })
@@ -114,8 +130,17 @@ server<-function(input, output,session){
     input$y_var
   })
   
+  
   second_var<- reactive({
     input$second_var
+  })
+  
+  variablePhyto<- reactive({
+    input$variablePhyto
+  })
+  
+  phytomerNumber<-reactive ({
+    input$phytomerNumber
   })
   
   res <- reactive({
@@ -131,6 +156,24 @@ server<-function(input, output,session){
     
   })
   
+  phyto <- reactive({
+    
+    # input$action
+    
+    resultPhyto=load_phyto(file =paste0('../../bin/msvc14/x64/phytoData.csv') )
+    
+    
+    return(resultPhyto)
+    
+  })
+  
+  observe({
+    phyto <- phyto()
+    if (is.null(phyto)) return(NULL)
+    
+    updateSelectInput(session = session, inputId = 'phytomerNumber', choices = sort(as.numeric(unique(phyto$NUMBER))))
+    updateSelectInput(session = session, inputId = 'variablePhyto', choices = names(phyto%>%select(-c('INFLO_STATUS','date','item'))))
+  })
   
   
   
@@ -153,7 +196,7 @@ server<-function(input, output,session){
     
     gr1=NULL
     
-
+    
     if (!is.null(x_var) & !is.null(y_var)){
       
       
@@ -163,10 +206,20 @@ server<-function(input, output,session){
         geom_line()+
         geom_point()+
         labs(x=paste(x_var),
-           y=paste(y_var))
+             y=paste(y_var))
       
       
     }
+    
+    
+    result%>%
+      mutate(month=paste0(month(Date),'/',year(Date)),
+             FFB=BUNCH_NONOIL_BIOMASS_HARVESTED+BUNCH_OIL_BIOMASS_HARVESTED)%>%
+      group_by(month)%>%
+      summarize(nb_days=n(),
+                yield_FFB=sum(FFB)/1000)%>%
+      filter(nb_days>27)
+    
     
     
     if(!is.null(gr1)){
@@ -203,14 +256,105 @@ server<-function(input, output,session){
         ggplot(aes(x=get(x_var),y=get(second_var),label=get(y_var)))+
         geom_line()+
         geom_point()+
-      labs(x=paste(x_var),
-           y=paste(second_var))
-
+        labs(x=paste(x_var),
+             y=paste(second_var))
+      
     }
     
     
     if(!is.null(gr2)){
       ggplotly(gr2)
+    }
+    
+  })
+  
+  ### visu yield
+  
+  output$graphYield<-renderPlotly({
+    res<-res()
+    if (is.null(res)) return(NULL)
+    
+    grY=res%>%
+      mutate(month=paste0(month(Date),'/',year(Date)),
+             FFB=BUNCH_NONOIL_BIOMASS_HARVESTED+BUNCH_OIL_BIOMASS_HARVESTED)%>%
+      group_by(month)%>%
+      summarize(nb_days=n(),
+                age=TREE_AGE/365,
+                yield_FFB=sum(FFB)/1000,
+                yield_oil=sum(BUNCH_OIL_BIOMASS_HARVESTED)/1000)%>%
+      filter(nb_days>27)%>%
+      ungroup()%>%
+      ggplot()+
+      geom_point(aes(x=my(month),y=yield_FFB,col='FFB',label=paste('age:',round(age,2))))+
+      geom_line(aes(x=my(month),y=yield_FFB,col='FFB'))+
+      geom_point(aes(x=my(month),y=yield_oil,col='Oil',label=paste('age:',round(age,2))))+
+      geom_line(aes(x=my(month),y=yield_oil,col='Oil'))+
+      labs(x='',
+           y='kg.tree-1')+
+      scale_color_discrete(name='')
+    
+    
+    if(!is.null(grY)){
+      ggplotly(grY)
+    }
+    
+  })
+  
+  
+  #### visu phyto
+  # output$graphPhyto<-renderPlotly({
+  #   
+  #   phyto<-phyto()
+  #   if (is.null(phyto)) return(NULL)
+  #   
+  #   
+  #   
+  #   gr_allPhyto=phyto%>%
+  #     mutate(num=paste('phyto #',sprintf( '%03d',NUMBER)))%>%
+  #     arrange(date,NUMBER)%>%
+  #     group_by(NUMBER)%>%
+  #     ggplot(aes(x=RANK,y=NUMBER,col=state,shape=sex))+
+  #     geom_vline(aes(xintercept =0),lty=2)+
+  #     geom_vline(aes(xintercept =50),lty=2)+
+  #     geom_point(size=1)+
+  #     geom_line(aes(group=num))+
+  #     scale_color_viridis_d()+
+  #     ylab('# phytomer')+
+  #     xlab('Leaf rank')+
+  #     theme(legend.position='right')
+  #   
+  #   if(!is.null(gr_allPhyto)){
+  #     ggplotly(gr_allPhyto)
+  #   }
+  #   
+  # })
+  
+  
+  output$graphPhyto2<-renderPlotly({
+    
+    phyto<-phyto()
+    if (is.null(phyto)) return(NULL)
+    
+    variablePhyto<- variablePhyto()
+    if (is.null(variablePhyto)) return(NULL)
+    
+    
+    nb<- phytomerNumber()
+    if (is.null(nb)) return(NULL)
+    
+    gr_Phyto=phyto%>%
+      filter(NUMBER %in% nb)%>%
+      arrange(date)%>%
+      # filter(RANK>0)%>%
+      ggplot(aes(x=date,y=get(variablePhyto),col=paste(state,sex),shape=sex))+
+      geom_line()+
+      geom_point()+
+      scale_color_viridis_d()+
+      labs(y=variablePhyto)+
+      facet_wrap(~paste('phytomer',NUMBER))
+    
+    if(!is.null(gr_Phyto)){
+      ggplotly(gr_Phyto)
     }
     
   })
