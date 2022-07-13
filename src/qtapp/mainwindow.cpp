@@ -11,6 +11,8 @@
 #include <ctime>
 #include <qmath.h>
 
+#include <artis/observer/Output.hpp>
+
 //using namespace artis::kernel;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -342,6 +344,9 @@ void MainWindow::on_actionLoad_simulation_triggered()
 
 }
 
+
+typedef artis::observer::Output<artis::utils::DoubleTime,ModelParameters> XPalmOutput;
+
 void MainWindow::on_actionLaunch_simulation_triggered()
 {
 //    load_simulation(settings->value("simulation_folder", "").toString());
@@ -354,8 +359,17 @@ void MainWindow::on_actionLaunch_simulation_triggered()
     XPalmSimulator simulator(m, globalParameters);
     observer::PlantView *view = new observer::PlantView();
     simulator.attachView("plant", view);
+
+    observer::PhytomerView *pview = new observer::PhytomerView();
+    simulator.attachView("phytomers", pview);
+
     simulator.init(parameters.get("BeginDate"), parameters);
     simulator.run(context);
+
+
+    XPalmOutput output(simulator.observer());
+    output("D:\\PAMStudio\\dev\\git\\bin\\msvc14\\x64\\");
+
 
 //    ResultParser * parser = new ResultParser();
 //    std::map <std::string, std::vector<double> > resultMap = parser->resultsToMap(&simulator);
@@ -387,15 +401,15 @@ void MainWindow::on_actionLaunch_simulation_triggered()
 //        std::cout << t;
 /*     */
 
-    if(ui->tableView->model() != nullptr)
-        delete ui->tableView->model();
+//    if(ui->tableView->model() != nullptr)
+//        delete ui->tableView->model();
 
-    trace_model = new VisibleTraceModel(::Trace::trace().elements());
-    ui->tableView->setModel(trace_model);
-    show_trace();
-    displayData(view, folderName,
-                parameters.get("BeginDate"),
-                parameters.get("EndDate"));
+//    trace_model = new VisibleTraceModel(::Trace::trace().elements());
+//    ui->tableView->setModel(trace_model);
+//    show_trace();
+//    displayData(view, folderName,
+//                parameters.get("BeginDate"),
+//                parameters.get("EndDate"));
 
 //    QMessageBox::about(this, "Simulation finished", folderName + " simulation done.");
 }

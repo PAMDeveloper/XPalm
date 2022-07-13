@@ -24,11 +24,13 @@ public:
     enum submodels { PEDUNCLE, FRUIT, MALEINFLO };
 
     enum internals { INFLO_STATUS,
-                     //                     STATUS_POT,
+                     INFLO_DEV_FACTOR,
+                     TT_INI_FLOWERING,
                      TT_INI_OLEO,
                      TT_INI_SEX,
+
                      TT_INI_ABORTION,
-                     TT_INI_FLOWERING,
+
                      TT_INI_HARVEST,
                      TT_INI_MALE_SENESCENCE,
                      BIOMASS,
@@ -88,7 +90,7 @@ private:
     double PERIOD_ABORTION;
     //    double Seuil_IC_sex;
     double SENSITIVITY_SEX;
-//    double Seuil_IC_abort;
+    //    double Seuil_IC_abort;
     double ABORTION_RATE_MAX;
     double  ABORTION_RATE_REF;
     double SEX_RATIO_MIN;
@@ -185,7 +187,7 @@ public:
 
         //         internals
         Internal(INFLO_STATUS, &Inflo::status);
-        //        Internal(STATUS_POT, &Inflo::status_pot);
+        Internal(INFLO_DEV_FACTOR, &Inflo::inflo_dev_factor);
         Internal(TT_INI_FLOWERING, &Inflo::TT_ini_flowering);
         Internal(TT_INI_OLEO, &Inflo::TT_ini_oleo);
         Internal(TT_INI_SEX, &Inflo::TT_ini_sex);
@@ -284,7 +286,7 @@ public:
         PERIOD_FRUIT_SET=parameters.get("PERIOD_FRUIT_SET");
         SEED = parameters.get("SEED");
 
-//        Seuil_IC_abort = parameters.get("Seuil_IC_abort");
+        //        Seuil_IC_abort = parameters.get("Seuil_IC_abort");
         //        PLASTICITY_BUNCH_IC_APRES_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_APRES_FLORAISON");
         //        PLASTICITY_BUNCH_IC_AVANT_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_AVANT_FLORAISON");
         //        SENS_FTSW = parameters.get("SENS_FTSW");

@@ -409,7 +409,7 @@ public:
                 nb_males+=1;
             }
 
-            double sexRatio=phytomer->inflo_model()->get <double, Inflo>(t, Inflo::SEX_RATIO);
+            double sexRatio=phytomer->inflo_model()->get <double, Inflo>(t-1, Inflo::SEX_RATIO);
             if (LA>0){
                 sum_sex_ratio+=sexRatio;
             }

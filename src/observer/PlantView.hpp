@@ -45,7 +45,6 @@ public:
         selector("FTSW", artis::kernel::DOUBLE, {Tree::BH,WaterBalance::FTSW});
         selector("TEFF", artis::kernel::DOUBLE, {Tree::METEO,Meteo::TEFF});
 
-
         //TREE STRUCTURE
         selector("NB_LEAVES", artis::kernel::DOUBLE,{Tree::NB_LEAVES});
         selector("NB_MALES", artis::kernel::DOUBLE,{Tree::NB_MALES});
