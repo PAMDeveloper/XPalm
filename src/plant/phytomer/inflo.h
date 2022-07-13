@@ -21,7 +21,7 @@ namespace model {
 class Inflo : public CoupledModel < Inflo >
 {
 public:
-    enum submodels { PEDUNCLE, FRUIT, MALEINFLO };
+    enum submodels { PEDUNCLE, BUNCH, MALEINFLO };
 
     enum internals { INFLO_STATUS,
                      INFLO_DEV_FACTOR,
@@ -33,7 +33,7 @@ public:
 
                      TT_INI_HARVEST,
                      TT_INI_MALE_SENESCENCE,
-                     BIOMASS,
+                     BUNCH_BIOMASS,
                      PEDUNCLE_BIOMASS,
                      BUNCH_OIL_BIOMASS,
                      BUNCH_NONOIL_BIOMASS,
@@ -123,7 +123,7 @@ private:
 
 
     //var
-    double biomass;
+    double bunch_biomass;
     double peduncle_biomass;
     double bunch_oil_biomass;
     double bunch_nonoil_biomass;
@@ -182,7 +182,7 @@ public:
     {
         //         submodels
         submodel(PEDUNCLE, peduncle.get());
-        submodel(FRUIT, bunch.get());
+        submodel(BUNCH, bunch.get());
         submodel(MALEINFLO, male.get());
 
         //         internals
@@ -194,7 +194,7 @@ public:
         Internal(TT_INI_ABORTION, &Inflo::TT_ini_abortion);
         Internal(TT_INI_HARVEST, &Inflo::TT_ini_harvest);
         Internal(TT_INI_MALE_SENESCENCE, &Inflo::TT_ini_male_senescence);
-        Internal(BIOMASS, &Inflo::biomass);
+        Internal(BUNCH_BIOMASS, &Inflo::bunch_biomass);
         Internal(PEDUNCLE_BIOMASS, &Inflo::peduncle_biomass);
         Internal(BUNCH_OIL_BIOMASS, &Inflo::bunch_oil_biomass);
         Internal(BUNCH_OIL_BIOMASS_HARVESTED, &Inflo::bunch_oil_biomass_harvested);
@@ -345,7 +345,7 @@ public:
         sex_ratio=SEX_RATIO_REF;
 
         //var
-        biomass= 0;
+        bunch_biomass= 0;
         peduncle_biomass=0;
         //        femelle_biomass= 0;
         bunch_oil_biomass=0;
@@ -511,6 +511,8 @@ public:
             bunch_nonoil_biomass =  bunch->get< double >(t, Bunch::NONOIL_BIOMASS);
             bunch_nonoil_biomass_harvested =  bunch->get< double >(t, Bunch::NONOIL_BIOMASS_HARVESTED);
             bunch_demand = bunch->get< double >(t, Bunch::DEMAND);
+
+            bunch_biomass=bunch_oil_biomass+bunch_nonoil_biomass;
 
         }
 

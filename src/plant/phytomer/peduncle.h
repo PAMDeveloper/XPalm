@@ -54,7 +54,7 @@ private:
 
     //      parameters
     //    double RANG_DEBUT_CROISSANCE_PEDUNCULE;
-    double SENSIVITY_IC_SPIKELET;
+    double SENSITIVITY_IC_SPIKELET;
     double MASSE_MEAN_PEDUNCULE_ADULTE;
     double REPRO_CONSTRUCTION_COST;
     double FRACTION_PERIOD_DEV_PEDUNCLE ;
@@ -125,7 +125,7 @@ public:
         TT_since_appearance=TT_since_appearance_;
 
         //        parameters
-        SENSIVITY_IC_SPIKELET = parameters.get("SENSIVITY_IC_SPIKELET");
+        SENSITIVITY_IC_SPIKELET = parameters.get("SENSITIVITY_IC_SPIKELET");
         MASSE_MEAN_PEDUNCULE_ADULTE = parameters.get("MASSE_MEAN_PEDUNCULE_ADULTE");
         FRACTION_PERIOD_DEV_PEDUNCLE = parameters.get("FRACTION_PERIOD_DEV_PEDUNCLE");
         double TEff_ini = parameters.get("T_EFF_INI");
@@ -193,7 +193,7 @@ public:
         }
         else if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)){
             demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * min(1.0, IC_spikelet) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration; //TODO, test with TT_corrige, correct 1.0 if plasticity
-            /*demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration;*/
+            /*demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * pow(IC_spikelet, SENSITIVITY_IC_SPIKELET) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration;*/
         }
     }
 
