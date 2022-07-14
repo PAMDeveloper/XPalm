@@ -12,6 +12,9 @@
 #include <qmath.h>
 
 //using namespace artis::kernel;
+#include <artis/observer/Output.hpp>
+typedef artis::observer::Output<artis::utils::DoubleTime,
+        ModelParameters> AnOutput;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -258,28 +261,31 @@ void MainWindow::displayData(observer::PlantView * view,
         j++;
     }
 
-    QFile data("results.csv");
-    if(data.open(QFile::WriteOnly |QFile::Truncate))
-    {
-        QTextStream output(&data);
-        for (int row = 0; row < results[0].length(); ++row) {
-            QString line;
-            if(row == 0)
-                line += "Date;";
-            else
-                line += startDate.addDays(row-1).toString("yyyy-MM-dd") + ";";
-            for (int col = 0; col < names.length(); ++col) {
-                if(row == 0)
-                    line += names[col] + ";";
-                else
-                    line += QString::number(results[col][row-1]) + ";";
-            }
-            line.chop(1);
-            output << line << "\n";
-        }
 
-        data.close();
-    }
+
+
+//    QFile data("results.csv");
+//    if(data.open(QFile::WriteOnly |QFile::Truncate))
+//    {
+//        QTextStream output(&data);
+//        for (int row = 0; row < results[0].length(); ++row) {
+//            QString line;
+//            if(row == 0)
+//                line += "Date;";
+//            else
+//                line += startDate.addDays(row-1).toString("yyyy-MM-dd") + ";";
+//            for (int col = 0; col < names.length(); ++col) {
+//                if(row == 0)
+//                    line += names[col] + ";";
+//                else
+//                    line += QString::number(results[col][row-1]) + ";";
+//            }
+//            line.chop(1);
+//            output << line << "\n";
+//        }
+
+//        data.close();
+//    }
 
 }
 
@@ -357,6 +363,9 @@ void MainWindow::on_actionLaunch_simulation_triggered()
     simulator.init(parameters.get("BeginDate"), parameters);
     simulator.run(context);
 
+    AnOutput output(simulator.observer());
+    output("D:/Workspace/");
+
 //    ResultParser * parser = new ResultParser();
 //    std::map <std::string, std::vector<double> > resultMap = parser->resultsToMap(&simulator);
 //    std::vector<double> tillers = resultMap["tillernb_1"];
@@ -387,15 +396,19 @@ void MainWindow::on_actionLaunch_simulation_triggered()
 //        std::cout << t;
 /*     */
 
-    if(ui->tableView->model() != nullptr)
-        delete ui->tableView->model();
 
-    trace_model = new VisibleTraceModel(::Trace::trace().elements());
-    ui->tableView->setModel(trace_model);
-    show_trace();
-    displayData(view, folderName,
-                parameters.get("BeginDate"),
-                parameters.get("EndDate"));
+
+
+
+//    if(ui->tableView->model() != nullptr)
+//        delete ui->tableView->model();
+
+//    trace_model = new VisibleTraceModel(::Trace::trace().elements());
+//    ui->tableView->setModel(trace_model);
+//    show_trace();
+//    displayData(view, folderName,
+//                parameters.get("BeginDate"),
+//                parameters.get("EndDate"));
 
 //    QMessageBox::about(this, "Simulation finished", folderName + " simulation done.");
 }
