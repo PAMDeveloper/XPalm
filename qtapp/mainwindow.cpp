@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     lay = new QGridLayout();
     client->setLayout(lay);
     lay->setSpacing(0);
-    ui->tabWidget->addTab(scrollArea, "Variables");
+//    ui->tabWidget->addTab(scrollArea, "Variables");
 
     settings = new QSettings("CIRAD", "XPalm");
     QString folder = settings->value("simulation_folder", "").toString();
@@ -345,22 +345,25 @@ void MainWindow::on_actionLaunch_simulation_triggered()
 
     AnOutput output(simulator.observer());
     output(".");
+#ifdef WITH_TRACE
+    trace_model = new VisibleTraceModel(::Trace::trace().elements());
+    ui->tableView->setModel(trace_model);
+    show_trace();
+#endif
 
+//    ResultParser parser;
+//    pair<map<string,vector<double>>,map<string,vector<string>>> results;
+//    results = parser.resultToMaps(simulator);
+//    map<string,vector<string>> headers = results.second;
 
+//    for(auto const& it: results.first){
+//        cout << endl << "---------------------------------------------------" << endl;
+//        cout << it.first << endl;
 
-    ResultParser parser;
-    pair<map<string,vector<double>>,map<string,vector<string>>> results;
-    results = parser.resultToMaps(simulator);
-    map<string,vector<string>> headers = results.second;
-
-    for(auto const& it: results.first){
-        cout << endl << "---------------------------------------------------" << endl;
-        cout << it.first << endl;
-
-        for (auto i: it.second)
-//            if (isnan(i))
-                cout << i << "-";
-    }
+//        for (auto i: it.second)
+////            if (isnan(i))
+//                cout << i << "-";
+//    }
     //    for (auto it: results.first){
 //        std::cout << it.first << endl;
 //        for (auto i: it.second)

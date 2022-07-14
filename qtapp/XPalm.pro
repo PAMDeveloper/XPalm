@@ -11,16 +11,12 @@ CONFIG += c++11 precompile_header
 ##### EXEC OPTIONS #####
 #DEFINES += UNSAFE_RUN
 DEFINES += FORCE_TRACE_ENUM
-#DEFINES += WITH_TRACE
+DEFINES += WITH_TRACE
 ########################
 
 ##### OPTIMIZATION #####
 QMAKE_CXXFLAGS_RELEASE -= -O1
 QMAKE_CXXFLAGS_RELEASE -= -O2
-##MSVC OPTIM FLAGS
-QMAKE_CXXFLAGS_RELEASE += -Ox
-##MINGW OPTIM FLAGS
-#QMAKE_CXXFLAGS_RELEASE += -Ofast
 #########################
 
 
@@ -33,13 +29,18 @@ QMAKE_CXXFLAGS_RELEASE += -Ox
 ##### PATH #####
 MDL_SRC = ../src
 ARTIS_SRC = ../../artis/src
-DEST = ../../bin
+DEST = ../bin
 THIRD_PARTY = ../ext_libs
 ARTIS_LIB = ../libs
 ################
-
-msvc: COMPILER = 'msvc'_$$(VisualStudioVersion)
-gcc: COMPILER = 'gcc'_$$system($$QMAKE_CXX " -dumpversion")
+msvc: {
+    COMPILER = 'msvc'_$$(VisualStudioVersion)
+    QMAKE_CXXFLAGS_RELEASE += -Ox
+}
+gcc: {
+    COMPILER = 'gcc'_$$system($$QMAKE_CXX " -dumpversion")
+    QMAKE_CXXFLAGS_RELEASE += -Ofast
+}
 
 contains(QT_ARCH, i386) { ARCHI = 'x86' }
 else { ARCHI = 'x64' }
@@ -50,12 +51,23 @@ CONFIG(static, static|): {
     LINK = shared
 }
 
+
 CONFIG(debug, debug|release) {
-    TARGET = $${NAME}d
-    LIBS += -L$$ARTIS_LIB/$$COMPILER/$$ARCHI/$$LINK -lartisd
+    contains(DEFINES, WITH_TRACE) {
+        TARGET = $${NAME}d_trace
+        LIBS += -L$$ARTIS_LIB/$$COMPILER/$$ARCHI/$$LINK -lartisd_trace
+    } else {
+        TARGET = $${NAME}d
+        LIBS += -L$$ARTIS_LIB/$$COMPILER/$$ARCHI/$$LINK -lartisd
+    }
 } else {
-    TARGET = $${NAME}
-    LIBS += -L$$ARTIS_LIB/$$COMPILER/$$ARCHI/$$LINK -lartis
+    contains(DEFINES, WITH_TRACE) {
+        TARGET = $${NAME}_trace
+        LIBS += -L$$ARTIS_LIB/$$COMPILER/$$ARCHI/$$LINK -lartis_trace
+    } else {
+        TARGET = $${NAME}
+        LIBS += -L$$ARTIS_LIB/$$COMPILER/$$ARCHI/$$LINK -lartis
+    }
 }
 
 equals(TEMPLATE,lib) {
