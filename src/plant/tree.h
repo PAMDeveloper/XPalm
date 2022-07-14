@@ -74,7 +74,7 @@ public:
                      FR_FRUITS,
                      FR_RESTE,
                      OFFRE_FRUITS,
-                     OFFRE_NETTE,
+                     GROWTH_OFFER,
                      OFFRE_RESTE,
                      GROWTH_DEMAND,
                      BUNCH_DEMAND,
@@ -88,7 +88,18 @@ public:
                      PEDUNCLE_DEMAND,
                      C_BALANCE,
                      FRACTION_NON_STR_BIOMASS_TOTAL,
-                     ASSIM_EXCESS};
+                     ASSIM_EXCESS,
+                     DIF_DEMAND_OFFER,
+                     RES_STEM,
+                     RES_LEAVES,
+                     RES_TOTAL,
+                     NB_LEAVES,
+                     NB_MALES,
+                     NB_BUNCHES,
+                     NB_ABORTED,
+                     LASTLEAFAREA,
+                     NEWPHYTOMER,
+                     AV_SEXRATIO};
 
 private:
     xpalm::ModelParameters _parameters;
@@ -113,7 +124,7 @@ private:
     double TT_HARVEST_ADULT;
     double PERIOD_MALE_INFLO;
     double MAXIMAL_SFIND;
-    double INITIAL_SFIND;
+    //    double INITIAL_SFIND;
     double DENS;
     double K;
     double AF_FRUITS;
@@ -121,7 +132,7 @@ private:
     double COUT_RESPI_MAINTENANCE_LEAF;
     double COUT_RESPI_MAINTENANCE_STIPE;
     double EFFICIENCE_BIOLOGIQUE;
-//    double SEUIL_ORGANO;
+    //    double SEUIL_ORGANO;
     //    double SEUIL_PHOTO;
     //    double VITESSE_SENSITIVITY;
     double SEED;
@@ -155,7 +166,7 @@ private:
     double fr_reste;
     double internode_demand;
     double offre_fruits;
-    double offre_nette;
+    double growth_offer;
     double offre_reste;
     double C_balance;
     double total_leaves_biomass;
@@ -183,6 +194,17 @@ private:
     double fraction_non_str_biomass_total;
     double delta_reserve_leaves;
     double assim_excess;
+    double dif_demand_offer;
+    double res_stem;
+    double res_leaves;
+    double res_total;
+    double nb_leaves;
+    double nb_males;
+    double nb_bunches;
+    double nb_aborted;
+    double lastLeafArea;
+    double newPhytomer;
+    double av_sex_ratio;
 
 public:
 
@@ -229,7 +251,7 @@ public:
         Internal(FR_FRUITS, &Tree::fr_fruits);
         Internal(FR_RESTE, &Tree::fr_reste);
         Internal(OFFRE_FRUITS, &Tree::offre_fruits);
-        Internal(OFFRE_NETTE, &Tree::offre_nette);
+        Internal(GROWTH_OFFER, &Tree::growth_offer);
         Internal(OFFRE_RESTE, &Tree::offre_reste);
         Internal(GROWTH_DEMAND, &Tree::growth_demand);
         Internal(BUNCH_DEMAND, &Tree::bunch_demand);
@@ -244,6 +266,17 @@ public:
         Internal(C_BALANCE, &Tree::C_balance);
         Internal(FRACTION_NON_STR_BIOMASS_TOTAL, &Tree::fraction_non_str_biomass_total);
         Internal(ASSIM_EXCESS, &Tree::assim_excess);
+        Internal(DIF_DEMAND_OFFER, &Tree::dif_demand_offer);
+        Internal(RES_STEM, &Tree::res_stem);
+        Internal(RES_LEAVES, &Tree::res_leaves);
+        Internal(RES_TOTAL, &Tree::res_total);
+        Internal(NB_LEAVES, &Tree::nb_leaves);
+        Internal(NB_MALES, &Tree::nb_males);
+        Internal(NB_BUNCHES, &Tree::nb_bunches);
+        Internal(NB_ABORTED, &Tree::nb_aborted);
+        Internal(LASTLEAFAREA, &Tree::lastLeafArea);
+        Internal(NEWPHYTOMER, &Tree::newPhytomer);
+        Internal(AV_SEXRATIO, &Tree::av_sex_ratio);
 
     }
 
@@ -268,7 +301,7 @@ public:
         _parameters = parameters;
 
         //        parameters
-        AGE_INI=parameters.get("AGE_INI");
+        AGE_INI=parameters.get("AGE_INI")* 365;
         PRODUCTION_SPEED_ADULT = parameters.get("PRODUCTION_SPEED_ADULT"); // (rank.DD-1)
         PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL"); // (rank.DD-1)
         AGE_ADULT = parameters.get("AGE_ADULT") * 365; // days
@@ -285,7 +318,7 @@ public:
         TT_HARVEST_ADULT = parameters.get("TT_HARVEST_ADULT");
         PERIOD_MALE_INFLO =parameters.get("PERIOD_MALE_INFLO");
         MAXIMAL_SFIND  = parameters.get("MAXIMAL_SFIND");
-        INITIAL_SFIND  = parameters.get("INITIAL_SFIND");
+        //        INITIAL_SFIND  = parameters.get("INITIAL_SFIND"); //SF at AGE_INI
         AF_FRUITS = parameters.get("AF_FRUITS");
         COUT_RESPI_MAINTENANCE_REPRO = parameters.get("COUT_RESPI_MAINTENANCE_REPRO");
         COUT_RESPI_MAINTENANCE_LEAF = parameters.get("COUT_RESPI_MAINTENANCE_LEAF");
@@ -307,12 +340,13 @@ public:
         ic = 1;
         ei = 0;
 
-        plantLeafArea = trunk_height  = total_leaves_biomass = total_leaves_biomass_harvested = trunk_biomass =
+        plantLeafArea =lastLeafArea = trunk_height  = total_leaves_biomass = total_leaves_biomass_harvested = trunk_biomass =
                 leaves_non_structural_biomass = leaves_structural_biomass = leaves_structural_biomass_harvested = leaves_non_structural_biomass_harvested =
                 respirable_repro_biomass = bunch_oil_biomass =bunch_oil_biomass_harvested = bunch_non_oil_biomass= bunch_non_oil_biomass_harvested = assim =
-                offre_fruits = offre_nette = growth_demand = bunch_demand = internode_demand =
+                offre_fruits  = growth_demand = bunch_demand = internode_demand =
                 leaves_demand = male_demand  = male_biomass = male_biomass_harvested = peduncle_demand =offre_reste =
-                peduncle_biomass = peduncle_biomass_harvested=respi_maintenance= leaves_reserve_excess=leaves_reserve_max=0;
+                peduncle_biomass = peduncle_biomass_harvested=respi_maintenance= leaves_reserve_excess=leaves_reserve_max=
+                dif_demand_offer=res_stem=res_leaves= res_total=nb_leaves=nb_males=nb_bunches=newPhytomer=av_sex_ratio=0;
 
         fr_fruits = fr_reste = 0.5;
 
@@ -320,7 +354,7 @@ public:
         srand(SEED);
 
         //init structure
-        age =AGE_INI * 365;
+        age =AGE_INI;
         double production_speed = age_relative_var(age, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
 
         int nb_phyto = INACTIVE_PHYTOMER_NUMBER + RANG_D_ABLATION;
@@ -346,15 +380,51 @@ public:
         bh->init(t, parameters);
 
 
+        double sum_sex_ratio=0;
+
         // plant leaf area
         auto it = phytomers.begin();
         while (it != phytomers.end()) {
             Phytomer* phytomer = (*it);
             plantLeafArea += phytomer->leaf_model()->get<double>(t-1, Leaf::LEAFAREA);
+
+
+
+            // get number of leaves
+            double LA= phytomer->leaf_model()->get <double>(t-1, Leaf::LEAFAREA);
+            if (LA > 0){
+                // last leaf area
+                lastLeafArea=LA;
+                nb_leaves+=1;
+            }
+
+            // get number of bunch & male inflo
+            double BN= phytomer->inflo_model()->get <double, Inflo>(t-1, Inflo::BUNCH_DEMAND);
+            if (BN > 0){
+                nb_bunches+=1;
+            }
+
+            double male= phytomer->inflo_model()->get <double, Inflo>(t-1, Inflo::MALE_DEMAND);
+            if (male > 0){
+                nb_males+=1;
+            }
+
+            double sexRatio=phytomer->inflo_model()->get <double, Inflo>(t-1, Inflo::SEX_RATIO);
+            if (LA>0){
+                sum_sex_ratio+=sexRatio;
+            }
+
+
             ++it;
         }
+
+        av_sex_ratio=sum_sex_ratio/nb_leaves;
+
         lai = plantLeafArea * DENS / 10000;
         ei = 1 - exp(- K * lai);
+
+        double Rg_init=18;
+        assim = ei * EFFICIENCE_BIOLOGIQUE * 0.48 * Rg_init  / (DENS/10000);
 
         //init trunk dim
         trunk_initial_height=0;
@@ -380,12 +450,12 @@ public:
         trunk_initial_res= POURCENT_NSC_ST_INI * trunk_initial_biomass;
 
 
-        double SLW_ini = parameters.get("SLW_ini") ; //g.cm-2
-        double SLW_min = parameters.get("SLW_min") ; //g.cm-2
+        double SLW_ini = parameters.get("SLW_ini")*10000; //g.m-2
+        double SLW_min = parameters.get("SLW_min")*10000 ; //g.m-2
         double POURC_FOLIOLE = parameters.get("POURC_FOLIOLE");
 
-        leaves_structural_biomass = plantLeafArea *10000  * SLW_min / POURC_FOLIOLE;  //gDM
-        leaves_non_structural_biomass = plantLeafArea *10000 * (SLW_ini - SLW_min) / POURC_FOLIOLE; //gDM
+        leaves_structural_biomass = plantLeafArea   * SLW_min / POURC_FOLIOLE;  //gDM
+        leaves_non_structural_biomass = plantLeafArea  * (SLW_ini - SLW_min) / POURC_FOLIOLE; //gDM
         total_leaves_biomass = leaves_structural_biomass + leaves_non_structural_biomass;
         reserve->init(t, parameters, plantLeafArea, trunk_initial_height,leaves_non_structural_biomass);
     }
@@ -409,11 +479,20 @@ public:
         double production_speed = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
         double TT_ini_flowering = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_FLOWERING_INITIAL, TT_FLOWERING_ADULT);
         double TT_ini_harvest = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_HARVEST_INITIAL, TT_HARVEST_ADULT);
-        double inflo_dev_factor = age_relative_var(age_at_creation, AGE_START_PROD, AGE_ADULT, 0, 1);
+        double inflo_dev_factor =0;
+        if (age>=AGE_START_PROD){
+            inflo_dev_factor=age_relative_var(age_at_creation, AGE_START_PROD, AGE_ADULT, 0.3, 1);
+        }
+
         double TT_ini_male_senescence = TT_ini_flowering +PERIOD_MALE_INFLO;
 
         //        Leaf area increase with plant age
-        double SF_ind = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, INITIAL_SFIND , MAXIMAL_SFIND);
+        double first_LA=0.005;
+
+        double SF_ind = age_relative_var(age_at_creation, 0, AGE_ADULT, first_LA , MAXIMAL_SFIND);
+
+
+
 
         Phytomer * phytomer = new Phytomer();
         setsubmodel(PHYTOMERS, phytomer);
@@ -491,6 +570,7 @@ public:
 
         //init structure
         plantLeafArea = 0;
+        lastLeafArea=0;
         trunk_height=trunk_initial_height;
 
         //init biomass
@@ -518,6 +598,12 @@ public:
         bunch_demand = 0;
         male_demand = 0;
         peduncle_demand = 0;
+        nb_leaves=0;
+        nb_bunches=0;
+        nb_males=0;
+        nb_aborted=0;
+
+        double sum_sex_ratio=0;
 
         it = phytomers.begin();
         while (it != phytomers.end()) {
@@ -527,6 +613,14 @@ public:
             //stem
             trunk_height += phytomer->internode_model()->get <double>(t, Internode::LENGTH);
             trunk_biomass += phytomer->internode_model()->get <double>(t, Internode::BIOMASS);
+
+
+            //            phytomer::phytomer_state state;
+
+            //            state=phytomer->get<phytomer::phytomer_state, Phytomer>(t, Phytomer::STATE);
+            //            if (state.is(phytomer::INACTIVE)){
+            //                nb_aborted+=1;
+            //            }
             internode_demand +=  phytomer->internode_model()->get <double>(t, Internode::DEMAND);
 
             //leaves
@@ -538,6 +632,43 @@ public:
             leaves_structural_biomass_harvested += phytomer->leaf_model()->get <double>(t, Leaf::LEAF_STRUCTURAL_BIOMASS_HARVESTED);
             leaves_non_structural_biomass_harvested += phytomer->leaf_model()->get <double>(t, Leaf::LEAF_NON_STRUCTURAL_BIOMASS_HARVESTED);
             leaves_demand += phytomer->leaf_model()->get <double>(t, Leaf::LEAF_DEMAND);
+
+
+
+            // get number of leaves
+            double LA= phytomer->leaf_model()->get <double>(t, Leaf::LEAFAREA);
+            if (LA > 0){
+                nb_leaves+=1;
+
+                // last leaf area
+                lastLeafArea=LA;
+            }
+
+            // get number of bunch & male inflo
+            //attr
+            inflo::inflo_states inflo_status;
+
+            inflo_status=phytomer->inflo_model()->get<inflo::inflo_states, Inflo>(t, Inflo::INFLO_STATUS);
+            if (inflo_status.is(inflo::ABORTED) && LA>0){
+                nb_aborted+=1;
+            }
+
+            double BN= phytomer->inflo_model()->get <double, Inflo>(t, Inflo::BUNCH_DEMAND);
+            if (BN > 0){
+                nb_bunches+=1;
+            }
+
+            double male= phytomer->inflo_model()->get <double, Inflo>(t, Inflo::MALE_DEMAND);
+            if (male > 0){
+                nb_males+=1;
+            }
+
+            double sexRatio=phytomer->inflo_model()->get <double, Inflo>(t, Inflo::SEX_RATIO);
+            if (LA>0){
+                sum_sex_ratio+=sexRatio;
+            }
+
+
 
             //inflo
             //            inflo_biomass += phytomer->inflo_model()->get <double, Inflo>(t, Inflo::BIOMASS); //## attention pour la respi de maintenance !!!
@@ -562,6 +693,10 @@ public:
             ++it;
         }
 
+
+        //average sex ratio
+        av_sex_ratio=sum_sex_ratio/nb_leaves;
+
         // compute total harvested biomass
         total_leaves_biomass_harvested = leaves_structural_biomass_harvested + leaves_non_structural_biomass_harvested;
         total_leaves_biomass = leaves_structural_biomass + leaves_non_structural_biomass - total_leaves_biomass_harvested;
@@ -581,6 +716,7 @@ public:
 
         // compute competition index
         ic = assim/growth_demand;
+
         ics.push_back(ic);
 
         double Rg = meteo->get<double>(t, Meteo::RG);
@@ -624,7 +760,15 @@ public:
 
 
         //       compute_offre_nette
-        offre_nette = reserve->get<double>(t, Reserve::GROWTH_OFFER);
+        growth_offer = reserve->get<double>(t, Reserve::GROWTH_OFFER);
+
+        dif_demand_offer=growth_demand-growth_offer;
+
+        //
+        res_stem=reserve->get<double>(t, Reserve::TRUNK_RES_AVAI);
+        res_leaves = reserve->get<double>(t, Reserve::LEAVES_RES_AVAI);
+        res_total= res_stem + res_leaves;
+
         //        fraction_pour_croissance = offre_nette / (growth_demand);
 
         //       compute_fraction_oil_reste
@@ -632,14 +776,14 @@ public:
         double bunch_demand_corrected = AF_FRUITS * bunch_demand;
         double fr_fruits_corrected= bunch_demand_corrected/(sum_organs_demand+bunch_demand_corrected);
 
-        offre_fruits = min( fr_fruits_corrected * offre_nette, bunch_demand );
-        offre_reste = offre_nette-offre_fruits;
+        offre_fruits = min( fr_fruits_corrected * growth_offer, bunch_demand );
+        offre_reste = growth_offer-offre_fruits;
         fr_fruits = offre_fruits/(sum_organs_demand+offre_fruits);
         fr_reste=1-fr_fruits;
 
-//        if (fr_reste<0 | fr_reste>1){
-//            fr_reste=fr_reste;
-//        }
+        //        if (fr_reste<0 | fr_reste>1){
+        //            fr_reste=fr_reste;
+        //        }
 
         double production_speed = age_relative_var(age, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
         //        newPhytomerEmergence += TEff * production_speed * pow(ic,VITESSE_SENSITIVITY) * ( ftsw > SEUIL_ORGANO ? 1 : ftsw / SEUIL_ORGANO);
@@ -653,6 +797,7 @@ public:
         if (newPhytomerEmergence >= 1) {
             create_phytomer(t, phytomerNumber-RANG_D_ABLATION-INACTIVE_PHYTOMER_NUMBER+1, phytomerNumber+1, age);
             phytomerNumber += 1;
+            newPhytomer+=1;
             newPhytomerEmergence -= 1;
         }
 
@@ -666,10 +811,10 @@ public:
         fraction_non_str_biomass_total = 0; //check must equal 1
 
         // compute total leaf reserve
-        double biomasse_reserve_leaves = reserve->get<double>(t-1, Reserve::LEAVES_RES_AVAI);
+        double res_leaves_ = reserve->get<double>(t-1, Reserve::LEAVES_RES_AVAI);
 
 
-        if  (biomasse_reserve_leaves > 0) {
+        if  (res_leaves_ > 0) {
             auto it = phytomers.begin();
             while (it != phytomers.end()) {
                 Phytomer* phytomer = (*it);

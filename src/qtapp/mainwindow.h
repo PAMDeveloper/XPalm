@@ -9,6 +9,7 @@
 
 #include <defines.hpp>
 #include <observer/PlantView.hpp>
+#include <observer/PhytomerView.hpp>
 #include <utils/ParametersReader.hpp>
 
 #include <qtapp/tracemodel.h>

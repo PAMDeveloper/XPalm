@@ -21,17 +21,19 @@ namespace model {
 class Inflo : public CoupledModel < Inflo >
 {
 public:
-    enum submodels { PEDUNCLE, FRUIT, MALEINFLO };
+    enum submodels { PEDUNCLE, BUNCH, MALEINFLO };
 
     enum internals { INFLO_STATUS,
-                     //                     STATUS_POT,
+                     INFLO_DEV_FACTOR,
+                     TT_INI_FLOWERING,
                      TT_INI_OLEO,
                      TT_INI_SEX,
+
                      TT_INI_ABORTION,
-                     TT_INI_FLOWERING,
+
                      TT_INI_HARVEST,
                      TT_INI_MALE_SENESCENCE,
-                     BIOMASS,
+                     BUNCH_BIOMASS,
                      PEDUNCLE_BIOMASS,
                      BUNCH_OIL_BIOMASS,
                      BUNCH_NONOIL_BIOMASS,
@@ -88,7 +90,7 @@ private:
     double PERIOD_ABORTION;
     //    double Seuil_IC_sex;
     double SENSITIVITY_SEX;
-//    double Seuil_IC_abort;
+    //    double Seuil_IC_abort;
     double ABORTION_RATE_MAX;
     double  ABORTION_RATE_REF;
     double SEX_RATIO_MIN;
@@ -121,7 +123,7 @@ private:
 
 
     //var
-    double biomass;
+    double bunch_biomass;
     double peduncle_biomass;
     double bunch_oil_biomass;
     double bunch_nonoil_biomass;
@@ -180,19 +182,19 @@ public:
     {
         //         submodels
         submodel(PEDUNCLE, peduncle.get());
-        submodel(FRUIT, bunch.get());
+        submodel(BUNCH, bunch.get());
         submodel(MALEINFLO, male.get());
 
         //         internals
         Internal(INFLO_STATUS, &Inflo::status);
-        //        Internal(STATUS_POT, &Inflo::status_pot);
+        Internal(INFLO_DEV_FACTOR, &Inflo::inflo_dev_factor);
         Internal(TT_INI_FLOWERING, &Inflo::TT_ini_flowering);
         Internal(TT_INI_OLEO, &Inflo::TT_ini_oleo);
         Internal(TT_INI_SEX, &Inflo::TT_ini_sex);
         Internal(TT_INI_ABORTION, &Inflo::TT_ini_abortion);
         Internal(TT_INI_HARVEST, &Inflo::TT_ini_harvest);
         Internal(TT_INI_MALE_SENESCENCE, &Inflo::TT_ini_male_senescence);
-        Internal(BIOMASS, &Inflo::biomass);
+        Internal(BUNCH_BIOMASS, &Inflo::bunch_biomass);
         Internal(PEDUNCLE_BIOMASS, &Inflo::peduncle_biomass);
         Internal(BUNCH_OIL_BIOMASS, &Inflo::bunch_oil_biomass);
         Internal(BUNCH_OIL_BIOMASS_HARVESTED, &Inflo::bunch_oil_biomass_harvested);
@@ -284,7 +286,7 @@ public:
         PERIOD_FRUIT_SET=parameters.get("PERIOD_FRUIT_SET");
         SEED = parameters.get("SEED");
 
-//        Seuil_IC_abort = parameters.get("Seuil_IC_abort");
+        //        Seuil_IC_abort = parameters.get("Seuil_IC_abort");
         //        PLASTICITY_BUNCH_IC_APRES_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_APRES_FLORAISON");
         //        PLASTICITY_BUNCH_IC_AVANT_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_AVANT_FLORAISON");
         //        SENS_FTSW = parameters.get("SENS_FTSW");
@@ -343,7 +345,7 @@ public:
         sex_ratio=SEX_RATIO_REF;
 
         //var
-        biomass= 0;
+        bunch_biomass= 0;
         peduncle_biomass=0;
         //        femelle_biomass= 0;
         bunch_oil_biomass=0;
@@ -446,6 +448,7 @@ public:
                 }
 
             }
+
             //male
             else if (status.is(inflo::MALE)) {
                 if( TT_since_appearance >= TT_ini_male_senescence) {
@@ -509,6 +512,8 @@ public:
             bunch_nonoil_biomass_harvested =  bunch->get< double >(t, Bunch::NONOIL_BIOMASS_HARVESTED);
             bunch_demand = bunch->get< double >(t, Bunch::DEMAND);
 
+            bunch_biomass=bunch_oil_biomass+bunch_nonoil_biomass;
+
         }
 
 
@@ -545,7 +550,7 @@ public:
             IC_sex_tot += tree_IC;
             IC_sex = IC_sex_tot / nb_joursICsex;
         }
-        sex_ratio =max(0.0, min(1.0, SEX_RATIO_MIN+IC_sex*(SEX_RATIO_REF-SEX_RATIO_MIN)));
+        sex_ratio =max(0.0, min(0.9, SEX_RATIO_MIN+IC_sex*(SEX_RATIO_REF-SEX_RATIO_MIN)));
 
         //IC on abortion
         if (TT_since_appearance >= TT_ini_sex && TT_since_appearance < TT_ini_abortion) {

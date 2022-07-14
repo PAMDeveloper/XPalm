@@ -139,3 +139,7 @@ generate_meteo=function(dir_raw,filename,date_ini=NULL,date_end=NULL){
   
 }
 
+
+filename='meteo_SMSE'
+dir_raw = '../parameters/'
+generate_meteo(dir_raw = dir_raw,filename = filename)

@@ -11,10 +11,9 @@
 #include <ctime>
 #include <qmath.h>
 
-//using namespace artis::kernel;
 #include <artis/observer/Output.hpp>
-typedef artis::observer::Output<artis::utils::DoubleTime,
-        ModelParameters> AnOutput;
+
+//using namespace artis::kernel;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -261,31 +260,28 @@ void MainWindow::displayData(observer::PlantView * view,
         j++;
     }
 
+    QFile data("results.csv");
+    if(data.open(QFile::WriteOnly |QFile::Truncate))
+    {
+        QTextStream output(&data);
+        for (int row = 0; row < results[0].length(); ++row) {
+            QString line;
+            if(row == 0)
+                line += "Date;";
+            else
+                line += startDate.addDays(row-1).toString("yyyy-MM-dd") + ";";
+            for (int col = 0; col < names.length(); ++col) {
+                if(row == 0)
+                    line += names[col] + ";";
+                else
+                    line += QString::number(results[col][row-1]) + ";";
+            }
+            line.chop(1);
+            output << line << "\n";
+        }
 
-
-
-//    QFile data("results.csv");
-//    if(data.open(QFile::WriteOnly |QFile::Truncate))
-//    {
-//        QTextStream output(&data);
-//        for (int row = 0; row < results[0].length(); ++row) {
-//            QString line;
-//            if(row == 0)
-//                line += "Date;";
-//            else
-//                line += startDate.addDays(row-1).toString("yyyy-MM-dd") + ";";
-//            for (int col = 0; col < names.length(); ++col) {
-//                if(row == 0)
-//                    line += names[col] + ";";
-//                else
-//                    line += QString::number(results[col][row-1]) + ";";
-//            }
-//            line.chop(1);
-//            output << line << "\n";
-//        }
-
-//        data.close();
-//    }
+        data.close();
+    }
 
 }
 
@@ -348,6 +344,9 @@ void MainWindow::on_actionLoad_simulation_triggered()
 
 }
 
+
+typedef artis::observer::Output<artis::utils::DoubleTime,ModelParameters> XPalmOutput;
+
 void MainWindow::on_actionLaunch_simulation_triggered()
 {
 //    load_simulation(settings->value("simulation_folder", "").toString());
@@ -360,11 +359,17 @@ void MainWindow::on_actionLaunch_simulation_triggered()
     XPalmSimulator simulator(m, globalParameters);
     observer::PlantView *view = new observer::PlantView();
     simulator.attachView("plant", view);
+
+    observer::PhytomerView *pview = new observer::PhytomerView();
+    simulator.attachView("phytomers", pview);
+
     simulator.init(parameters.get("BeginDate"), parameters);
     simulator.run(context);
 
-    AnOutput output(simulator.observer());
-    output("D:/Workspace/");
+
+    XPalmOutput output(simulator.observer());
+    output("D:\\PAMStudio\\dev\\git\\bin\\msvc14\\x64\\");
+
 
 //    ResultParser * parser = new ResultParser();
 //    std::map <std::string, std::vector<double> > resultMap = parser->resultsToMap(&simulator);
@@ -395,10 +400,6 @@ void MainWindow::on_actionLaunch_simulation_triggered()
 //    for(auto t: tillers_2)
 //        std::cout << t;
 /*     */
-
-
-
-
 
 //    if(ui->tableView->model() != nullptr)
 //        delete ui->tableView->model();

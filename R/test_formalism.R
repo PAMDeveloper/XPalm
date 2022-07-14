@@ -33,7 +33,7 @@ AGE_FIN=8*365
 leaf1=data.frame(leaf='leaf1',age=3*365,TT_sim=TT_sim)%>%
   mutate(prodspeed=age_relative_var(age = age,age_ini =AGE_INI ,age_fin =AGE_FIN ,val_ini =PRODUCTIOn_SPEED_INITIAL ,val_fin = PRODUCTIOn_SPEED_ADULT),
          SF_sim=Leafarea_expand(TTleaf =TT_sim,SFMax = 2.5,INFLEXION = 15*50*T_EFF_INI, COURBURE = 100))
- 
+
 leaf2=data.frame(leaf='leaf2',age=4*365,TT_sim=TT_sim)%>%
   mutate(prodspeed=age_relative_var(age = age,age_ini =AGE_INI ,age_fin =AGE_FIN ,val_ini =PRODUCTIOn_SPEED_INITIAL ,val_fin = PRODUCTIOn_SPEED_ADULT),
          SF_sim=Leafarea_expand(TTleaf =TT_sim,SFMax = 3.5,INFLEXION = 15*50*T_EFF_INI/1.5, COURBURE = 100),
@@ -64,17 +64,22 @@ age=2*365
 age_relative_var(age = age,age_ini = 3*365,age_fin = 8*365,val_ini =PRODUCTIOn_SPEED_INITIAL ,val_fin = PRODUCTIOn_SPEED_ADULT)
 
 
-INITIAL_SFIND=2.5
+INITIAL_SFIND=3.5
 MAXIMAl_SFIND=12
 age_relative_var(age = age,age_ini = 3*365,age_fin = 8*365,val_ini = INITIAL_SFIND,val_fin = MAXIMAl_SFIND)
 
 
 
-data.frame(x=seq(0,16,1))%>%
+ggplotly(data.frame(x=seq(0,40,1))%>%
   group_by(x)%>%
-  mutate(y=age_relative_var(age =x ,age_ini = 2,age_fin = 8,val_ini = 0,val_fin = 1))%>%
-  ggplot()+
-  geom_line(aes(x=x,y=y))
-
-
-# leaf expansion ---------------------------------------------------------
+  mutate(y=age_relative_var(age =x ,age_ini = 6*365,age_fin = 8*365,val_ini = INITIAL_SFIND,val_fin = MAXIMAl_SFIND),
+         y2=f.onto_sf(age = x,age_ini =0,age_fin = 8*365,val_ini =0.01,val_fin =MAXIMAl_SFIND))%>%
+           ggplot()+
+           geom_line(aes(x=x,y=y,col='V0'))+
+           geom_line(aes(x=x,y=y2,col='V1')))
+         
+         
+         
+         
+         
+         

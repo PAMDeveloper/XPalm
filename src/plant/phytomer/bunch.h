@@ -44,9 +44,9 @@ private:
     double OIL_CONTENT;
     double COUT_OIL;
     double REPRO_CONSTRUCTION_COST;
-    double SENSIVITY_IC_SPIKELET;
+    double SENSITIVITY_IC_SPIKELET;
     //    double IC_spikelet_RANG_FIN;
-    double SENSIVITY_IC_SETTING;
+    double SENSITIVITY_IC_SETTING;
     double PERIOD_FRUIT_SET;
     double IND_FRUIT_WEIGHT;
     double MEAN_FRUIT_NUMBER_ADULTE;
@@ -147,8 +147,8 @@ public:
         OIL_CONTENT = parameters.get("OIL_CONTENT");
         COUT_OIL = parameters.get("COUT_OIL");
         REPRO_CONSTRUCTION_COST = parameters.get("REPRO_CONSTRUCTION_COST");
-        SENSIVITY_IC_SPIKELET = parameters.get("SENSIVITY_IC_SPIKELET");
-        SENSIVITY_IC_SETTING = parameters.get("SENSIVITY_IC_SETTING");
+        SENSITIVITY_IC_SPIKELET = parameters.get("SENSITIVITY_IC_SPIKELET");
+        SENSITIVITY_IC_SETTING = parameters.get("SENSITIVITY_IC_SETTING");
         PERIOD_FRUIT_SET= parameters.get("PERIOD_FRUIT_SET");
         IND_FRUIT_WEIGHT = parameters.get("IND_FRUIT_WEIGHT");
         MEAN_FRUIT_NUMBER_ADULTE = parameters.get("MEAN_FRUIT_NUMBER_ADULTE");
@@ -242,11 +242,15 @@ public:
         else
             ratio_huile_mesocarp = oil_biomass / (nonoil_biomass + oil_biomass);
 
-        //        growth_demand();
-        //        if (TT_since_appearance>=TT_ini_flowering)
-        //            fruit_number = pow(IC_spikelet, SENSIVITY_IC_SPIKELET) * pow(IC_setting, SENSIVITY_IC_SETTING) * pot_fruits_number;
 
-        fruit_number = min (1.0, IC_spikelet) * min (1.0, IC_setting) * pot_fruits_number;
+        double coeff_max_plasticity=2;
+        if (TT_since_appearance >= TT_ini_flowering)
+            fruit_number = min (coeff_max_plasticity, IC_spikelet) * pot_fruits_number;
+
+        if (TT_since_appearance>= TT_ini_flowering+ PERIOD_FRUIT_SET)
+            //            fruit_number = pow(IC_spikelet, SENSITIVITY_IC_SPIKELET) * pow(IC_setting, SENSITIVITY_IC_SETTING) * pot_fruits_number;
+            fruit_number = min (coeff_max_plasticity, IC_spikelet) * min (coeff_max_plasticity, IC_setting) * pot_fruits_number;
+
 
 
         if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)) {
