@@ -40,7 +40,7 @@
 #include <QMenu>
 #include <QFileDialog>
 
-#include <qtapp/callout.h>
+#include <callout.h>
 
 QT_CHARTS_USE_NAMESPACE
 

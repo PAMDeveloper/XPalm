@@ -25,7 +25,7 @@
 //#include <stdlib.h>
 //#include <crtdbg.h>
 
-#include <qtapp/mainwindow.h>
+#include <mainwindow.h>
 #include <QApplication>
 #include <QDebug>
 #include <QDate>

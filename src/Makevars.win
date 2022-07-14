@@ -1,4 +1,3 @@
-PKG_CFLAGS= -Ofast -Wsign-compare -Wunused-variable -Wconversion-null -Wparentheses -Wreorder
-PKG_CPPFLAGS =  -I../../artis/src/
-PKG_CXXFLAGS +=  -I"." `Rscript -e 'Rcpp:::CxxFlags()'` $(FPICFLAGS) $(SHLIB_FFLAGS)
-PKG_LIBS += -L"../../libs/rtools/x64/static" -lArtis $(FPICFLAGS) $(SHLIB_FFLAGS) `Rscript -e 'Rcpp:::LdFlags()'` -lbcrypt
+PKG_CFLAGS= -Ofast
+PKG_CXXFLAGS +=  -I"." `Rscript -e 'Rcpp:::CxxFlags()'` -I../../artis/src/ -I./src
+PKG_LIBS += -L"../../libs/gcc_10.3.0/x64/static" -lArtis $(FPICFLAGS) $(SHLIB_FFLAGS) `Rscript -e 'Rcpp:::LdFlags()'` -lbcrypt

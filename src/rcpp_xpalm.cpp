@@ -4,9 +4,12 @@
 #include "xpalm_types.hpp"
 
 using namespace Rcpp;
+using namespace std;
 
+map<string,vector<string>> sim_headers;
+map<string,vector<double>> sim_values;
 
-DataFrame mapOfVectorToDF(std::map<std::string, std::vector<double>> map) {
+DataFrame mapOfDVectorToDF(std::map<std::string, std::vector<double>> map) {
   Rcpp::CharacterVector names;
   List values(map.size());
   int idx = 0;
@@ -20,6 +23,23 @@ DataFrame mapOfVectorToDF(std::map<std::string, std::vector<double>> map) {
   df.attr("names") = names;
   return df;
 }
+
+
+DataFrame mapOfSVectorToDF(std::map<std::string, std::vector<string>> map) {
+  Rcpp::CharacterVector names;
+  List values(map.size());
+  int idx = 0;
+  for(auto const& it: map){
+    names.push_back(it.first);
+    CharacterVector vec( it.second.begin(), it.second.end() );
+    values[idx] = vec;
+    idx++;
+  }
+  DataFrame df(values);
+  df.attr("names") = names;
+  return df;
+}
+
 
 // map <string, vector <double > > mapFromDF(DataFrame list) {
 //   map <string, vector <double > > map;
@@ -44,21 +64,24 @@ Rcpp::List runFolder(Rcpp::String folder)
 
   reader.loadParametersFromFiles(folder, parameters);
 
-
-
+  /** RUN SIMU **/
   XPalmContext context(parameters.get("BeginDate"), parameters.get("EndDate"));
   Tree * m = new Tree();
   XPalmSimulator simulator(m, globalParameters);
-  observer::PlantView *view = new observer::PlantView();
-  simulator.attachView("plant", view);
+  simulator.attachView("plant", new observer::PlantView());
+  simulator.attachView("phytomers", new observer::PhytomerView());
   simulator.init(parameters.get("BeginDate"), parameters);
   simulator.run(context);
 
   ResultParser parser;
-  std::map <std::string, std::vector<double> > resultMap = parser.resultsToMap(&simulator);
-  return mapOfVectorToDF(resultMap);
-
+  pair<map<string,vector<double>>,map<string,vector<string>>> results;
+  results = parser.resultToMaps(simulator);
+  sim_values = results.first;
+  sim_headers = results.second;
+  return mapOfDVectorToDF(sim_values);
 }
+
+
 
 // [[Rcpp::export]]
 Rcpp::List runDF(Rcpp::List dfParameters, Rcpp::List dfMeteo)
@@ -91,183 +114,57 @@ Rcpp::List runDF(Rcpp::List dfParameters, Rcpp::List dfMeteo)
               << std::endl;
   }
 
-  NumericVector TMax = dfMeteo[0];
-  NumericVector TMin = dfMeteo[1];
-  NumericVector HMax = dfMeteo[2];
-  NumericVector HMin = dfMeteo[3];
-  NumericVector Vt = dfMeteo[4];
-  NumericVector Rg = dfMeteo[5];
-  NumericVector Rain = dfMeteo[6];
+  IntegerVector Day = dfMeteo[0];
+  IntegerVector Month = dfMeteo[1];
+  IntegerVector Year = dfMeteo[2];
+  NumericVector TMax = dfMeteo[3];
+  NumericVector TMin = dfMeteo[4];
+  NumericVector HMax = dfMeteo[5];
+  NumericVector HMin = dfMeteo[6];
+  NumericVector Vt = dfMeteo[7];
+  NumericVector Rg = dfMeteo[8];
+  NumericVector Rain = dfMeteo[9];
+
 
   for (int i = 0; i < TMax.size(); ++i) {
     xpalm::Climate c(TMax(i), TMin(i), HMax(i), HMin(i), Vt(i), Rg(i), Rain(i));
     parameters.meteoValues.push_back(c);
   }
 
-  parameters.beginDate = parameters.get("BeginDate");
+  double beginDate = JulianCalculator::getJulianDay(JulianCalculator::dateInts(Year(0), Month(0), Day(0)));
+  parameters.set("BeginDate", beginDate);
+  parameters.beginDate = beginDate;
+
+  int end_idx = Day.size()-1;
+  double endDate = JulianCalculator::getJulianDay(JulianCalculator::dateInts(Year(end_idx), Month(end_idx), Day(end_idx)));
+  parameters.set("EndDate", endDate);
 
     /** RUN SIMU **/
   XPalmContext context(parameters.get("BeginDate"), parameters.get("EndDate"));
   Tree * m = new Tree();
   XPalmSimulator simulator(m, globalParameters);
-  observer::PlantView *view = new observer::PlantView();
-  simulator.attachView("plant", view);
+  simulator.attachView("plant", new observer::PlantView());
+  simulator.attachView("phytomers", new observer::PhytomerView());
   simulator.init(parameters.get("BeginDate"), parameters);
   simulator.run(context);
 
   ResultParser parser;
-  std::map <std::string, std::vector<double> > resultMap = parser.resultsToMap(&simulator);
-  return mapOfVectorToDF(resultMap);
+  pair<map<string,vector<double>>,map<string,vector<string>>> results;
+  results = parser.resultToMaps(simulator);
+  sim_values = results.first;
+  sim_headers = results.second;
+  return mapOfDVectorToDF(sim_values);
+}
 
+// [[Rcpp::export]]
+Rcpp::List getValues()
+{
+  return mapOfDVectorToDF(sim_values);
 }
 
 
-
-  // // [[Rcpp::export]]
-  // List launch_simu(Rcpp::String name, CharacterVector names = CharacterVector(), NumericVector params = NumericVector()) {
-  //
-  //
-  //   Simulation * s = simulations[name];
-  //   if(names.size() > 0) {
-  //     for (int i = 0; i < names.size(); ++i) {
-  //       s->parameters.mParams[Rcpp::as<string>(names(i))] = params[i];
-  //     }
-  //   }
-  //   EcomeristemSimulator simulator(new PlantModel(), s->globalParameters);
-  //   simulator.init(s->beginDate, s->parameters);
-  //   map<string,vector<double>> res = simulator.runOptim(s->context, s->filter);
-  //   return mapOfVectorToDF(res);
-  // }
-  //
-  // // [[Rcpp::export]]
-  // List launch_simu_meteo(Rcpp::String name, List dfMeteo) {
-  //   Simulation * s = simulations[name];
-  //   NumericVector Temperature = dfMeteo[0];
-  //   NumericVector Par = dfMeteo[1];
-  //   NumericVector Etp = dfMeteo[2];
-  //   NumericVector Irrigation = dfMeteo[3];
-  //   NumericVector P = dfMeteo[4];
-  //   s->parameters.meteoValues.clear();
-  //   for (int i = 0; i < Temperature.size(); ++i) {
-  //     ecomeristem::Climate c(Temperature(i), Par(i), Etp(i), Irrigation(i), P(i));
-  //     s->parameters.meteoValues.push_back(c);
-  //   }
-  //
-  //   EcomeristemSimulator simulator(new PlantModel(), s->globalParameters);
-  //   simulator.init(s->beginDate, s->parameters);
-  //   map<string,vector<double>> res = simulator.runOptim(s->context, s->filter);
-  //   return mapOfVectorToDF(res);
-  // }
-
-
-//
-//
-// struct Simulation {
-//   Simulation(){}
-//   GlobalParameters globalParameters;
-//   ecomeristem::ModelParameters parameters;
-//   double beginDate;
-//   double endDate;
-//   EcomeristemContext context;
-//   SimulatorFilter filter;
-// };
-//
-//
-// std::map <std::string, Simulation*> simulations;
-//
-// // [[Rcpp::export]]
-// void init_simu(List dfParameters, List dfMeteo, List obs, Rcpp::String name) {
-//   Simulation * s = new Simulation();
-//   simulations[name] = s;
-//   CharacterVector names = dfParameters[0];
-//   NumericVector values = dfParameters[1];
-//   for (int i = 0; i < names.size(); ++i) {
-//     s->parameters.getRawParameters()->insert(
-//         std::pair<std::string,double>(
-//             Rcpp::as<std::string>(names(i)),
-//             values(i)
-//         )
-//     );
-//   }
-//
-//   NumericVector Temperature = dfMeteo[0];
-//   NumericVector Par = dfMeteo[1];
-//   NumericVector Etp = dfMeteo[2];
-//   NumericVector Irrigation = dfMeteo[3];
-//   NumericVector P = dfMeteo[4];
-//
-//   for (int i = 0; i < Temperature.size(); ++i) {
-//     ecomeristem::Climate c(Temperature(i), Par(i), Etp(i), Irrigation(i), P(i));
-//     s->parameters.meteoValues.push_back(c);
-//   }
-//
-//   s->parameters.beginDate = s->parameters.get("BeginDate");
-//   /** RUN SIMU **/
-//   s->beginDate = s->parameters.get("BeginDate");
-//   s->endDate = s->parameters.get("EndDate");
-//   s->context.setBegin(s->beginDate);
-//   s->context.setEnd(s->endDate);
-//
-//   observer::PlantView view;
-//   map <string, vector <double > > obsMap = mapFromDF(obs);
-//   s->filter.init(&view, obsMap, "day");
-// }
-//
-
-
-//
-//
-//
-// // [[Rcpp::export]]
-// List getParameters_from_files(Rcpp::String folder)
-// {
-//   ecomeristem::ModelParameters parameters;
-//   utils::ParametersReader reader;
-//   reader.loadParametersFromFiles(folder, parameters);
-//
-//   std::map < std::string, double > * paramMap = parameters.getRawParameters();
-//   Rcpp::List result(paramMap->size());
-//   Rcpp::CharacterVector names;
-//   Rcpp::NumericVector values;
-//   for(auto const& it: *paramMap){
-//     std::string key = it.first;
-//     double value = it.second;
-//     names.push_back(key);
-//     values.push_back(value);
-//   }
-//
-//   DataFrame df = DataFrame::create(Named("Name")=names,Named("Values")=values);
-//   return df;
-// }
-//
-//
-// // [[Rcpp::export]]
-// List getMeteo_from_files(Rcpp::String folder)
-// {
-//   ecomeristem::ModelParameters parameters;
-//   utils::ParametersReader reader;
-//   reader.loadParametersFromFiles(folder, parameters);
-//
-//   std::vector < ecomeristem::Climate > * meteoValues = parameters.getMeteoValues();
-//   Rcpp::List result(meteoValues->size());
-//   CharacterVector names =  CharacterVector::create("Temperature", "Par", "Etp", "Irrigation", "P");
-//   NumericVector Temperature, Par, Etp, Irrigation, P;
-//
-//   for(auto const& it: *meteoValues){
-//     Temperature.push_back(it.Temperature);
-//     Par.push_back(it.Par);
-//     Etp.push_back(it.Etp);
-//     Irrigation.push_back(it.Irrigation);
-//     P.push_back(it.P);
-//   }
-//
-//   DataFrame df = DataFrame::create(
-//     Named("Temperature")=Temperature,
-//     Named("Par")=Par,
-//     Named("Etp")=Etp,
-//     Named("Irrigation")=Irrigation,
-//     Named("P")=P
-//   );
-//   return df;
-// }
-
+// [[Rcpp::export]]
+Rcpp::List getHeaders()
+{
+  return mapOfSVectorToDF(sim_headers);
+}

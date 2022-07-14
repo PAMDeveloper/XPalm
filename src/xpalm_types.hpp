@@ -28,6 +28,7 @@
 #include <utils/juliancalculator.h>
 #include <plant/tree.h>
 #include <observer/PlantView.hpp>
+#include <observer/PhytomerView.hpp>
 #ifndef UNSAFE_RUN
 #include <boost/property_tree/ptree.hpp>
 #include <boost/lexical_cast.hpp>

@@ -6,11 +6,6 @@
 
 using namespace Rcpp;
 
-#ifdef RCPP_USE_GLOBAL_ROSTREAM
-Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
-Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
-#endif
-
 // runFolder
 Rcpp::List runFolder(Rcpp::String folder);
 RcppExport SEXP _XPalm_runFolder(SEXP folderSEXP) {
@@ -34,10 +29,32 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getValues
+Rcpp::List getValues();
+RcppExport SEXP _XPalm_getValues() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(getValues());
+    return rcpp_result_gen;
+END_RCPP
+}
+// getHeaders
+Rcpp::List getHeaders();
+RcppExport SEXP _XPalm_getHeaders() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(getHeaders());
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_XPalm_runFolder", (DL_FUNC) &_XPalm_runFolder, 1},
     {"_XPalm_runDF", (DL_FUNC) &_XPalm_runDF, 2},
+    {"_XPalm_getValues", (DL_FUNC) &_XPalm_getValues, 0},
+    {"_XPalm_getHeaders", (DL_FUNC) &_XPalm_getHeaders, 0},
     {NULL, NULL, 0}
 };
 

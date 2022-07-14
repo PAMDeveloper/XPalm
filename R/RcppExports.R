@@ -9,3 +9,11 @@ runDF <- function(dfParameters, dfMeteo) {
     .Call(`_XPalm_runDF`, dfParameters, dfMeteo)
 }
 
+getValues <- function() {
+    .Call(`_XPalm_getValues`)
+}
+
+getHeaders <- function() {
+    .Call(`_XPalm_getHeaders`)
+}
+

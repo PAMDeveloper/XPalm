@@ -8,13 +8,13 @@
 #include <QDir>
 
 #include <defines.hpp>
-#include <observer/PlantView.hpp>
-#include <utils/ParametersReader.hpp>
 
-#include <qtapp/tracemodel.h>
-#include <qtapp/meteodatamodel.h>
-#include <qtapp/parametersdatamodel.h>
-#include <qtapp/view.h>
+
+#include <tracemodel.h>
+#include <meteodatamodel.h>
+#include <parametersdatamodel.h>
+#include <view.h>
+#include <utils/ParametersReader.hpp>
 
 #include <QtCharts/QLineSeries>
 
@@ -32,8 +32,7 @@ public:
 
     void displayModels();
 
-    void displayData(observer::PlantView * view, QString dirName,
-                     double begin, double end);
+//    void displayData(double begin, double end);
 
     void addChart(int row, int col, QtCharts::QLineSeries * series, QtCharts::QLineSeries *refseries,
                   QGridLayout * lay, QString name);

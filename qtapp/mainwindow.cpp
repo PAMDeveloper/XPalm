@@ -11,7 +11,15 @@
 #include <ctime>
 #include <qmath.h>
 
+#include <observer/PlantView.hpp>
+#include <observer/PhytomerView.hpp>
+
 //using namespace artis::kernel;
+#include <artis/observer/Output.hpp>
+#include <utils/resultparser.h>
+
+typedef artis::observer::Output<artis::utils::DoubleTime,
+        ModelParameters> AnOutput;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -189,99 +197,76 @@ void MainWindow::displayModels(){
     ui->meteoTableView->setModel(meteoModel);
 }
 
-void MainWindow::displayData(observer::PlantView * view,
-                             QString dirName,
-                             double begin, double end){
-
-//    ui->tabWidget->setCurrentWidget(scrollArea);
-    QLayoutItem *item;
-    while((item = lay->takeAt(0))) {
-        if (item->layout()) {
-            delete item->layout();
-        }
-        if (item->widget()) {
-            delete item->widget();
-        }
-        delete item;
-    }
+//void MainWindow::displayData(QString dirName,
+//                             double begin, double end){
 
 
-    startDate = QDate::fromJulianDay(begin);
-    QDate endDate = QDate::fromJulianDay(end);
-    currentDate = startDate;
-    const int numCol = 2;
+////    ui->tabWidget->setCurrentWidget(scrollArea);
+//    QLayoutItem *item;
+//    while((item = lay->takeAt(0))) {
+//        if (item->layout()) {
+//            delete item->layout();
+//        }
+//        if (item->widget()) {
+//            delete item->widget();
+//        }
+//        delete item;
+//    }
 
-    QStringList outRefs;
-    if(refFolder.isEmpty() && QDir(dirName+"/ref").exists())
-        refFolder = dirName+"/ref";
 
-    if(!refFolder.isEmpty()){
-        QDir dir(refFolder);
-        dir.setFilter(QDir::Files);
-        QFileInfoList list = dir.entryInfoList();
-        for (int i = 0; i < list.size(); ++i) {
-            QFileInfo fileInfo = list.at(i);
-            outRefs << fileInfo.fileName().toLower();
-        }
-    }
+//    startDate = QDate::fromJulianDay(begin);
+//    QDate endDate = QDate::fromJulianDay(end);
+//    currentDate = startDate;
+//    const int numCol = 2;
 
-    QStringList names;
-    QVector<QVector<double>> results;
-    auto m = view->values();
-    int j = 0;
-    for(auto it = m.begin(); it != m.end(); ++it) {
-        QString param = QString::fromStdString(it->first);
-        names.append(param);
-        QtCharts::QLineSeries *series = new QtCharts::QLineSeries();
-        series->setColor(getColor(j));
-        QtCharts::QLineSeries * refSeries;
-        QString pCpy = param;
-        refSeries = NULL;
-        QString refName = pCpy.replace("Plant:","").toLower() +"_out.txt";
-        if(outRefs.contains(refName)) {
-            refSeries = getSeries(refFolder + "/" + pCpy.replace("Plant:","").toLower() +"_out.txt", endDate);
-            outRefs.removeAll(refName);
-        }
+//    QStringList outRefs;
+//    if(refFolder.isEmpty() && QDir(dirName+"/ref").exists())
+//        refFolder = dirName+"/ref";
 
-        QVector<double> values;
-        for (int i = 0; i < startDate.daysTo(endDate); ++i) {
-            double value = view->get(startDate.addDays(i).toJulianDay(),
-                                     param.toLocal8Bit().constData());
-            values.append(value);
-            QDateTime momentInTime;
-            momentInTime.setDate(startDate.addDays(i));
-            series->append(momentInTime.toMSecsSinceEpoch(), value);
-        }
+//    if(!refFolder.isEmpty()){
+//        QDir dir(refFolder);
+//        dir.setFilter(QDir::Files);
+//        QFileInfoList list = dir.entryInfoList();
+//        for (int i = 0; i < list.size(); ++i) {
+//            QFileInfo fileInfo = list.at(i);
+//            outRefs << fileInfo.fileName().toLower();
+//        }
+//    }
 
-        results.append(values);
-        addChart(j/numCol,j%numCol,series, refSeries, lay, param);
-        j++;
-    }
+//    QStringList names;
+//    QVector<QVector<double>> results;
+//    auto m = view->values();
+//    int j = 0;
+//    for(auto it = m.begin(); it != m.end(); ++it) {
+//        QString param = QString::fromStdString(it->first);
+//        names.append(param);
+//        QtCharts::QLineSeries *series = new QtCharts::QLineSeries();
+//        series->setColor(getColor(j));
+//        QtCharts::QLineSeries * refSeries;
+//        QString pCpy = param;
+//        refSeries = NULL;
+//        QString refName = pCpy.replace("Plant:","").toLower() +"_out.txt";
+//        if(outRefs.contains(refName)) {
+//            refSeries = getSeries(refFolder + "/" + pCpy.replace("Plant:","").toLower() +"_out.txt", endDate);
+//            outRefs.removeAll(refName);
+//        }
 
-    QFile data("results.csv");
-    if(data.open(QFile::WriteOnly |QFile::Truncate))
-    {
-        QTextStream output(&data);
-        for (int row = 0; row < results[0].length(); ++row) {
-            QString line;
-            if(row == 0)
-                line += "Date;";
-            else
-                line += startDate.addDays(row-1).toString("yyyy-MM-dd") + ";";
-            for (int col = 0; col < names.length(); ++col) {
-                if(row == 0)
-                    line += names[col] + ";";
-                else
-                    line += QString::number(results[col][row-1]) + ";";
-            }
-            line.chop(1);
-            output << line << "\n";
-        }
+//        QVector<double> values;
+//        for (int i = 0; i < startDate.daysTo(endDate); ++i) {
+//            double value = view->get(startDate.addDays(i).toJulianDay(),
+//                                     param.toLocal8Bit().constData());
+//            values.append(value);
+//            QDateTime momentInTime;
+//            momentInTime.setDate(startDate.addDays(i));
+//            series->append(momentInTime.toMSecsSinceEpoch(), value);
+//        }
 
-        data.close();
-    }
+//        results.append(values);
+//        addChart(j/numCol,j%numCol,series, refSeries, lay, param);
+//        j++;
+//    }
 
-}
+//}
 
 
 
@@ -342,6 +327,7 @@ void MainWindow::on_actionLoad_simulation_triggered()
 
 }
 
+
 void MainWindow::on_actionLaunch_simulation_triggered()
 {
 //    load_simulation(settings->value("simulation_folder", "").toString());
@@ -352,50 +338,49 @@ void MainWindow::on_actionLaunch_simulation_triggered()
 //    XPalmContext context(parameters.get("BeginDate"), parameters.get("BeginDate")+4);
     Tree * m = new Tree;
     XPalmSimulator simulator(m, globalParameters);
-    observer::PlantView *view = new observer::PlantView();
-    simulator.attachView("plant", view);
+    simulator.attachView("plant", new observer::PlantView());
+    simulator.attachView("phytomers", new observer::PhytomerView());
     simulator.init(parameters.get("BeginDate"), parameters);
     simulator.run(context);
 
-//    ResultParser * parser = new ResultParser();
-//    std::map <std::string, std::vector<double> > resultMap = parser->resultsToMap(&simulator);
-//    std::vector<double> tillers = resultMap["tillernb_1"];
-//    for(auto t: tillers)
-//        std::cout << t;
+    AnOutput output(simulator.observer());
+    output(".");
 
-/* TEST */
-//    QString folderName = settings->value("simulation_folder", "").toString();
-//    std::string dirName = folderName.toStdString();
-//    utils::ParametersReader reader;
-//    reader.loadParametersFromFiles(dirName, parameters);
 
-//    ::Trace::trace().clear();
-//    GlobalParameters globalParameters2;
-//    XPalmContext context2(parameters.get("BeginDate"), parameters.get("EndDate"));
-//    PlantModel * m2 = new PlantModel;
-//    XPalmSimulator simulator2(m2, globalParameters2);
-//    observer::PlantView *view2 = new observer::PlantView();
-//    simulator.attachView("plant2", view2);
-//    simulator.init(parameters.get("BeginDate"), parameters);
-//    simulator.run(context2);
 
-//    ResultParser * parser2 = new ResultParser();
-//    std::map <std::string, std::vector<double> > resultMap2 = parser2->resultsToMap(&simulator);
-//    std::vector<double> tillers_2 = resultMap2["tillernb_1"];
-//    qDebug() << std::equal(tillers.begin(), tillers.end(), tillers_2.begin());
-//    for(auto t: tillers_2)
-//        std::cout << t;
-/*     */
+    ResultParser parser;
+    pair<map<string,vector<double>>,map<string,vector<string>>> results;
+    results = parser.resultToMaps(simulator);
+    map<string,vector<string>> headers = results.second;
 
-    if(ui->tableView->model() != nullptr)
-        delete ui->tableView->model();
+    for(auto const& it: results.first){
+        cout << endl << "---------------------------------------------------" << endl;
+        cout << it.first << endl;
 
-    trace_model = new VisibleTraceModel(::Trace::trace().elements());
-    ui->tableView->setModel(trace_model);
-    show_trace();
-    displayData(view, folderName,
-                parameters.get("BeginDate"),
-                parameters.get("EndDate"));
+        for (auto i: it.second)
+//            if (isnan(i))
+                cout << i << "-";
+    }
+    //    for (auto it: results.first){
+//        std::cout << it.first << endl;
+//        for (auto i: it.second)
+//            cout << i << " ";
+//        cout << endl << "***************************************************" << endl;
+//    }
+
+//    for (auto it: results.second){
+//        std::cout << it.first << endl;
+//        for (auto i: it.second)
+//            cout << i << " - ";
+//        cout << endl << "---------------------------------------------------" << endl;
+//    }
+
+//    trace_model = new VisibleTraceModel(::Trace::trace().elements());
+//    ui->tableView->setModel(trace_model);
+//    show_trace();
+//    displayData(view, folderName,
+//                parameters.get("BeginDate"),
+//                parameters.get("EndDate"));
 
 //    QMessageBox::about(this, "Simulation finished", folderName + " simulation done.");
 }
