@@ -443,7 +443,7 @@ public:
 
         compute_biomasse_non_structurale_allouee_aux_feuilles(t);
 
-//        std::cout << "Age:" << age << std::endl;
+        std::cout << "Age:" << age << std::endl;
         (*meteo)(t);
 
         bh->put<double>(t, WaterBalance::RACINES_TAILLEC, racines->get<double>(t-1, Racines::TAILLEC));

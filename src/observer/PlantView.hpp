@@ -45,12 +45,11 @@ public:
         selector("FTSW", artis::kernel::DOUBLE, {Tree::BH,WaterBalance::FTSW});
         selector("TEFF", artis::kernel::DOUBLE, {Tree::METEO,Meteo::TEFF});
 
-        //PHTYOMER
-        selector("Phyto_Age", artis::kernel::DOUBLE, {Tree::PHYTOMERS,Phytomer::AGE});
+        selector("TEST", artis::kernel::INT, {Tree::PHYTOMERS,Phytomer::INFLO, Inflo::INFLO_STATUS});
+//        //TREE
 
-        //TREE
-        selector("ASSIM", artis::kernel::DOUBLE,{Tree::ASSIM});
-        selector("ASSIM_EXCESS", artis::kernel::DOUBLE,{Tree::ASSIM_EXCESS});
+//        selector("ASSIM", artis::kernel::DOUBLE,{Tree::ASSIM});
+//        selector("ASSIM_EXCESS", artis::kernel::DOUBLE,{Tree::ASSIM_EXCESS});
 
 //        selector("BUNCH_DEMAND", artis::kernel::DOUBLE,{Tree::BUNCH_DEMAND});
 //        selector("BUNCH_OIL_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::BUNCH_OIL_BIOMASS_HARVESTED});
@@ -92,7 +91,9 @@ public:
 //        selector("TRUNK_HEIGHT", artis::kernel::DOUBLE,{Tree::TRUNK_HEIGHT});
 
 
-
+        selector("test", artis::kernel::DOUBLE, {
+                     Tree::PHYTOMERS,
+                     Phytomer::AGE});
 
 
         //DEMAND

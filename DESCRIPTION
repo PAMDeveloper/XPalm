@@ -1,6 +1,6 @@
-Package: recomeristem
+Package: XPalm
 Type: Package
-Title: Discrete time hierachical simulation kernel
+Title: Palm Tree model
 Version: 1.0
 Date: 2017-01-20
 Author: Gregory Beurier

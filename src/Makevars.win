@@ -1,11 +1,4 @@
-ifeq "$(WIN)" "64"
-PKG_CXXFLAGS += `Rscript -e 'Rcpp:::CxxFlags()'` -I"." $(FPICFLAGS) $(SHLIB_FFLAGS) `Rscript -e 'Rcpp:::LdFlags()'` -std=c++11
-PKG_CFLAGS= -Ofast
-CFLAGS= -Ofast
-PKG_LIBS += `Rscript -e 'Rcpp:::LdFlags()'` $(FPICFLAGS) $(SHLIB_FFLAGS) `Rscript -e 'Rcpp:::LdFlags()'` -std=c++11
-else
-PKG_CXXFLAGS += `Rscript -e 'Rcpp:::CxxFlags()'` -I"." $(FPICFLAGS) $(SHLIB_FFLAGS) `Rscript -e 'Rcpp:::LdFlags()'` -std=c++11
-PKG_LIBS += `Rscript -e 'Rcpp:::LdFlags()'` $(FPICFLAGS) $(SHLIB_FFLAGS) `Rscript -e 'Rcpp:::LdFlags()'` -std=c++11
-PKG_CFLAGS= -Ofast
-CFLAGS= -Ofast
-endif
+PKG_CFLAGS= -Ofast -Wsign-compare -Wunused-variable -Wconversion-null -Wparentheses -Wreorder
+PKG_CPPFLAGS =  -I../../artis/src/
+PKG_CXXFLAGS +=  -I"." `Rscript -e 'Rcpp:::CxxFlags()'` $(FPICFLAGS) $(SHLIB_FFLAGS)
+PKG_LIBS += -L"../../libs/rtools/x64/static" -lArtis $(FPICFLAGS) $(SHLIB_FFLAGS) `Rscript -e 'Rcpp:::LdFlags()'` -lbcrypt

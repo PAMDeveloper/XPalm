@@ -6,5 +6,4 @@ Makefile*
 .qmake.stash
 ui_mainwindow.h
 .Rproj.user
-parameters/
-.qtc_clangd
+.qtc_clangd/

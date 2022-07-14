@@ -8,6 +8,7 @@
 #include "iso646.h"
 #include <type_traits> //necessary for enum type checking on states
 
+//#include <artis/utils/Types.hpp>
 class Tree;
 const double _PI = 3.141592653589793238462643383280;
 
