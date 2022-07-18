@@ -7,3 +7,6 @@ Makefile*
 ui_mainwindow.h
 .Rproj.user
 .qtc_clangd/
+src/XPalm.dll
+.Rhistory
+src/rcpp_xpalm.o
