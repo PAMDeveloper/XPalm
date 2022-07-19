@@ -11,7 +11,7 @@ CONFIG += c++11 precompile_header
 ##### EXEC OPTIONS #####
 #DEFINES += UNSAFE_RUN
 DEFINES += FORCE_TRACE_ENUM
-DEFINES += WITH_TRACE
+#DEFINES += WITH_TRACE
 ########################
 
 ##### OPTIMIZATION #####
