@@ -99,7 +99,8 @@ public:
                      NB_ABORTED,
                      LASTLEAFAREA,
                      NEWPHYTOMER,
-                     AV_SEXRATIO};
+                     AV_SEXRATIO,
+                     AV_ABORTION};
 
 private:
     xpalm::ModelParameters _parameters;
@@ -205,6 +206,7 @@ private:
     double lastLeafArea;
     double newPhytomer;
     double av_sex_ratio;
+    double av_abortion_rate;
 
 public:
 
@@ -277,6 +279,8 @@ public:
         Internal(LASTLEAFAREA, &Tree::lastLeafArea);
         Internal(NEWPHYTOMER, &Tree::newPhytomer);
         Internal(AV_SEXRATIO, &Tree::av_sex_ratio);
+        Internal(AV_ABORTION, &Tree::av_abortion_rate);
+
 
     }
 
@@ -305,7 +309,7 @@ public:
         PRODUCTION_SPEED_ADULT = parameters.get("PRODUCTION_SPEED_ADULT"); // (rank.DD-1)
         PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL"); // (rank.DD-1)
         AGE_ADULT = parameters.get("AGE_ADULT") * 365; // days
-        AGE_PLANTING = parameters.get("AGE_PLANTING") * 365; // days (age when production speed starts to decrease
+        AGE_PLANTING = parameters.get("AGE_PLANTING") * 365; // days (age when production speed starts to decrease)
         AGE_START_PROD = parameters.get("AGE_START_PROD") * 365;
         DEBUT_CROISSANCE_EN = parameters.get("DEBUT_CROISSANCE_EN")* 365;
         FIN_CROISSANCE_EN= parameters.get("FIN_CROISSANCE_EN")* 365;
@@ -346,7 +350,7 @@ public:
                 offre_fruits  = growth_demand = bunch_demand = internode_demand =
                 leaves_demand = male_demand  = male_biomass = male_biomass_harvested = peduncle_demand =offre_reste =
                 peduncle_biomass = peduncle_biomass_harvested=respi_maintenance= leaves_reserve_excess=leaves_reserve_max=
-                dif_demand_offer=res_stem=res_leaves= res_total=nb_leaves=nb_males=nb_bunches=newPhytomer=av_sex_ratio=0;
+                dif_demand_offer=res_stem=res_leaves= res_total=nb_leaves=nb_males=nb_bunches=newPhytomer=av_sex_ratio=av_abortion_rate=0;
 
         fr_fruits = fr_reste = 0.5;
 
@@ -381,6 +385,7 @@ public:
 
 
         double sum_sex_ratio=0;
+        double sum_AB=0;
 
         // plant leaf area
         auto it = phytomers.begin();
@@ -414,11 +419,18 @@ public:
                 sum_sex_ratio+=sexRatio;
             }
 
+            double AB=phytomer->inflo_model()->get <double, Inflo>(t-1, Inflo::ABORTION_RATE);
+            if (LA>0){
+                sum_AB+=AB;
+            }
+
+
 
             ++it;
         }
 
         av_sex_ratio=sum_sex_ratio/nb_leaves;
+        av_abortion_rate=sum_AB/nb_leaves;
 
         lai = plantLeafArea * DENS / 10000;
         ei = 1 - exp(- K * lai);
@@ -480,16 +492,16 @@ public:
         double TT_ini_flowering = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_FLOWERING_INITIAL, TT_FLOWERING_ADULT);
         double TT_ini_harvest = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_HARVEST_INITIAL, TT_HARVEST_ADULT);
         double inflo_dev_factor =0;
-        if (age>=AGE_START_PROD){
-            inflo_dev_factor=age_relative_var(age_at_creation, AGE_START_PROD, AGE_ADULT, 0.3, 1);
+        if (age_at_creation>=AGE_PLANTING){
+            inflo_dev_factor=age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, 0.3, 1);
         }
 
         double TT_ini_male_senescence = TT_ini_flowering +PERIOD_MALE_INFLO;
 
         //        Leaf area increase with plant age
-        double first_LA=0.005;
+        double first_LA=0.5;
 
-        double SF_ind = age_relative_var(age_at_creation, 0, AGE_ADULT, first_LA , MAXIMAL_SFIND);
+        double SF_ind = age_relative_var(age_at_creation, 0.0, AGE_ADULT, first_LA , MAXIMAL_SFIND);
 
 
 
@@ -604,6 +616,8 @@ public:
         nb_aborted=0;
 
         double sum_sex_ratio=0;
+        double sum_AB=0;
+
 
         it = phytomers.begin();
         while (it != phytomers.end()) {
@@ -668,6 +682,11 @@ public:
                 sum_sex_ratio+=sexRatio;
             }
 
+            double AB=phytomer->inflo_model()->get <double, Inflo>(t, Inflo::ABORTION_RATE);
+            if (LA>0){
+                sum_AB+=AB;
+            }
+
 
 
             //inflo
@@ -696,6 +715,7 @@ public:
 
         //average sex ratio
         av_sex_ratio=sum_sex_ratio/nb_leaves;
+        av_abortion_rate=sum_AB/nb_leaves;
 
         // compute total harvested biomass
         total_leaves_biomass_harvested = leaves_structural_biomass_harvested + leaves_non_structural_biomass_harvested;

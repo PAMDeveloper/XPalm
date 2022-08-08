@@ -47,8 +47,13 @@ public:
         selector("IC_SEX", artis::kernel::DOUBLE, {Tree::PHYTOMERS, Phytomer::INFLO, Inflo::IC_SEX});
         selector("IC_ABORTION", artis::kernel::DOUBLE, {Tree::PHYTOMERS, Phytomer::INFLO, Inflo::IC_ABORT});
         selector("BUNCH_BIOMASS", artis::kernel::DOUBLE, {Tree::PHYTOMERS, Phytomer::INFLO, Inflo::BUNCH_BIOMASS});
-//        selector("FRUIT_NUMBER", artis::kernel::DOUBLE, {Tree::PHYTOMERS, Phytomer::INFLO, Inflo::BUNCH, Bunch::FRUIT_NUMBER});
 
+//        selector("FRUIT_NUMBER", artis::kernel::DOUBLE, {Tree::PHYTOMERS, Phytomer::INFLO, Inflo::BUNCH, Bunch::FRUIT_NUMBER});
+//        selector("OIL_BIOMASS", artis::kernel::DOUBLE, {Tree::PHYTOMERS, Phytomer::INFLO, Inflo::BUNCH, Bunch::OIL_BIOMASS});
+        selector("MALE_BIOMASS", artis::kernel::DOUBLE, {Tree::PHYTOMERS, Phytomer::INFLO, Inflo::MALE_BIOMASS});
+        selector("MALE_DEMAND", artis::kernel::DOUBLE, {Tree::PHYTOMERS, Phytomer::INFLO, Inflo::MALE_DEMAND});
+        selector("TT_INI_ABORTION", artis::kernel::DOUBLE, {Tree::PHYTOMERS, Phytomer::INFLO, Inflo::TT_INI_ABORTION});
+        selector("TT_INI_FLOWERING", artis::kernel::DOUBLE, {Tree::PHYTOMERS, Phytomer::INFLO, Inflo::TT_INI_FLOWERING});
 
     }
 

@@ -476,6 +476,7 @@ public:
         if(status.is(inflo::ABORTED))
             return;
 
+
         step_state();
 
         if (status.is(inflo::FEMALE) && status.is(inflo::NON_ABORTED)) {
@@ -542,8 +543,6 @@ public:
         //            TT_corrige += pow(fr_fruits, PLASTICITY_BUNCH_IC_AVANT_FLORAISON) * TEff;
         //        else if (status.is(inflo::FLOWERING)| status.is(inflo::OLEOSYNTHESIS))
         //            TT_corrige += pow(fr_fruits, PLASTICITY_BUNCH_IC_APRES_FLORAISON) * TEff;
-
-
         //IC on sex determination
         if (TT_since_appearance >= TT_ini_sex-PERIOD_SEX_DETERMINATION && TT_since_appearance < TT_ini_sex ) {
             nb_joursICsex += 1;
@@ -573,6 +572,9 @@ public:
             IC_setting_tot += tree_IC;
             IC_setting = (IC_setting_tot) / nb_joursIC_setting;
         }
+
+
+
     }
 
 

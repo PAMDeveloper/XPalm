@@ -91,6 +91,7 @@ public:
         selector("DEMAND_PEDUNCLE", artis::kernel::DOUBLE,{Tree::PEDUNCLE_DEMAND});
         selector("RESPI_MAINTENANCE", artis::kernel::DOUBLE,{Tree::RESPI_MAINTENANCE});
         selector("AV_SEXRATIO", artis::kernel::DOUBLE,{Tree::AV_SEXRATIO});
+        selector("AV_ABORTION", artis::kernel::DOUBLE,{Tree::AV_ABORTION});
 
 
         //DEMAND

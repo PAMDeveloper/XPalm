@@ -40,6 +40,7 @@ private:
     double H_CR;
     double H_PF;
 
+    //test
 
     //    internals
     double TailleC1;

@@ -159,9 +159,10 @@ public:
         TT_ini_oleo = TT_ini_oleo_;
         TT_since_appearance=TT_since_appearance_;
 
+        double coeff_max_plasticity=1;
 
-        masse_ind_max = IND_FRUIT_WEIGHT;
-        pot_fruits_number = int (inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE);
+        masse_ind_max = (1+coeff_max_plasticity)*IND_FRUIT_WEIGHT;
+        pot_fruits_number = (1+coeff_max_plasticity)*int (inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE);
 
         //        double RATIO_DUREE_JEUNES_OLEO = parameters.get("RATIO_DUREE_JEUNES_OLEO");
         //        double PRODUCTION_SPEED_ADULT = parameters.get("PRODUCTION_SPEED_ADULT");
@@ -188,16 +189,17 @@ public:
         demand = 0;
 
 
-        fruit_number = pot_fruits_number; //TODO change 1.0 in 1+x% of potential increase du to plasticity
+        fruit_number = int (inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE);
+        masse_ind=IND_FRUIT_WEIGHT;
 
         if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)) {
             double fr_bunch_dev = min (1.0 , (TT_since_appearance - TT_ini_flowering) / TT_bunch_dev_duration);
-            nonoil_biomass = fruit_number * masse_ind_max * (1 - OIL_CONTENT ) * fr_bunch_dev;
-            nonoil_demand = fruit_number * masse_ind_max * (1 - OIL_CONTENT ) * REPRO_CONSTRUCTION_COST  * ( Teff / TT_bunch_dev_duration );
+            nonoil_biomass = fruit_number * masse_ind * (1 - OIL_CONTENT ) * fr_bunch_dev;
+            nonoil_demand = fruit_number * masse_ind * (1 - OIL_CONTENT ) * REPRO_CONSTRUCTION_COST  * ( Teff / TT_bunch_dev_duration );
 
             if(inflo_status.is(inflo::OLEOSYNTHESIS)) {
                 double fr_oleo = min (1.0, (TT_since_appearance - TT_ini_oleo) / TT_oleo_duration);
-                final_oil_mass = fruit_number * masse_ind_max * OIL_CONTENT;
+                final_oil_mass = fruit_number * masse_ind * OIL_CONTENT;
                 oil_biomass =  final_oil_mass * fr_oleo;
                 oil_demand = final_oil_mass * COUT_OIL  * ( Teff / TT_oleo_duration );
 
@@ -206,7 +208,7 @@ public:
         }
 
         if (inflo_status.is(inflo::HARVEST)){
-            oil_biomass = fruit_number * masse_ind_max * OIL_CONTENT;
+            oil_biomass = fruit_number * masse_ind * OIL_CONTENT;
             oil_biomass_harvested=oil_biomass;
             nonoil_biomass_harvested=nonoil_biomass;
             oil_biomass=0;
@@ -243,14 +245,16 @@ public:
             ratio_huile_mesocarp = oil_biomass / (nonoil_biomass + oil_biomass);
 
 
-        double coeff_max_plasticity=2;
-        if (TT_since_appearance >= TT_ini_flowering)
-            fruit_number = min (coeff_max_plasticity, IC_spikelet) * pot_fruits_number;
 
-        if (TT_since_appearance>= TT_ini_flowering+ PERIOD_FRUIT_SET)
-            //            fruit_number = pow(IC_spikelet, SENSITIVITY_IC_SPIKELET) * pow(IC_setting, SENSITIVITY_IC_SETTING) * pot_fruits_number;
-            fruit_number = min (coeff_max_plasticity, IC_spikelet) * min (coeff_max_plasticity, IC_setting) * pot_fruits_number;
+        if (TT_since_appearance < TT_ini_flowering)
+//            fruit_number =  min (IC_spikelet * pot_fruits_number, pot_fruits_number);
+            fruit_number=0.0;
 
+        else
+            if (TT_since_appearance >=  TT_ini_flowering+ PERIOD_FRUIT_SET) {
+            double IC_total_setting=2;
+                fruit_number = min (IC_spikelet * pot_fruits_number, pot_fruits_number) * min (1.0, IC_setting/IC_total_setting);
+            }
 
 
         if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)) {

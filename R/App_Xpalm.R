@@ -22,7 +22,7 @@ lapply(packs, InstIfNec)
 
 
 # meteo = data.table::fread('D:/PAMStudio/dev/git/XPalm/parameters/meteo.txt')
-params = data.table::fread('D:/PAMStudio/dev/git/XPalm/parameters/XPalm_parameters_ref.txt',header=F)%>%
+params = data.table::fread('D:/PAMStudio/dev/git/XPalm/parameters/XPalm_parameters.txt',header=F)%>%
   select(V1,V3)%>%
   mutate(V3=as.numeric(V3))%>%
   data.frame()
@@ -216,7 +216,8 @@ ui<-
                  phyto_number=data.frame(path=colnames(data.table::fread(file =paste0('../../bin/msvc14/x64/phytomers.csv'),header=T,skip=1)))%>%
                    mutate(n=row_number())%>%
                    group_by(n)%>%
-                   mutate(number=str_extract(string = path,pattern =  "(?<=\\[).+?(?=\\])")[[1]])
+                   mutate(number=str_extract(string = path,pattern =  "(?<=\\[).+?(?=\\])")[[1]],
+                          number=sprintf("%03d",as.numeric(number)))
                  
                  
                  colnames(resultPhyto)=paste(head,phyto_number$number,sep='#')
@@ -232,9 +233,10 @@ ui<-
                  
                  inputPhyto=data.frame(key=colnames(phyto))%>%
                    separate(key,into = c('var','number'),sep = '#')%>%
-                   filter(var!='time')
+                   filter(var!='time')%>%
+                   mutate(number=sprintf("%03d",as.numeric(number)))
                  
-                 updateSelectInput(session = session, inputId = 'phytomerNumber', choices = sort(as.numeric(unique(inputPhyto$number))))
+                 updateSelectInput(session = session, inputId = 'phytomerNumber', choices = sort(unique(inputPhyto$number)))
                  updateSelectInput(session = session, inputId = 'variablePhyto_x', choices = unique(inputPhyto$var))
                  # updateSelectInput(session = session, inputId = 'variablePhyto_y', choices = unique(inputPhyto$var))
                })
@@ -336,7 +338,7 @@ ui<-
                              age=TREE_AGE/365,
                              yield_FFB=sum(FFB)/1000,
                              yield_oil=sum(BUNCH_OIL_BIOMASS_HARVESTED)/1000)%>%
-                   filter(nb_days>27)%>%
+                   filter(nb_days>27 & yield_oil>0)%>%
                    ungroup()%>%
                    ggplot()+
                    geom_point(aes(x=my(month),y=yield_FFB,col='FFB',label=paste('age:',round(age,2))))+
@@ -372,7 +374,7 @@ ui<-
                  # if (is.null(variablePhyto_y)) return(NULL)
                  
                  sub_phyto=phyto%>%
-                   rename(time=`time#NA`)%>%
+                   rename(time=`time# NA`)%>%
                    mutate(Date=ymd(str_sub(time,start = 0,end = 10)))%>%
                    select(Date,contains(variablePhyto_x))%>%
                    select(Date,contains(paste0("#",phytomerNumber)))%>%
@@ -382,7 +384,7 @@ ui<-
                    arrange(Date,number)
                  
                  sub_state=phyto%>%
-                   rename(time=`time#NA`)%>%
+                   rename(time=`time# NA`)%>%
                    mutate(Date=ymd(str_sub(time,start = 0,end = 10)))%>%
                    select(Date,contains('STATE'))%>%
                    select(Date,contains(paste0("#",phytomerNumber)))%>%
