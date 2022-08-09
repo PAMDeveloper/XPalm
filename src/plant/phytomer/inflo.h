@@ -2,14 +2,7 @@
 #define BUNCH_H
 
 /** PHYTOMER_MODEL Ablation **/
-//        ### ablation des regimes le jour de la mise en place des traitements
-//        if simulation.step == DEBUT_ABLATION_REGIME :
-//            for key in sorted(phytomers):
-//                if (phytomers[key].rank >= RANG_D_ABLATION_REGIME) :
-//                    if (phytomers[key].bunch.statut != "RECOLTE") :
-//                        if phytomers[key].bunch.sexe == "FEMELLE" :
-//                            if phytomers[key].bunch.avort == "NON_AVORTE" :
-//                                phytomers[key].bunch.ablation = phytomers[key].bunch.ablation_decision(POURC_ABLATION_REGIME)
+
 #include <defines.hpp>
 
 #include <plant/phytomer/bunch.h>
@@ -97,7 +90,6 @@ private:
     double SEX_RATIO_REF;
     double SEED;
     double FRACTION_PERIOD_OLEOSYNTHESIS;
-    //    double INI_SEX_RATIO;
 
     //    double INI_TAUX_D_AVORTEMENT;
 
@@ -260,7 +252,7 @@ public:
     //        else
     //            inflo_dev_factor = (INCREASE_TAILLE_REGIMES * t + phytomer.step_apparition - tree.date_plus_jeune_feuille) + FACTEUR_AGE_INI);
 
-    //        pot_fruits_number = inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE;
+    //        pot_fruits_number = inflo_dev_factor * FRUIT_NUMBER_ADULT;
     //    }
 
 
@@ -301,7 +293,6 @@ public:
         //        ICabort_RANG_FIN = parameters.get("ICabort_RANG_FIN");
         //        Seuil_IC_sex = parameters.get("Seuil_IC_sex");
         //        SENSITIVITY_ABORTION = parameters.get("SENSITIVITY_ABORTION");
-        //        INI_SEX_RATIO=parameters.get("INI_SEX_RATIO");
         //        INI_TAUX_D_AVORTEMENT= parameters.get("INI_TAUX_D_AVORTEMENT");
 
 

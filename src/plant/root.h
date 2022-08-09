@@ -33,12 +33,12 @@ class Racines : public AtomicModel < Racines >
 {
 private:
     //    parameters
-    double FTSW_RACINES;
-    double VITESSE_RACINES;
+    double TRESH_FTSW_SLOW_ROOTS;
+    double ROOTS_GROWTH_DEPTH;
     double Z2;
     double Z1;
-    double H_CR;
-    double H_PF;
+    double H_FC;
+    double H_WP;
 
     //test
 
@@ -88,12 +88,12 @@ public:
         last_time = t-1;
 
         //    parameters variables
-        FTSW_RACINES = parameters.get("FTSW_RACINES");
-        VITESSE_RACINES = parameters.get("VITESSE_RACINES");
+        TRESH_FTSW_SLOW_ROOTS = parameters.get("TRESH_FTSW_SLOW_ROOTS");
+        ROOTS_GROWTH_DEPTH = parameters.get("ROOTS_GROWTH_DEPTH");
         Z2 = parameters.get("Z2");
         Z1 = parameters.get("Z1");
-        H_CR = parameters.get("H_CR");
-        H_PF = parameters.get("H_PF");
+        H_FC = parameters.get("H_FC");
+        H_WP = parameters.get("H_WP");
 
         //    computed variables (internal)
         z = parameters.get("Z_INIT");
@@ -109,33 +109,33 @@ public:
 
     void compute_compartment_size() {
         if (z > Z1) {
-            TailleC1 = (H_CR - 0.5 * H_PF) * Z1;
-            TailleVap = 0.5 * H_PF * Z1;
+            TailleC1 = (H_FC - 0.5 * H_WP) * Z1;
+            TailleVap = 0.5 * H_WP * Z1;
         } else {
-            TailleC1 = (H_CR - 0.5 * H_PF) * z;
-            TailleVap = 0.5 * H_PF * z;
+            TailleC1 = (H_FC - 0.5 * H_WP) * z;
+            TailleVap = 0.5 * H_WP * z;
         }
         TailleC1moinsVap = TailleC1 - TailleVap;
 
         if (z > Z2 + Z1)
-            TailleC2 =  (H_CR - H_PF) * Z2;
+            TailleC2 =  (H_FC - H_WP) * Z2;
         else
-            TailleC2 = max(0. , (H_CR - H_PF) * (z - Z1));
+            TailleC2 = max(0. , (H_FC - H_WP) * (z - Z1));
         TailleC = TailleC2 + TailleC1moinsVap;
     }
 
     void compute(double /*t*/, bool /* update */) {
         //growth
         double red;
-        if (ftsw > FTSW_RACINES)
+        if (ftsw > TRESH_FTSW_SLOW_ROOTS)
             red = 1;
         else
-            red = ftsw / FTSW_RACINES;
+            red = ftsw / TRESH_FTSW_SLOW_ROOTS;
 
-        if (z + red * VITESSE_RACINES * TEff > Z2 + Z1)
+        if (z + red * ROOTS_GROWTH_DEPTH * TEff > Z2 + Z1)
             z = Z2 + Z1;
         else
-            z += red * VITESSE_RACINES * TEff;
+            z += red * ROOTS_GROWTH_DEPTH * TEff;
 
         compute_compartment_size();
     }

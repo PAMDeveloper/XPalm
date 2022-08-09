@@ -55,8 +55,8 @@ private:
     //      parameters
     //    double RANG_DEBUT_CROISSANCE_PEDUNCULE;
     double SENSITIVITY_IC_SPIKELET;
-    double MASSE_MEAN_PEDUNCULE_ADULTE;
-    double REPRO_CONSTRUCTION_COST;
+    double STALK_FINAL_BIOMASS;
+    double CONSTRUCTION_COST_INFLO;
     double FRACTION_PERIOD_DEV_PEDUNCLE ;
 
     //     internals
@@ -126,12 +126,12 @@ public:
 
         //        parameters
         SENSITIVITY_IC_SPIKELET = parameters.get("SENSITIVITY_IC_SPIKELET");
-        MASSE_MEAN_PEDUNCULE_ADULTE = parameters.get("MASSE_MEAN_PEDUNCULE_ADULTE");
+        STALK_FINAL_BIOMASS = parameters.get("STALK_FINAL_BIOMASS");
         FRACTION_PERIOD_DEV_PEDUNCLE = parameters.get("FRACTION_PERIOD_DEV_PEDUNCLE");
         double TEff_ini = parameters.get("T_EFF_INI");
 
         //        RANG_DEBUT_CROISSANCE_PEDUNCULE = parameters.get("RANG_DEBUT_CROISSANCE_PEDUNCULE");
-        REPRO_CONSTRUCTION_COST = parameters.get("REPRO_CONSTRUCTION_COST");
+        CONSTRUCTION_COST_INFLO = parameters.get("CONSTRUCTION_COST_INFLO");
 
         //        double PRODUCTION_SPEED_INITIAL = parameters.get("PRODUCTION_SPEED_INITIAL");
 
@@ -163,10 +163,10 @@ public:
                 //                    coeff = ( TT_since_appearance - (TT_ini_flowering - TT_since_growth)) / TT_since_growth;
                 //                }
 
-                //                biomass = inflo_dev_factor * MASSE_MEAN_PEDUNCULE_ADULTE * coeff;
+                //                biomass = inflo_dev_factor * STALK_FINAL_BIOMASS * coeff;
 
-                biomass = MASSE_MEAN_PEDUNCULE_ADULTE * inflo_dev_factor * fr_ped_dev;
-                demand= MASSE_MEAN_PEDUNCULE_ADULTE * inflo_dev_factor * REPRO_CONSTRUCTION_COST * ( TEff_ini / TT_ped_dev_duration );
+                biomass = STALK_FINAL_BIOMASS * inflo_dev_factor * fr_ped_dev;
+                demand= STALK_FINAL_BIOMASS * inflo_dev_factor * CONSTRUCTION_COST_INFLO * ( TEff_ini / TT_ped_dev_duration );
 
             }
         }
@@ -182,8 +182,8 @@ public:
 
         // growth();
         assimilate_supply = demand * fr_reste;
-        biomass += assimilate_supply / REPRO_CONSTRUCTION_COST;
-        potential_biomass += demand/ REPRO_CONSTRUCTION_COST;
+        biomass += assimilate_supply / CONSTRUCTION_COST_INFLO;
+        potential_biomass += demand/ CONSTRUCTION_COST_INFLO;
         demand=0;
 
         //        growth_demand();
@@ -192,8 +192,8 @@ public:
             biomass = 0;
         }
         else if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)){
-            demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * min(1.0, IC_spikelet) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration; //TODO, test with TT_corrige, correct 1.0 if plasticity
-            /*demand = inflo_dev_factor * REPRO_CONSTRUCTION_COST * pow(IC_spikelet, SENSITIVITY_IC_SPIKELET) * MASSE_MEAN_PEDUNCULE_ADULTE * Teff/TT_ped_dev_duration;*/
+            demand = inflo_dev_factor * CONSTRUCTION_COST_INFLO * min(1.0, IC_spikelet) * STALK_FINAL_BIOMASS * Teff/TT_ped_dev_duration; //TODO, test with TT_corrige, correct 1.0 if plasticity
+            /*demand = inflo_dev_factor * CONSTRUCTION_COST_INFLO * pow(IC_spikelet, SENSITIVITY_IC_SPIKELET) * STALK_FINAL_BIOMASS * Teff/TT_ped_dev_duration;*/
         }
     }
 

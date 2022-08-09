@@ -26,7 +26,7 @@ public:
                      LEAF_STATE,
                      RESERVE_EXCESS,
                      RESERVE_ALLOCATED,
-                     INFLEXION};
+                     LEAF_EXPANSION_INFLEXION_POINT};
 
     enum externals { TEFF,
                      SF_FIN,
@@ -44,16 +44,16 @@ public:
 private:
 
     //      parameters
-    double RANG_D_ABLATION;
-    double SLW_min;
-    double COURBURE;
-    double POURC_FOLIOLE;
+    double LEAF_PRUNING_RANK;
+    double SPECIFIC_LEAFLET_WEIGHT_MIN;
+    double LEAF_EXPANSION_SLOPE;
+    double LEAFLET_BIOMASS_CONTRIBUTION;
     //    double INCREASE_OF_LEAF_AREA;
-    double SLW_ini;
+    double SPECIFIC_LEAFLET_WEIGHT_INI;
     //    double PLASTICITY_LEAF_IC;
-    double SLW_max;
-    double COUT_RESPI_FEUILLE;
-    double TRESH_SLOW_PHYLO;
+    double SPECIFIC_LEAFLET_WEIGHT_MAX;
+    double RESPIRATION_COST_LEAF;
+    double TRESH_FTSW_SLOW_PHYLO;
     //    double SEUIL_EXPAN;
     double PRODUCTION_SPEED_ADULT;
 
@@ -79,7 +79,7 @@ private:
     leaf::leaf_state leaf_state;
     double reserve_allocated;
     double reserve_excess;
-    double inflexion;
+    double leaf_expansion_inflexion_point;
 
     //     externals
     double SF_fin;
@@ -119,7 +119,7 @@ public:
         Internal(LEAF_STATE, &Leaf::leaf_state);
         Internal(RESERVE_EXCESS, &Leaf::reserve_excess);
         Internal(RESERVE_ALLOCATED, &Leaf::reserve_allocated);
-        Internal(INFLEXION, &Leaf::inflexion);
+        Internal(LEAF_EXPANSION_INFLEXION_POINT, &Leaf::leaf_expansion_inflexion_point);
 
 
         //          externals
@@ -149,15 +149,15 @@ public:
         last_time = t;
 
         //        parameters
-        SLW_min = parameters.get("SLW_min")* 10000; //g.m-2
-        SLW_max = parameters.get("SLW_max")* 10000; //g.m-2
-        SLW_ini = parameters.get("SLW_ini")* 10000; //g.m-2
-        COUT_RESPI_FEUILLE = parameters.get("COUT_RESPI_FEUILLE");
-        POURC_FOLIOLE = parameters.get("POURC_FOLIOLE");
-        TRESH_SLOW_PHYLO  = parameters.get("TRESH_SLOW_PHYLO");
-        COURBURE = parameters.get("COURBURE");
+        SPECIFIC_LEAFLET_WEIGHT_MIN = parameters.get("SPECIFIC_LEAFLET_WEIGHT_MIN")* 10000; //g.m-2
+        SPECIFIC_LEAFLET_WEIGHT_MAX = parameters.get("SPECIFIC_LEAFLET_WEIGHT_MAX")* 10000; //g.m-2
+        SPECIFIC_LEAFLET_WEIGHT_INI = parameters.get("SPECIFIC_LEAFLET_WEIGHT_INI")* 10000; //g.m-2
+        RESPIRATION_COST_LEAF = parameters.get("RESPIRATION_COST_LEAF");
+        LEAFLET_BIOMASS_CONTRIBUTION = parameters.get("LEAFLET_BIOMASS_CONTRIBUTION");
+        TRESH_FTSW_SLOW_PHYLO  = parameters.get("TRESH_FTSW_SLOW_PHYLO");
+        LEAF_EXPANSION_SLOPE = parameters.get("LEAF_EXPANSION_SLOPE");
         //        PLASTICITY_LEAF_IC = parameters.get("PLASTICITY_LEAF_IC");
-        RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
+        LEAF_PRUNING_RANK = parameters.get("LEAF_PRUNING_RANK");
         PRODUCTION_SPEED_ADULT = parameters.get("PRODUCTION_SPEED_ADULT"); // (rank.DD-1)
 
         //        internals
@@ -179,7 +179,7 @@ public:
         leaf_state=leaf::NON_COUPE;
 
         double tt_cor= production_speed/PRODUCTION_SPEED_ADULT; // correction factor to take into account varying production speed of leaves, enables to get leaf emmition around rank 0
-        inflexion = parameters.get("INFLEXION")/tt_cor;
+        leaf_expansion_inflexion_point = parameters.get("LEAF_EXPANSION_INFLEXION_POINT")/tt_cor;
 
         //        externals
         SF_fin = SF_fin_leaf; //m2
@@ -187,7 +187,7 @@ public:
         phytomer_state = state;
         reserve_excess = 0;
 
-        if ((phytomer_rank >= RANG_D_ABLATION) | (inflo_status.is(inflo::FEMALE) && !inflo_status.is(inflo::ABORTED)&& inflo_status.is(inflo::HARVEST))){
+        if ((phytomer_rank >= LEAF_PRUNING_RANK) | (inflo_status.is(inflo::FEMALE) && !inflo_status.is(inflo::ABORTED)&& inflo_status.is(inflo::HARVEST))){
             leaf_state= leaf::COUPE;
             leaf_structural_biomass=0;
             leaf_non_structural_biomass=0;
@@ -197,7 +197,7 @@ public:
 
 
         if (leaf_state==leaf::NON_COUPE){
-            potLeafArea = (SF_fin / (1 + exp(-(TT_since_leaf_expand - inflexion) / COURBURE)));
+            potLeafArea = (SF_fin / (1 + exp(-(TT_since_leaf_expand - leaf_expansion_inflexion_point) / LEAF_EXPANSION_SLOPE)));
 
 
             leafArea_cor=potLeafArea;
@@ -206,17 +206,17 @@ public:
                     ? potLeafArea
                     : 0;
 
-            leaf_structural_biomass = leafArea * SLW_min / POURC_FOLIOLE; // m2  x g.m-2=g
-            leaf_non_structural_biomass = leafArea  * (SLW_ini - SLW_min) / POURC_FOLIOLE;
+            leaf_structural_biomass = leafArea * SPECIFIC_LEAFLET_WEIGHT_MIN / LEAFLET_BIOMASS_CONTRIBUTION; // m2  x g.m-2=g
+            leaf_non_structural_biomass = leafArea  * (SPECIFIC_LEAFLET_WEIGHT_INI - SPECIFIC_LEAFLET_WEIGHT_MIN) / LEAFLET_BIOMASS_CONTRIBUTION;
 
             slw = (leafArea > 0)
-                    ? leaf_total_biomass * POURC_FOLIOLE / leafArea // g.m-2
+                    ? leaf_total_biomass * LEAFLET_BIOMASS_CONTRIBUTION / leafArea // g.m-2
                     : 0;
 
 
         }
 
-        leaf_reserve_max = (SLW_max - SLW_min) * leafArea  / POURC_FOLIOLE;  //g
+        leaf_reserve_max = (SPECIFIC_LEAFLET_WEIGHT_MAX - SPECIFIC_LEAFLET_WEIGHT_MIN) * leafArea  / LEAFLET_BIOMASS_CONTRIBUTION;  //g
         leaf_reserve_pot = leaf_reserve_max-leaf_non_structural_biomass;
         reserve_allocated=leaf_non_structural_biomass;
         leaf_total_biomass = leaf_structural_biomass + leaf_non_structural_biomass; //g
@@ -230,8 +230,7 @@ public:
         reserve_excess=0;
 
         //        compute_coupe_feuille_recolte
-        if ((phytomer_rank >= RANG_D_ABLATION) | (inflo_status.is(inflo::FEMALE) && !inflo_status.is(inflo::ABORTED) && inflo_status.is(inflo::HARVEST))){
-            //         if ((phytomer_rank >= RANG_D_ABLATION)){
+        if ((phytomer_rank >= LEAF_PRUNING_RANK) | (inflo_status.is(inflo::FEMALE) && !inflo_status.is(inflo::ABORTED) && inflo_status.is(inflo::HARVEST))){
             leaf_state= leaf::COUPE;
             leaf_demand=0;
             assimilate_supply=0;
@@ -264,9 +263,9 @@ public:
 
             //            leafArea =leafArea_cor;
             assimilate_supply = leaf_demand * fr_reste;
-            leaf_structural_biomass += assimilate_supply / COUT_RESPI_FEUILLE;
+            leaf_structural_biomass += assimilate_supply / RESPIRATION_COST_LEAF;
 
-            leaf_reserve_max = (SLW_max - SLW_min) * leafArea / POURC_FOLIOLE;
+            leaf_reserve_max = (SPECIFIC_LEAFLET_WEIGHT_MAX - SPECIFIC_LEAFLET_WEIGHT_MIN) * leafArea / LEAFLET_BIOMASS_CONTRIBUTION;
             reserve_allocated = fraction_non_str_biomasse_allouee * leaves_res_avai;
 
             if (reserve_allocated>=leaf_reserve_max){
@@ -279,22 +278,22 @@ public:
             }
 
             slw = ( leafArea > 0 )
-                    ? leaf_total_biomass * POURC_FOLIOLE / (leafArea) // g.m-2
+                    ? leaf_total_biomass * LEAFLET_BIOMASS_CONTRIBUTION / (leafArea) // g.m-2
                     : 0;
 
 
             //        GROWTH DEMAND;
-            double expan_slow=(ftsw > TRESH_SLOW_PHYLO
+            double expan_slow=(ftsw > TRESH_FTSW_SLOW_PHYLO
                                ? 1
-                               : ftsw / TRESH_SLOW_PHYLO );
+                               : ftsw / TRESH_FTSW_SLOW_PHYLO );
 
             gain_TEff_jour = TEff * expan_slow;
             TT_since_leaf_expand += gain_TEff_jour;
 
 
-            vitesse_exp = -(SF_fin /COURBURE) * (-exp(-(TT_since_leaf_expand-inflexion)/COURBURE))/(pow( (1+exp(-(TT_since_leaf_expand-inflexion)/COURBURE)),2));
+            vitesse_exp = -(SF_fin /LEAF_EXPANSION_SLOPE) * (-exp(-(TT_since_leaf_expand-leaf_expansion_inflexion_point)/LEAF_EXPANSION_SLOPE))/(pow( (1+exp(-(TT_since_leaf_expand-leaf_expansion_inflexion_point)/LEAF_EXPANSION_SLOPE)),2));
             increase_potleafArea = gain_TEff_jour * vitesse_exp ;
-            leaf_demand =  increase_potleafArea  *(SLW_min * COUT_RESPI_FEUILLE )/ POURC_FOLIOLE;
+            leaf_demand =  increase_potleafArea  *(SPECIFIC_LEAFLET_WEIGHT_MIN * RESPIRATION_COST_LEAF )/ LEAFLET_BIOMASS_CONTRIBUTION;
 
             //            }
         }

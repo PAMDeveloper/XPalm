@@ -33,8 +33,8 @@ public:
 
 private:
     //      parameters
-    double MASSE_INFLO_MALE_ADULTE;
-    double REPRO_CONSTRUCTION_COST;
+    double MALE_INFLO_FINAL_BIOMASS;
+    double CONSTRUCTION_COST_INFLO;
     double TEFF_INI;
 
     //     internals
@@ -90,8 +90,8 @@ public:
         last_time = t;
 
         //        parameters
-        MASSE_INFLO_MALE_ADULTE = parameters.get("MASSE_INFLO_MALE_ADULTE");
-        REPRO_CONSTRUCTION_COST = parameters.get("REPRO_CONSTRUCTION_COST");
+        MALE_INFLO_FINAL_BIOMASS = parameters.get("MALE_INFLO_FINAL_BIOMASS");
+        CONSTRUCTION_COST_INFLO = parameters.get("CONSTRUCTION_COST_INFLO");
         TEFF_INI = parameters.get("T_EFF_INI");
         //       internals
         biomass = 0;
@@ -115,8 +115,8 @@ public:
         //init structure
         if (inflo_status.is(inflo::FLOWERING) ) {
             double fr_growth = min(1.0, (TT_since_appearance - TT_ini_flowering) / TT_flowering_duration );
-            biomass = MASSE_INFLO_MALE_ADULTE * inflo_dev_factor * fr_growth;
-            demand = MASSE_INFLO_MALE_ADULTE * REPRO_CONSTRUCTION_COST * inflo_dev_factor * ( TEFF_INI / TT_flowering_duration );
+            biomass = MALE_INFLO_FINAL_BIOMASS * inflo_dev_factor * fr_growth;
+            demand = MALE_INFLO_FINAL_BIOMASS * CONSTRUCTION_COST_INFLO * inflo_dev_factor * ( TEFF_INI / TT_flowering_duration );
         }
 
         if (inflo_status.is(inflo::SENESCENCE) ) {
@@ -133,12 +133,12 @@ public:
 
         // growth();
         assimilate_supply = demand * fr_reste;
-        biomass += assimilate_supply / REPRO_CONSTRUCTION_COST;
-        potential_biomass += demand/ REPRO_CONSTRUCTION_COST;
+        biomass += assimilate_supply / CONSTRUCTION_COST_INFLO;
+        potential_biomass += demand/ CONSTRUCTION_COST_INFLO;
         demand=0;
 
         if (inflo_status.is(inflo::FLOWERING)){
-            demand = MASSE_INFLO_MALE_ADULTE * REPRO_CONSTRUCTION_COST * inflo_dev_factor * ( Teff / TT_flowering_duration );
+            demand = MALE_INFLO_FINAL_BIOMASS * CONSTRUCTION_COST_INFLO * inflo_dev_factor * ( Teff / TT_flowering_duration );
 
         }
         else if (inflo_status.is(inflo::SENESCENCE)){

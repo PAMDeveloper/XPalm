@@ -43,7 +43,7 @@ private:
 
     //     parameters
     double INACTIVE_PHYTOMER_NUMBER;
-    double RANG_D_ABLATION;
+    double LEAF_PRUNING_RANK;
 
     //     internals
     phytomer::phytomer_state state;
@@ -118,7 +118,7 @@ public:
 
         //parameters
         INACTIVE_PHYTOMER_NUMBER = parameters.get("INACTIVE_PHYTOMER_NUMBER");
-        RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
+        LEAF_PRUNING_RANK = parameters.get("LEAF_PRUNING_RANK");
 
 
         //predim
@@ -128,7 +128,7 @@ public:
         SF_fin = SF_fin_;
         TT_ini_harvest=harv_tt;
 
-        rank = total_phyto_-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER) - number - INACTIVE_PHYTOMER_NUMBER;
+        rank = total_phyto_-(LEAF_PRUNING_RANK + INACTIVE_PHYTOMER_NUMBER) - number - INACTIVE_PHYTOMER_NUMBER;
 
         //        state = st ? phytomer::INACTIVE : phytomer::ACTIVE;
 
@@ -166,10 +166,10 @@ public:
         //         rank = total_phytomer_number - INACTIVE_PHYTOMER_NUMBER - number - 1;
 
         //        rank = (number>0)
-        //                ? total_phytomer_number- (RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + number) - INACTIVE_PHYTOMER_NUMBER
-        //                : total_phytomer_number-(RANG_D_ABLATION +INACTIVE_PHYTOMER_NUMBER - number) + INACTIVE_PHYTOMER_NUMBER;
+        //                ? total_phytomer_number- (LEAF_PRUNING_RANK + INACTIVE_PHYTOMER_NUMBER + number) - INACTIVE_PHYTOMER_NUMBER
+        //                : total_phytomer_number-(LEAF_PRUNING_RANK +INACTIVE_PHYTOMER_NUMBER - number) + INACTIVE_PHYTOMER_NUMBER;
 
-        rank = total_phytomer_number-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER) - number - INACTIVE_PHYTOMER_NUMBER;
+        rank = total_phytomer_number-(LEAF_PRUNING_RANK + INACTIVE_PHYTOMER_NUMBER) - number - INACTIVE_PHYTOMER_NUMBER;
 
         //        if(rank > 0 && state == phytomer::INACTIVE)
         //            state = phytomer::ACTIVE;

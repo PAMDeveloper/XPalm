@@ -60,14 +60,14 @@ public:
         selector("TRUNK_HEIGHT", artis::kernel::DOUBLE,{Tree::TRUNK_HEIGHT});
 
         //TREE BIOMASS
-        selector("BUNCH_OIL_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::BUNCH_OIL_BIOMASS_HARVESTED});
-        selector("BUNCH_NONOIL_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::BUNCH_NONOIL_BIOMASS_HARVESTED});
-        selector("TRUNK_BIOMASS", artis::kernel::DOUBLE,{Tree::TRUNK_BIOMASS});
+        selector("BIOMASS_BUNCH_OIL_HARVESTED", artis::kernel::DOUBLE,{Tree::BUNCH_OIL_BIOMASS_HARVESTED});
+        selector("BIOMASS_BUNCH_NONOIL_HARVESTED", artis::kernel::DOUBLE,{Tree::BUNCH_NONOIL_BIOMASS_HARVESTED});
+        selector("BIOMASS_TRUNK", artis::kernel::DOUBLE,{Tree::TRUNK_BIOMASS});
         selector("FRACTION_NON_STR_BIOMASS_TOTAL", artis::kernel::DOUBLE,{Tree::FRACTION_NON_STR_BIOMASS_TOTAL});
-        selector("LEAVES_STRUCTURAL_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::LEAVES_STRUCTURAL_BIOMASS_HARVESTED});
-        selector("LEAVES_NON_STRUCTURAL_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::LEAVES_NON_STRUCTURAL_BIOMASS_HARVESTED});
-        selector("MALE_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::MALE_BIOMASS_HARVESTED});
-        selector("PEDUNCLE_BIOMASS_HARVESTED", artis::kernel::DOUBLE,{Tree::PEDUNCLE_BIOMASS_HARVESTED});
+        selector("BIOMASS_LEAVES_STRUCTURAL_HARVESTED", artis::kernel::DOUBLE,{Tree::LEAVES_STRUCTURAL_BIOMASS_HARVESTED});
+        selector("BIOMASS_LEAVES_NON_STRUCTURAL_HARVESTED", artis::kernel::DOUBLE,{Tree::LEAVES_NON_STRUCTURAL_BIOMASS_HARVESTED});
+        selector("BIOMASS_MALE_HARVESTED", artis::kernel::DOUBLE,{Tree::MALE_BIOMASS_HARVESTED});
+        selector("BIOMASS_PEDUNCLE_HARVESTED", artis::kernel::DOUBLE,{Tree::PEDUNCLE_BIOMASS_HARVESTED});
 
         //TREE PHYSIOL
         selector("ASSIM", artis::kernel::DOUBLE,{Tree::ASSIM});
@@ -86,7 +86,7 @@ public:
         selector("IC", artis::kernel::DOUBLE,{Tree::IC});
         selector("DEMAND_INTERNODE", artis::kernel::DOUBLE,{Tree::INTERNODE_DEMAND});
         selector("DEMAND_LEAVES", artis::kernel::DOUBLE,{Tree::LEAVES_DEMAND});
-        selector("LEAVES_RESERVE_EXCESS", artis::kernel::DOUBLE,{Tree::LEAVES_RESERVE_EXCESS});
+        selector("RESERVE_LEAVES_EXCESS", artis::kernel::DOUBLE,{Tree::LEAVES_RESERVE_EXCESS});
         selector("DEMAND_MALE", artis::kernel::DOUBLE,{Tree::MALE_DEMAND});
         selector("DEMAND_PEDUNCLE", artis::kernel::DOUBLE,{Tree::PEDUNCLE_DEMAND});
         selector("RESPI_MAINTENANCE", artis::kernel::DOUBLE,{Tree::RESPI_MAINTENANCE});

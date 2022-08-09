@@ -332,12 +332,12 @@ ui<-
                  
                  grY=res%>%
                    mutate(month=paste0(month(Date),'/',year(Date)),
-                          FFB=BUNCH_NONOIL_BIOMASS_HARVESTED+BUNCH_OIL_BIOMASS_HARVESTED)%>%
+                          FFB=BIOMASS_BUNCH_NONOIL_HARVESTED+BIOMASS_BUNCH_OIL_HARVESTED)%>%
                    group_by(month)%>%
                    summarize(nb_days=n(),
                              age=TREE_AGE/365,
                              yield_FFB=sum(FFB)/1000,
-                             yield_oil=sum(BUNCH_OIL_BIOMASS_HARVESTED)/1000)%>%
+                             yield_oil=sum(BIOMASS_BUNCH_OIL_HARVESTED)/1000)%>%
                    filter(nb_days>27 & yield_oil>0)%>%
                    ungroup()%>%
                    ggplot()+

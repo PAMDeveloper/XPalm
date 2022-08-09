@@ -42,14 +42,14 @@ public:
 private:
     //      parameters
     double OIL_CONTENT;
-    double COUT_OIL;
-    double REPRO_CONSTRUCTION_COST;
+    double COST_OLEOSYNTHESIS;
+    double CONSTRUCTION_COST_INFLO;
     double SENSITIVITY_IC_SPIKELET;
     //    double IC_spikelet_RANG_FIN;
     double SENSITIVITY_IC_SETTING;
     double PERIOD_FRUIT_SET;
     double IND_FRUIT_WEIGHT;
-    double MEAN_FRUIT_NUMBER_ADULTE;
+    double FRUIT_NUMBER_ADULT;
 
 
     //     internals
@@ -145,13 +145,13 @@ public:
 
         //        parameters
         OIL_CONTENT = parameters.get("OIL_CONTENT");
-        COUT_OIL = parameters.get("COUT_OIL");
-        REPRO_CONSTRUCTION_COST = parameters.get("REPRO_CONSTRUCTION_COST");
+        COST_OLEOSYNTHESIS = parameters.get("COST_OLEOSYNTHESIS");
+        CONSTRUCTION_COST_INFLO = parameters.get("CONSTRUCTION_COST_INFLO");
         SENSITIVITY_IC_SPIKELET = parameters.get("SENSITIVITY_IC_SPIKELET");
         SENSITIVITY_IC_SETTING = parameters.get("SENSITIVITY_IC_SETTING");
         PERIOD_FRUIT_SET= parameters.get("PERIOD_FRUIT_SET");
         IND_FRUIT_WEIGHT = parameters.get("IND_FRUIT_WEIGHT");
-        MEAN_FRUIT_NUMBER_ADULTE = parameters.get("MEAN_FRUIT_NUMBER_ADULTE");
+        FRUIT_NUMBER_ADULT = parameters.get("FRUIT_NUMBER_ADULT");
 
         //        IC_spikelet_RANG_FIN = parameters.get("IC_spikelet_RANG_FIN");
         TT_ini_harvest = harv_tt;
@@ -162,7 +162,7 @@ public:
         double coeff_max_plasticity=1;
 
         masse_ind_max = (1+coeff_max_plasticity)*IND_FRUIT_WEIGHT;
-        pot_fruits_number = (1+coeff_max_plasticity)*int (inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE);
+        pot_fruits_number = (1+coeff_max_plasticity)*int (inflo_dev_factor * FRUIT_NUMBER_ADULT);
 
         //        double RATIO_DUREE_JEUNES_OLEO = parameters.get("RATIO_DUREE_JEUNES_OLEO");
         //        double PRODUCTION_SPEED_ADULT = parameters.get("PRODUCTION_SPEED_ADULT");
@@ -189,19 +189,19 @@ public:
         demand = 0;
 
 
-        fruit_number = int (inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE);
+        fruit_number = int (inflo_dev_factor * FRUIT_NUMBER_ADULT);
         masse_ind=IND_FRUIT_WEIGHT;
 
         if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)) {
             double fr_bunch_dev = min (1.0 , (TT_since_appearance - TT_ini_flowering) / TT_bunch_dev_duration);
             nonoil_biomass = fruit_number * masse_ind * (1 - OIL_CONTENT ) * fr_bunch_dev;
-            nonoil_demand = fruit_number * masse_ind * (1 - OIL_CONTENT ) * REPRO_CONSTRUCTION_COST  * ( Teff / TT_bunch_dev_duration );
+            nonoil_demand = fruit_number * masse_ind * (1 - OIL_CONTENT ) * CONSTRUCTION_COST_INFLO  * ( Teff / TT_bunch_dev_duration );
 
             if(inflo_status.is(inflo::OLEOSYNTHESIS)) {
                 double fr_oleo = min (1.0, (TT_since_appearance - TT_ini_oleo) / TT_oleo_duration);
                 final_oil_mass = fruit_number * masse_ind * OIL_CONTENT;
                 oil_biomass =  final_oil_mass * fr_oleo;
-                oil_demand = final_oil_mass * COUT_OIL  * ( Teff / TT_oleo_duration );
+                oil_demand = final_oil_mass * COST_OLEOSYNTHESIS  * ( Teff / TT_oleo_duration );
 
             }
 
@@ -227,9 +227,9 @@ public:
         //compute oil and nonoil biomass
 
         nonoil_assimilate_supply = nonoil_demand * fr_fruits;
-        nonoil_biomass += nonoil_assimilate_supply / REPRO_CONSTRUCTION_COST;
+        nonoil_biomass += nonoil_assimilate_supply / CONSTRUCTION_COST_INFLO;
         oil_assimilate_supply = oil_demand * fr_fruits;
-        oil_biomass += oil_assimilate_supply / COUT_OIL;
+        oil_biomass += oil_assimilate_supply / COST_OLEOSYNTHESIS;
         nonoil_demand=0;
         oil_demand=0;
 
@@ -260,13 +260,13 @@ public:
         if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)) {
             double fr_bunch_dev = min (1.0 , (TT_since_appearance - TT_ini_flowering) / TT_bunch_dev_duration);
             nonoil_biomass = fruit_number * masse_ind_max * (1 - OIL_CONTENT ) * fr_bunch_dev;
-            nonoil_demand = fruit_number * masse_ind_max * (1 - OIL_CONTENT ) * REPRO_CONSTRUCTION_COST  * ( Teff / TT_bunch_dev_duration );
+            nonoil_demand = fruit_number * masse_ind_max * (1 - OIL_CONTENT ) * CONSTRUCTION_COST_INFLO  * ( Teff / TT_bunch_dev_duration );
 
             if(inflo_status.is(inflo::OLEOSYNTHESIS)) {
                 double fr_oleo = min (1.0, (TT_since_appearance - TT_ini_oleo) / TT_oleo_duration);
                 final_oil_mass = fruit_number * masse_ind_max * OIL_CONTENT;
                 oil_biomass =  final_oil_mass * fr_oleo;
-                oil_demand = final_oil_mass * COUT_OIL  * ( Teff / TT_oleo_duration );
+                oil_demand = final_oil_mass * COST_OLEOSYNTHESIS  * ( Teff / TT_oleo_duration );
             }
 
         }
