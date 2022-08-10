@@ -158,7 +158,7 @@ ui<-
                  
                  updateSelectInput(session = session, inputId = 'x_var', choices = unique(c('Date',names(res))))
                  updateSelectInput(session = session, inputId = 'y_var', choices = unique(c('PLANTLEAFAREA',names(res))))
-                 updateSelectInput(session = session, inputId = 'second_var', choices = unique(c('IC',names(res))))
+                 updateSelectInput(session = session, inputId = 'second_var', choices = unique(c('COMPETITION_INDEX',names(res))))
                })
                
                
