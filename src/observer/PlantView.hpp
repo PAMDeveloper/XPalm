@@ -73,23 +73,22 @@ public:
         selector("ASSIM", artis::kernel::DOUBLE,{Tree::ASSIM});
         selector("ASSIM_EXCESS", artis::kernel::DOUBLE,{Tree::ASSIM_EXCESS});
         selector("GROWTH_OFFER", artis::kernel::DOUBLE,{Tree::GROWTH_OFFER});
-        selector("DIF_DEMAND_OFFER", artis::kernel::DOUBLE,{Tree::DIF_DEMAND_OFFER});
-        selector("RES_STEM", artis::kernel::DOUBLE,{Tree::RES_STEM});
-        selector("RES_LEAVES", artis::kernel::DOUBLE,{Tree::RES_LEAVES});
-        selector("RES_TOTAL", artis::kernel::DOUBLE,{Tree::RES_TOTAL});
-        selector("DEMAND_BUNCH", artis::kernel::DOUBLE,{Tree::BUNCH_DEMAND});
-        selector("C_BALANCE", artis::kernel::DOUBLE,{Tree::C_BALANCE});
-        selector("EI", artis::kernel::DOUBLE,{Tree::EI});
-        selector("FR_FRUITS", artis::kernel::DOUBLE,{Tree::FR_FRUITS});
-        selector("FR_RESTE", artis::kernel::DOUBLE,{Tree::FR_RESTE});
+        selector("RESERVE_STEM", artis::kernel::DOUBLE,{Tree::RES_STEM});
+        selector("RESERVE_LEAVES", artis::kernel::DOUBLE,{Tree::RES_LEAVES});
+        selector("RESERVE_TOTAL", artis::kernel::DOUBLE,{Tree::RES_TOTAL});
+        selector("CARBON_BALANCE", artis::kernel::DOUBLE,{Tree::C_BALANCE});
+        selector("RIE", artis::kernel::DOUBLE,{Tree::EI});
+        selector("FRACTION_OFFER_TO_BUNCHES", artis::kernel::DOUBLE,{Tree::FR_FRUITS});
         selector("DEMAND_GROWTH", artis::kernel::DOUBLE,{Tree::GROWTH_DEMAND});
-        selector("IC", artis::kernel::DOUBLE,{Tree::IC});
         selector("DEMAND_INTERNODE", artis::kernel::DOUBLE,{Tree::INTERNODE_DEMAND});
         selector("DEMAND_LEAVES", artis::kernel::DOUBLE,{Tree::LEAVES_DEMAND});
-        selector("RESERVE_LEAVES_EXCESS", artis::kernel::DOUBLE,{Tree::LEAVES_RESERVE_EXCESS});
         selector("DEMAND_MALE", artis::kernel::DOUBLE,{Tree::MALE_DEMAND});
         selector("DEMAND_PEDUNCLE", artis::kernel::DOUBLE,{Tree::PEDUNCLE_DEMAND});
-        selector("RESPI_MAINTENANCE", artis::kernel::DOUBLE,{Tree::RESPI_MAINTENANCE});
+        selector("DEMAND_BUNCH", artis::kernel::DOUBLE,{Tree::BUNCH_DEMAND});
+        selector("COMPETITION_INDEX", artis::kernel::DOUBLE,{Tree::IC});
+
+        selector("RESERVE_LEAVES_EXCESS", artis::kernel::DOUBLE,{Tree::LEAVES_RESERVE_EXCESS});
+        selector("MAINTENANCE_RESPIRATION", artis::kernel::DOUBLE,{Tree::RESPI_MAINTENANCE});
         selector("AV_SEXRATIO", artis::kernel::DOUBLE,{Tree::AV_SEXRATIO});
         selector("AV_ABORTION", artis::kernel::DOUBLE,{Tree::AV_ABORTION});
 
