@@ -69,7 +69,7 @@ public:
                      BUNCH_NONOIL_BIOMASS_HARVESTED,
                      ASSIM,
                      RESPI_MAINTENANCE,
-                     PHYTOMERNUMBER,
+                     TOTALPHYTOMERNUMBER,
                      NEWPHYTOMEREMERGENCE,
                      FR_FRUITS,
                      FR_RESTE,
@@ -117,7 +117,7 @@ private:
     double PRODUCTION_SPEED_INITIAL;
     double AGE_INI;
     double AGE_ADULT;
-    double AGE_PLANTING;
+    //    double AGE_PLANTING;
     double AGE_START_PROD;
     double TT_FLOWERING_INITIAL;
     double TT_FLOWERING_ADULT;
@@ -159,7 +159,7 @@ private:
     double assim;
     double ic;
     double respi_maintenance;
-    double phytomerNumber;
+    double total_phytomer_number;
     double newPhytomerEmergence;
     double fr_fruits;
     double fr_reste;
@@ -246,7 +246,7 @@ public:
         Internal(BUNCH_NONOIL_BIOMASS_HARVESTED, &Tree::bunch_non_oil_biomass_harvested);
         Internal(ASSIM, &Tree::assim);
         Internal(RESPI_MAINTENANCE, &Tree::respi_maintenance);
-        Internal(PHYTOMERNUMBER, &Tree::phytomerNumber);
+        Internal(TOTALPHYTOMERNUMBER, &Tree::total_phytomer_number);
         Internal(NEWPHYTOMEREMERGENCE, &Tree::newPhytomerEmergence);
         Internal(FR_FRUITS, &Tree::fr_fruits);
         Internal(FR_RESTE, &Tree::fr_reste);
@@ -310,9 +310,6 @@ public:
         //        AGE_START_PROD = parameters.get("AGE_START_PROD") * 365;
         //        AGE_PLANTING = parameters.get("AGE_PLANTING") * 365; // days (age when production speed starts to decrease)
         AGE_INI=parameters.get("AGE_INI")* 365;
-        AGE_ADULT = 8.0 * 365; // days
-        AGE_PLANTING = 1.0 * 365;
-        AGE_START_PROD = 3.0 * 365;
         INTERNODE_START_GROWTH = parameters.get("INTERNODE_START_GROWTH")* 365;
         INTERNODE_STOP_GROWTH= parameters.get("INTERNODE_STOP_GROWTH")* 365;
         TEFF_INI = parameters.get("T_EFF_INI");
@@ -340,7 +337,8 @@ public:
 
         //        internals
         newPhytomerEmergence = 0;
-        phytomerNumber = INACTIVE_PHYTOMER_NUMBER + LEAF_PRUNING_RANK;
+
+
         ic = 1;
         ei = 0;
 
@@ -358,17 +356,36 @@ public:
         srand(SEED);
 
         //init structure
-        age =AGE_INI;
-        double production_speed = age_relative_var(age, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
 
-        int nb_phyto = INACTIVE_PHYTOMER_NUMBER + LEAF_PRUNING_RANK;
+        AGE_ADULT = 5.0 * 365; // days
+        //      AGE_PLANTING = 1.0 * 365;
+        AGE_START_PROD = 0.0 * 365; // =60 phytomers without inflorescence
+
+
+        age =AGE_INI;
+        double production_speed = age_relative_var(age, 0.0, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
+
+        // estimate total phytomers
+        total_phytomer_number = INACTIVE_PHYTOMER_NUMBER;
+        double d=0;
+        while(d<=AGE_INI){
+            d+=1;
+            production_speed = age_relative_var(d, 0.0, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
+            total_phytomer_number+=production_speed*TEFF_INI;
+        }
+
+        total_phytomer_number=floor(total_phytomer_number);
+
+        int nb_phyto = total_phytomer_number;
+
         double age_at_creation = age;
         for ( int i =0 ; i<nb_phyto ; ++i ) {
-            create_phytomer(t-1, -i, phytomerNumber, age_at_creation);
+            create_phytomer(t-1, -i, newPhytomer, age_at_creation);
             //update production speed for each phytomer
-            production_speed = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
+            production_speed = age_relative_var(age_at_creation, 0.0, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
             //update age at phytomer creation
             age_at_creation -= 1 / (TEFF_INI * production_speed);
+
         }
 
         meteo->init(t, parameters);
@@ -485,15 +502,15 @@ public:
     }
 
 
-    void create_phytomer(double t, double number, double total_phyto, double age_at_creation) {
+    void create_phytomer(double t, double number, double newPhytomer, double age_at_creation) {
         //        double rank = total_phyto - INACTIVE_PHYTOMER_NUMBER - number - 1;
 
-        double production_speed = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
-        double TT_ini_flowering = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_FLOWERING_INITIAL, TT_FLOWERING_ADULT);
-        double TT_ini_harvest = age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, TT_HARVEST_INITIAL, TT_HARVEST_ADULT);
+        double production_speed = age_relative_var(age_at_creation, 0.0, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
+        double TT_ini_flowering = age_relative_var(age_at_creation, 0.0, AGE_ADULT, TT_FLOWERING_INITIAL, TT_FLOWERING_ADULT);
+        double TT_ini_harvest = age_relative_var(age_at_creation, 0.0, AGE_ADULT, TT_HARVEST_INITIAL, TT_HARVEST_ADULT);
         double inflo_dev_factor =0;
-        if (age_at_creation>=AGE_PLANTING){
-            inflo_dev_factor=age_relative_var(age_at_creation, AGE_PLANTING, AGE_ADULT, 0.3, 1);
+        if (age_at_creation>=AGE_START_PROD){
+            inflo_dev_factor=age_relative_var(age_at_creation, AGE_START_PROD, AGE_ADULT, 0.3, 1);
         }
 
         double TT_ini_male_senescence = TT_ini_flowering +PERIOD_MALE_INFLO;
@@ -508,8 +525,7 @@ public:
 
         Phytomer * phytomer = new Phytomer();
         setsubmodel(PHYTOMERS, phytomer);
-        phytomer->init(t, _parameters, number, total_phyto,
-                       (number > LEAF_PRUNING_RANK),
+        phytomer->init(t, _parameters, number, newPhytomer,
                        age_at_creation,
                        age,
                        production_speed,
@@ -520,7 +536,7 @@ public:
                        SF_ind);
 
         phytomers.push_back(phytomer);
-        //        phytomerNumber += 1;
+
     }
 
 
@@ -554,8 +570,11 @@ public:
         auto it = phytomers.begin();
         while (it != phytomers.end()) {
             Phytomer* phytomer = (*it);
-            phytomer->put < double >(t, Phytomer::TOTAL_PHYTOMER_NUMBER, phytomers.size());
+            phytomer->put < double >(t, Phytomer::TOTAL_PHYTOMER_NUMBER, total_phytomer_number);
+            phytomer->put < double >(t, Phytomer::NEWPHYTOMER, newPhytomer);
             phytomer->put < double >(t, Phytomer::TREE_IC, ic);
+            phytomer->put < double >(t, Phytomer::TREE_GROWTH_DEMAND, growth_demand);
+            phytomer->put < double >(t, Phytomer::TREE_ASSIM, assim);
             phytomer->put < double >(t, Phytomer::TEFF, TEff);
 
             phytomer->internode_model()->put<double>(t, Internode::TEFF, TEff);
@@ -807,8 +826,7 @@ public:
         //            fr_reste=fr_reste;
         //        }
 
-        double production_speed = age_relative_var(age, AGE_PLANTING, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
-        //        newPhytomerEmergence += TEff * production_speed * pow(ic,VITESSE_SENSITIVITY) * ( ftsw > SEUIL_ORGANO ? 1 : ftsw / SEUIL_ORGANO);
+        double production_speed = age_relative_var(age, 0.0, AGE_ADULT, PRODUCTION_SPEED_INITIAL, PRODUCTION_SPEED_ADULT);
 
         double phylo_slow=(ftsw > TRESH_FTSW_SLOW_PHYLO
                            ? 1
@@ -817,10 +835,12 @@ public:
         newPhytomerEmergence += TEff * production_speed * phylo_slow;
 
         if (newPhytomerEmergence >= 1) {
-            create_phytomer(t, phytomerNumber-LEAF_PRUNING_RANK-INACTIVE_PHYTOMER_NUMBER+1, phytomerNumber+1, age);
-            phytomerNumber += 1;
+            total_phytomer_number += 1;
             newPhytomer+=1;
             newPhytomerEmergence -= 1;
+                create_phytomer(t, newPhytomer, newPhytomer, age);
+
+
         }
 
     }

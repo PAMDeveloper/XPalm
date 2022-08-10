@@ -58,15 +58,17 @@ public:
                      FR_RESTE,
                      FR_FRUITS,
                      TT_SINCE_APPEARANCE,
-                     TREE_IC
+                     TREE_IC,
+                     TREE_ASSIM,
+                     TREE_GROWTH_DEMAND
                    };
 
 private:
     xpalm::ModelParameters _parameters;
 
     //      parameters
-    double PLASTICITY_BUNCH_IC_APRES_FLORAISON;
-    double PLASTICITY_BUNCH_IC_AVANT_FLORAISON;
+//    double PLASTICITY_BUNCH_IC_APRES_FLORAISON;
+//    double PLASTICITY_BUNCH_IC_AVANT_FLORAISON;
     //    double SENS_FTSW;
     //    double SEUIL_MEDIAN_FTSW;
     //    double DEBUT_RANG_SENSITIVITY_NOUAISON;
@@ -139,18 +141,28 @@ private:
     double nb_joursIC_setting;
     double IC_setting_tot;
     double IC_setting;
+    double assim_setting_tot;
+    double growth_demand_setting_tot;
+
     double nb_joursIC_spikelet;
     double IC_spikelet_tot;
     double IC_spikelet;
+    double assim_spikelet_tot;
+    double growth_demand_spikelet_tot;
+
 
     double nb_joursICsex;
     double IC_sex_tot;
     double IC_sex;
+    double assim_sex_tot;
+    double growth_demand_sex_tot;
     double sex_ratio;
 
     double nb_joursICabort;
     double IC_abort_tot;
     double IC_abort;
+    double assim_abort_tot;
+    double growth_demand_abort_tot;
     double abortion_rate;
 
 
@@ -164,6 +176,8 @@ private:
     //    double TT_since_rank1;
     double TT_since_appearance;
     double tree_IC;
+    double tree_assim;
+    double tree_growth_demand;
 
 public:
 
@@ -221,6 +235,8 @@ public:
         External(FR_FRUITS, &Inflo::fr_fruits);
         External(TT_SINCE_APPEARANCE, &Inflo::TT_since_appearance);
         External(TREE_IC, &Inflo::tree_IC);
+        External(TREE_ASSIM, &Inflo::tree_assim);
+        External(TREE_GROWTH_DEMAND, &Inflo::tree_growth_demand);
         External(NUMBER, &Inflo::number);
     }
 
@@ -331,6 +347,14 @@ public:
         nb_joursIC_spikelet = 0;
         IC_spikelet_tot = 0;
         IC_spikelet = 0;
+        assim_sex_tot=0;
+        growth_demand_sex_tot=0;
+        assim_abort_tot=0;
+        growth_demand_abort_tot=0;
+        assim_setting_tot=0;
+        growth_demand_setting_tot=0;
+        assim_spikelet_tot=0;
+        growth_demand_spikelet_tot=0;
 
         abortion_rate=ABORTION_RATE_REF;
         sex_ratio=SEX_RATIO_REF;
@@ -536,32 +560,44 @@ public:
         //            TT_corrige += pow(fr_fruits, PLASTICITY_BUNCH_IC_APRES_FLORAISON) * TEff;
         //IC on sex determination
         if (TT_since_appearance >= TT_ini_sex-PERIOD_SEX_DETERMINATION && TT_since_appearance < TT_ini_sex ) {
-            nb_joursICsex += 1;
-            IC_sex_tot += tree_IC;
-            IC_sex = IC_sex_tot / nb_joursICsex;
+//            nb_joursICsex += 1;
+//            IC_sex_tot += tree_IC;
+//            IC_sex = IC_sex_tot / nb_joursICsex;
+            assim_sex_tot+=tree_assim;
+            growth_demand_sex_tot+=tree_growth_demand;
+            IC_sex=assim_sex_tot/growth_demand_sex_tot;
         }
         sex_ratio =max(0.0, min(0.9, SEX_RATIO_MIN+IC_sex*(SEX_RATIO_REF-SEX_RATIO_MIN)));
 
         //IC on abortion
         if (TT_since_appearance >= TT_ini_sex && TT_since_appearance < TT_ini_abortion) {
-            nb_joursICabort += 1;
-            IC_abort_tot += tree_IC;
-            IC_abort = IC_abort_tot / nb_joursICabort;
+//            nb_joursICabort += 1;
+//            IC_abort_tot += tree_IC;
+//            IC_abort = IC_abort_tot / nb_joursICabort;
+            assim_abort_tot+=tree_assim;
+            growth_demand_abort_tot+=tree_growth_demand;
+            IC_abort=assim_abort_tot/growth_demand_abort_tot;
         }
         abortion_rate =max(0.0, min(ABORTION_RATE_MAX, ABORTION_RATE_MAX+IC_abort*(ABORTION_RATE_REF-ABORTION_RATE_MAX)));
 
         //IC on spikelet biomass
         if (TT_since_appearance >= TT_ini_abortion && TT_since_appearance < TT_ini_flowering){
-            nb_joursIC_spikelet += 1;
-            IC_spikelet_tot += tree_IC;
-            IC_spikelet = IC_spikelet_tot / nb_joursIC_spikelet;
+//            nb_joursIC_spikelet += 1;
+//            IC_spikelet_tot += tree_IC;
+//            IC_spikelet = IC_spikelet_tot / nb_joursIC_spikelet;
+            assim_spikelet_tot+=tree_assim;
+            growth_demand_spikelet_tot+=tree_growth_demand;
+            IC_spikelet=assim_spikelet_tot/growth_demand_spikelet_tot;
         }
 
         //IC on fruit set
         if (TT_since_appearance >= TT_ini_flowering && TT_since_appearance < TT_ini_flowering+ PERIOD_FRUIT_SET) {
-            nb_joursIC_setting += 1;
-            IC_setting_tot += tree_IC;
-            IC_setting = (IC_setting_tot) / nb_joursIC_setting;
+//            nb_joursIC_setting += 1;
+//            IC_setting_tot += tree_IC;
+//            IC_setting = (IC_setting_tot) / nb_joursIC_setting;
+            assim_setting_tot+=tree_assim;
+            growth_demand_setting_tot+=tree_growth_demand;
+            IC_setting=assim_setting_tot/growth_demand_setting_tot;
         }
 
 

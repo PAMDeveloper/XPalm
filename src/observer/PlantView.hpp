@@ -52,7 +52,7 @@ public:
         selector("NB_ABORTED", artis::kernel::DOUBLE,{Tree::NB_ABORTED});
         selector("LAI", artis::kernel::DOUBLE,{Tree::LAI});
         selector("NEWPHYTOMEREMERGENCE", artis::kernel::DOUBLE,{Tree::NEWPHYTOMEREMERGENCE});
-        selector("PHYTOMERNUMBER", artis::kernel::DOUBLE,{Tree::PHYTOMERNUMBER});
+        selector("TOTALPHYTOMERNUMBER", artis::kernel::DOUBLE,{Tree::TOTALPHYTOMERNUMBER});
         selector("PLANTLEAFAREA", artis::kernel::DOUBLE,{Tree::PLANTLEAFAREA});
         selector("LASTLEAFAREA", artis::kernel::DOUBLE,{Tree::LASTLEAFAREA});
         selector("TREE_AGE", artis::kernel::DOUBLE,{Tree::TREE_AGE});

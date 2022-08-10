@@ -207,9 +207,9 @@ ui<-
                  
                  # input$action
                  
-                 # resultPhyto=load_phyto(file =paste0('../../bin/msvc14/x64/phytomer.csv') )
+                 # phyto=load_phyto(file =paste0('../../bin/msvc14/x64/phytomer.csv') )
                  
-                 resultPhyto=data.table::fread(file =paste0('../../bin/msvc14/x64/phytomers.csv'),header=F,skip = 3)
+                 phyto=data.table::fread(file =paste0('../../bin/msvc14/x64/phytomers.csv'),header=F,skip = 3)
                  
                  head=colnames(data.table::fread(file =paste0('../../bin/msvc14/x64/phytomers.csv'),header=T))
                  
@@ -220,10 +220,10 @@ ui<-
                           number=sprintf("%03d",as.numeric(number)))
                  
                  
-                 colnames(resultPhyto)=paste(head,phyto_number$number,sep='#')
+                 colnames(phyto)=paste(head,phyto_number$number,sep='#')
                  
                  
-                 return(resultPhyto)
+                 return(phyto)
                  
                })
                
@@ -231,13 +231,22 @@ ui<-
                  phyto <- phyto()
                  if (is.null(phyto)) return(NULL)
                  
-                 inputPhyto=data.frame(key=colnames(phyto))%>%
+                 inputPhyto=phyto%>%
+                   rename(time=`time# NA`)%>%
+                   mutate(Date=ymd(str_sub(time,start = 0,end = 10)))%>%
+                   select(contains('LEAF NUMBER'))%>%
+                   filter(row_number()==1)%>%
+                   tidyr::gather('number',"LeafId")%>%
+                   arrange(LeafId)
+                   
+                 
+                 inputPhytoVar=data.frame(key=colnames(phyto))%>%
                    separate(key,into = c('var','number'),sep = '#')%>%
                    filter(var!='time')%>%
                    mutate(number=sprintf("%03d",as.numeric(number)))
-                 
-                 updateSelectInput(session = session, inputId = 'phytomerNumber', choices = sort(unique(inputPhyto$number)))
-                 updateSelectInput(session = session, inputId = 'variablePhyto_x', choices = unique(inputPhyto$var))
+
+                 updateSelectInput(session = session, inputId = 'phytomerNumber', choices = sort(unique(inputPhyto$LeafId)))
+                 updateSelectInput(session = session, inputId = 'variablePhyto_x', choices = unique(inputPhytoVar$var)[unique(inputPhytoVar$var)!='LEAF NUMBER'])
                  # updateSelectInput(session = session, inputId = 'variablePhyto_y', choices = unique(inputPhyto$var))
                })
                
@@ -347,7 +356,8 @@ ui<-
                    geom_line(aes(x=my(month),y=yield_oil,col='Oil'))+
                    labs(x='',
                         y='kg.tree-1')+
-                   scale_color_discrete(name='')
+                   scale_color_discrete(name='')+
+                   xlim(range(res$Date,na.rm=T))
                  
                  
                  if(!is.null(grY)){
@@ -373,25 +383,30 @@ ui<-
                  # variablePhyto_y<- variablePhyto_y()
                  # if (is.null(variablePhyto_y)) return(NULL)
                  
+                 
+                 inputPhytoNumber=inputPhyto%>%
+                   filter(LeafId %in% phytomerNumber)%>%
+                   mutate(number=str_remove(string = number,'LEAF NUMBER'))
+                 
                  sub_phyto=phyto%>%
                    rename(time=`time# NA`)%>%
                    mutate(Date=ymd(str_sub(time,start = 0,end = 10)))%>%
                    select(Date,contains(variablePhyto_x))%>%
-                   select(Date,contains(paste0("#",phytomerNumber)))%>%
+                   select(Date,contains(inputPhytoNumber$number))%>%
                    tidyr::gather('number',"value",-c(Date))%>%
-                   mutate(number=str_remove(string = number,pattern = paste0(variablePhyto_x,'#')))%>%
-                   filter(number %in% phytomerNumber)%>%
+                   mutate(number=str_remove(string = number,pattern = variablePhyto_x))%>%
+                   filter(number %in% inputPhytoNumber$number)%>%
                    arrange(Date,number)
                  
                  sub_state=phyto%>%
                    rename(time=`time# NA`)%>%
                    mutate(Date=ymd(str_sub(time,start = 0,end = 10)))%>%
                    select(Date,contains('STATE'))%>%
-                   select(Date,contains(paste0("#",phytomerNumber)))%>%
+                   select(Date,contains(inputPhytoNumber$number))%>%
                    tidyr::gather('number',"INFLO_STATUS",-c(Date))%>%
-                   mutate(number=str_remove(string = number,pattern = paste0('STATE','#')),
+                   mutate(number=str_remove(string = number,pattern = 'STATE'),
                           INFLO_STATUS=as.numeric(INFLO_STATUS))%>%
-                   filter(number %in% phytomerNumber)%>%
+                   filter(number %in% inputPhytoNumber$number)%>%
                    arrange(Date,number)
                  
                  
@@ -400,10 +415,11 @@ ui<-
                  
                  alpha=min(0.1,1/length(phytomerNumber))
                  
-                 sub_phyto=cbind(sub_phyto,sub_state%>%select(sex,state))
+                 sub_phyto=merge(cbind(sub_phyto,sub_state%>%select(sex,state)),
+                                       inputPhytoNumber)
                  
                  gr_Phyto=sub_phyto%>%
-                   mutate(num=paste('phyto #',sprintf( '%03d',as.numeric(number))))%>%
+                   mutate(num=paste('phyto #',sprintf( '%03d',as.numeric(LeafId))))%>%
                    arrange(Date,number)%>%
                    group_by(number)%>%
                    ggplot(aes(x=Date,y=value,col=sex,pch=state,label=num))+
