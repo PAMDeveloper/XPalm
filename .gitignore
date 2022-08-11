@@ -10,3 +10,8 @@ ui_mainwindow.h
 src/XPalm.dll
 .Rhistory
 src/rcpp_xpalm.o
+build-XPalm-Desktop_Qt_5_15_2_MSVC2015_64bit-Release
+debug
+/rsconnect
+/xpalmd_plugin_import.cpp
+/xpalm_plugin_import.cpp

@@ -29,9 +29,9 @@ QMAKE_CXXFLAGS_RELEASE -= -O2
 ##### PATH #####
 MDL_SRC = ../src
 ARTIS_SRC = ../../artis/src
-DEST = ../bin
-THIRD_PARTY = ../ext_libs
-ARTIS_LIB = ../libs
+DEST = ../../bin
+THIRD_PARTY = ../../ext_libs
+ARTIS_LIB = ../../libs
 ################
 msvc: {
     COMPILER = 'msvc'_$$(VisualStudioVersion)
