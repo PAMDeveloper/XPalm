@@ -6,12 +6,94 @@
 #include <observer/PlantView.hpp>
 #include <utils/ParametersReader.hpp>
 
+
+static const string _TIME_ = "_time_";
+
 class ResultParser
 {
-public:
+ public:
     ResultParser() {
 
     }
+
+    pair<map<string,vector<double>>,map<string,vector<string>>> resultToMaps(const XPalmSimulator &simulator) const
+    {
+        map<string, vector<double>> results;
+        map<string, vector<string>> headers;
+
+        vector<string> v;
+        v.push_back(_TIME_);
+        v.push_back(_TIME_);
+        v.push_back(_TIME_);
+        headers[_TIME_] = v;
+
+        const Observer& observer = simulator.observer();
+        const Observer::Views& views = observer.views();
+
+
+        View::Values global_map;
+
+        double begin = numeric_limits<double>::max();
+        double end = numeric_limits<double>::lowest();
+
+        Observer::Views::const_iterator it = views.begin();
+        for (it; it != views.end(); ++it) {
+
+            if(it->second->begin() < begin)
+                begin = it->second->begin();
+
+            if(it->second->end() > end)
+                end = it->second->end();
+
+            View::Values values = it->second->values();
+            for (View::Values::const_iterator itv = values.begin(); itv != values.end(); ++itv) {
+                vector<string> v;
+                v.push_back(it->second->name(itv->first));
+                v.push_back(it->second->path(itv->first));
+                v.push_back(itv->first);
+                headers[itv->first] = v;
+            }
+
+            global_map.insert(values.begin(), values.end());
+
+            results[_TIME_] = vector<double>();
+            for (typename View::Values::const_iterator itv = global_map.begin(); itv != global_map.end(); ++itv) {
+                results[itv->first] = vector<double>();
+            }
+
+            for (double t = begin; t <= end; ++t)
+                results[_TIME_].push_back(t);
+
+            // write values
+            for (View::Values::const_iterator itv = global_map.begin(); itv != global_map.end(); ++itv) {
+                View::Value::const_iterator itp = itv->second.begin();
+                string s = itv->first;
+
+                for (double t = begin; t <= end; ++t) {
+                    while (itp != itv->second.end() and itp->first < t) {
+                        ++itp;
+                    }
+
+                    if (itp != itv->second.end()) {
+                        string c = itp->second;
+                        char* p;
+                        double converted = strtod(c.c_str(), &p);
+                        if (*p) {
+                            results[s].push_back(nan(""));
+                        } else {
+                            results[s].push_back(converted);
+                        }
+                    } else {
+                        results[s].push_back(nan(""));
+                    }
+                }
+            }
+        }
+
+        return make_pair(results, headers);
+
+    }
+
 
     //1 seule view
     map<string, vector<double>>  resultsToMap(XPalmSimulator * simulator) {
@@ -19,6 +101,8 @@ public:
         const Observer& observer = simulator->observer();
         const Observer::Views& views = observer.views();
         Observer::Views::const_iterator it = views.begin();
+
+
         View::Values values = it->second->values();
         double begin = it->second->begin();
         double end = it->second->end();
@@ -42,8 +126,8 @@ public:
 
                 if (itp != itv->second.end()) {
 #ifdef UNSAFE_RUN
-                  double converted = itp->second;
-                  result[s].push_back(converted);
+                    double converted = itp->second;
+                    result[s].push_back(converted);
 #else
                     string c = itp->second;
                     char* p;

@@ -6,7 +6,7 @@ Makefile*
 .qmake.stash
 ui_mainwindow.h
 .Rproj.user
-xpalm_plugin_import.cpp
-xpalmd_plugin_import.cpp
-xpalm_plugin_import.cpp
-.Rbuildignore
+.qtc_clangd/
+src/XPalm.dll
+.Rhistory
+src/rcpp_xpalm.o
