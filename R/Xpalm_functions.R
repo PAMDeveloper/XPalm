@@ -24,6 +24,15 @@ derive_Leafarea_expand=function(TTleaf,SFMax,INFLEXION,COURBURE){
 }
 
 
+f.onto_sf=function( age,  age_ini,  age_fin, val_ini,  val_fin) {
+  
+  inc = (val_fin - val_ini) / (age_fin - age_ini)
+  int= val_ini-inc*age_ini
+  y=ifelse (test = age > age_fin ,yes = val_fin,no =int+age * inc)
+  return(y)
+}
+
+
 
 #' variable value at a given age (ontogenetic gradient)
 #'

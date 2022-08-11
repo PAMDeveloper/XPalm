@@ -2,14 +2,7 @@
 #define BUNCH_H
 
 /** PHYTOMER_MODEL Ablation **/
-//        ### ablation des regimes le jour de la mise en place des traitements
-//        if simulation.step == DEBUT_ABLATION_REGIME :
-//            for key in sorted(phytomers):
-//                if (phytomers[key].rank >= RANG_D_ABLATION_REGIME) :
-//                    if (phytomers[key].bunch.statut != "RECOLTE") :
-//                        if phytomers[key].bunch.sexe == "FEMELLE" :
-//                            if phytomers[key].bunch.avort == "NON_AVORTE" :
-//                                phytomers[key].bunch.ablation = phytomers[key].bunch.ablation_decision(POURC_ABLATION_REGIME)
+
 #include <defines.hpp>
 
 #include <plant/phytomer/bunch.h>
@@ -21,17 +14,19 @@ namespace model {
 class Inflo : public CoupledModel < Inflo >
 {
 public:
-    enum submodels { PEDUNCLE, FRUIT, MALEINFLO };
+    enum submodels { PEDUNCLE, BUNCH, MALEINFLO };
 
     enum internals { INFLO_STATUS,
-                     //                     STATUS_POT,
+                     INFLO_DEV_FACTOR,
+                     TT_INI_FLOWERING,
                      TT_INI_OLEO,
                      TT_INI_SEX,
+
                      TT_INI_ABORTION,
-                     TT_INI_FLOWERING,
+
                      TT_INI_HARVEST,
                      TT_INI_MALE_SENESCENCE,
-                     BIOMASS,
+                     BUNCH_BIOMASS,
                      PEDUNCLE_BIOMASS,
                      BUNCH_OIL_BIOMASS,
                      BUNCH_NONOIL_BIOMASS,
@@ -63,15 +58,17 @@ public:
                      FR_RESTE,
                      FR_FRUITS,
                      TT_SINCE_APPEARANCE,
-                     TREE_IC
+                     TREE_IC,
+                     TREE_ASSIM,
+                     TREE_GROWTH_DEMAND
                    };
 
 private:
     xpalm::ModelParameters _parameters;
 
     //      parameters
-    double PLASTICITY_BUNCH_IC_APRES_FLORAISON;
-    double PLASTICITY_BUNCH_IC_AVANT_FLORAISON;
+//    double PLASTICITY_BUNCH_IC_APRES_FLORAISON;
+//    double PLASTICITY_BUNCH_IC_AVANT_FLORAISON;
     //    double SENS_FTSW;
     //    double SEUIL_MEDIAN_FTSW;
     //    double DEBUT_RANG_SENSITIVITY_NOUAISON;
@@ -88,14 +85,13 @@ private:
     double PERIOD_ABORTION;
     //    double Seuil_IC_sex;
     double SENSITIVITY_SEX;
-//    double Seuil_IC_abort;
+    //    double Seuil_IC_abort;
     double ABORTION_RATE_MAX;
     double  ABORTION_RATE_REF;
     double SEX_RATIO_MIN;
     double SEX_RATIO_REF;
     double SEED;
     double FRACTION_PERIOD_OLEOSYNTHESIS;
-    //    double INI_SEX_RATIO;
 
     //    double INI_TAUX_D_AVORTEMENT;
 
@@ -121,7 +117,7 @@ private:
 
 
     //var
-    double biomass;
+    double bunch_biomass;
     double peduncle_biomass;
     double bunch_oil_biomass;
     double bunch_nonoil_biomass;
@@ -145,18 +141,28 @@ private:
     double nb_joursIC_setting;
     double IC_setting_tot;
     double IC_setting;
+    double assim_setting_tot;
+    double growth_demand_setting_tot;
+
     double nb_joursIC_spikelet;
     double IC_spikelet_tot;
     double IC_spikelet;
+    double assim_spikelet_tot;
+    double growth_demand_spikelet_tot;
+
 
     double nb_joursICsex;
     double IC_sex_tot;
     double IC_sex;
+    double assim_sex_tot;
+    double growth_demand_sex_tot;
     double sex_ratio;
 
     double nb_joursICabort;
     double IC_abort_tot;
     double IC_abort;
+    double assim_abort_tot;
+    double growth_demand_abort_tot;
     double abortion_rate;
 
 
@@ -170,6 +176,8 @@ private:
     //    double TT_since_rank1;
     double TT_since_appearance;
     double tree_IC;
+    double tree_assim;
+    double tree_growth_demand;
 
 public:
 
@@ -180,19 +188,19 @@ public:
     {
         //         submodels
         submodel(PEDUNCLE, peduncle.get());
-        submodel(FRUIT, bunch.get());
+        submodel(BUNCH, bunch.get());
         submodel(MALEINFLO, male.get());
 
         //         internals
         Internal(INFLO_STATUS, &Inflo::status);
-        //        Internal(STATUS_POT, &Inflo::status_pot);
+        Internal(INFLO_DEV_FACTOR, &Inflo::inflo_dev_factor);
         Internal(TT_INI_FLOWERING, &Inflo::TT_ini_flowering);
         Internal(TT_INI_OLEO, &Inflo::TT_ini_oleo);
         Internal(TT_INI_SEX, &Inflo::TT_ini_sex);
         Internal(TT_INI_ABORTION, &Inflo::TT_ini_abortion);
         Internal(TT_INI_HARVEST, &Inflo::TT_ini_harvest);
         Internal(TT_INI_MALE_SENESCENCE, &Inflo::TT_ini_male_senescence);
-        Internal(BIOMASS, &Inflo::biomass);
+        Internal(BUNCH_BIOMASS, &Inflo::bunch_biomass);
         Internal(PEDUNCLE_BIOMASS, &Inflo::peduncle_biomass);
         Internal(BUNCH_OIL_BIOMASS, &Inflo::bunch_oil_biomass);
         Internal(BUNCH_OIL_BIOMASS_HARVESTED, &Inflo::bunch_oil_biomass_harvested);
@@ -227,6 +235,8 @@ public:
         External(FR_FRUITS, &Inflo::fr_fruits);
         External(TT_SINCE_APPEARANCE, &Inflo::TT_since_appearance);
         External(TREE_IC, &Inflo::tree_IC);
+        External(TREE_ASSIM, &Inflo::tree_assim);
+        External(TREE_GROWTH_DEMAND, &Inflo::tree_growth_demand);
         External(NUMBER, &Inflo::number);
     }
 
@@ -258,7 +268,7 @@ public:
     //        else
     //            inflo_dev_factor = (INCREASE_TAILLE_REGIMES * t + phytomer.step_apparition - tree.date_plus_jeune_feuille) + FACTEUR_AGE_INI);
 
-    //        pot_fruits_number = inflo_dev_factor * MEAN_FRUIT_NUMBER_ADULTE;
+    //        pot_fruits_number = inflo_dev_factor * FRUIT_NUMBER_ADULT;
     //    }
 
 
@@ -284,7 +294,7 @@ public:
         PERIOD_FRUIT_SET=parameters.get("PERIOD_FRUIT_SET");
         SEED = parameters.get("SEED");
 
-//        Seuil_IC_abort = parameters.get("Seuil_IC_abort");
+        //        Seuil_IC_abort = parameters.get("Seuil_IC_abort");
         //        PLASTICITY_BUNCH_IC_APRES_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_APRES_FLORAISON");
         //        PLASTICITY_BUNCH_IC_AVANT_FLORAISON = parameters.get("PLASTICITY_BUNCH_IC_AVANT_FLORAISON");
         //        SENS_FTSW = parameters.get("SENS_FTSW");
@@ -299,7 +309,6 @@ public:
         //        ICabort_RANG_FIN = parameters.get("ICabort_RANG_FIN");
         //        Seuil_IC_sex = parameters.get("Seuil_IC_sex");
         //        SENSITIVITY_ABORTION = parameters.get("SENSITIVITY_ABORTION");
-        //        INI_SEX_RATIO=parameters.get("INI_SEX_RATIO");
         //        INI_TAUX_D_AVORTEMENT= parameters.get("INI_TAUX_D_AVORTEMENT");
 
 
@@ -338,12 +347,20 @@ public:
         nb_joursIC_spikelet = 0;
         IC_spikelet_tot = 0;
         IC_spikelet = 0;
+        assim_sex_tot=0;
+        growth_demand_sex_tot=0;
+        assim_abort_tot=0;
+        growth_demand_abort_tot=0;
+        assim_setting_tot=0;
+        growth_demand_setting_tot=0;
+        assim_spikelet_tot=0;
+        growth_demand_spikelet_tot=0;
 
         abortion_rate=ABORTION_RATE_REF;
         sex_ratio=SEX_RATIO_REF;
 
         //var
-        biomass= 0;
+        bunch_biomass= 0;
         peduncle_biomass=0;
         //        femelle_biomass= 0;
         bunch_oil_biomass=0;
@@ -446,6 +463,7 @@ public:
                 }
 
             }
+
             //male
             else if (status.is(inflo::MALE)) {
                 if( TT_since_appearance >= TT_ini_male_senescence) {
@@ -472,6 +490,7 @@ public:
 
         if(status.is(inflo::ABORTED))
             return;
+
 
         step_state();
 
@@ -509,6 +528,8 @@ public:
             bunch_nonoil_biomass_harvested =  bunch->get< double >(t, Bunch::NONOIL_BIOMASS_HARVESTED);
             bunch_demand = bunch->get< double >(t, Bunch::DEMAND);
 
+            bunch_biomass=bunch_oil_biomass+bunch_nonoil_biomass;
+
         }
 
 
@@ -537,37 +558,50 @@ public:
         //            TT_corrige += pow(fr_fruits, PLASTICITY_BUNCH_IC_AVANT_FLORAISON) * TEff;
         //        else if (status.is(inflo::FLOWERING)| status.is(inflo::OLEOSYNTHESIS))
         //            TT_corrige += pow(fr_fruits, PLASTICITY_BUNCH_IC_APRES_FLORAISON) * TEff;
-
-
         //IC on sex determination
         if (TT_since_appearance >= TT_ini_sex-PERIOD_SEX_DETERMINATION && TT_since_appearance < TT_ini_sex ) {
-            nb_joursICsex += 1;
-            IC_sex_tot += tree_IC;
-            IC_sex = IC_sex_tot / nb_joursICsex;
+//            nb_joursICsex += 1;
+//            IC_sex_tot += tree_IC;
+//            IC_sex = IC_sex_tot / nb_joursICsex;
+            assim_sex_tot+=tree_assim;
+            growth_demand_sex_tot+=tree_growth_demand;
+            IC_sex=assim_sex_tot/growth_demand_sex_tot;
         }
-        sex_ratio =max(0.0, min(1.0, SEX_RATIO_MIN+IC_sex*(SEX_RATIO_REF-SEX_RATIO_MIN)));
+        sex_ratio =max(0.0, min(0.9, SEX_RATIO_MIN+IC_sex*(SEX_RATIO_REF-SEX_RATIO_MIN)));
 
         //IC on abortion
         if (TT_since_appearance >= TT_ini_sex && TT_since_appearance < TT_ini_abortion) {
-            nb_joursICabort += 1;
-            IC_abort_tot += tree_IC;
-            IC_abort = IC_abort_tot / nb_joursICabort;
+//            nb_joursICabort += 1;
+//            IC_abort_tot += tree_IC;
+//            IC_abort = IC_abort_tot / nb_joursICabort;
+            assim_abort_tot+=tree_assim;
+            growth_demand_abort_tot+=tree_growth_demand;
+            IC_abort=assim_abort_tot/growth_demand_abort_tot;
         }
         abortion_rate =max(0.0, min(ABORTION_RATE_MAX, ABORTION_RATE_MAX+IC_abort*(ABORTION_RATE_REF-ABORTION_RATE_MAX)));
 
         //IC on spikelet biomass
         if (TT_since_appearance >= TT_ini_abortion && TT_since_appearance < TT_ini_flowering){
-            nb_joursIC_spikelet += 1;
-            IC_spikelet_tot += tree_IC;
-            IC_spikelet = IC_spikelet_tot / nb_joursIC_spikelet;
+//            nb_joursIC_spikelet += 1;
+//            IC_spikelet_tot += tree_IC;
+//            IC_spikelet = IC_spikelet_tot / nb_joursIC_spikelet;
+            assim_spikelet_tot+=tree_assim;
+            growth_demand_spikelet_tot+=tree_growth_demand;
+            IC_spikelet=assim_spikelet_tot/growth_demand_spikelet_tot;
         }
 
         //IC on fruit set
         if (TT_since_appearance >= TT_ini_flowering && TT_since_appearance < TT_ini_flowering+ PERIOD_FRUIT_SET) {
-            nb_joursIC_setting += 1;
-            IC_setting_tot += tree_IC;
-            IC_setting = (IC_setting_tot) / nb_joursIC_setting;
+//            nb_joursIC_setting += 1;
+//            IC_setting_tot += tree_IC;
+//            IC_setting = (IC_setting_tot) / nb_joursIC_setting;
+            assim_setting_tot+=tree_assim;
+            growth_demand_setting_tot+=tree_growth_demand;
+            IC_setting=assim_setting_tot/growth_demand_setting_tot;
         }
+
+
+
     }
 
 

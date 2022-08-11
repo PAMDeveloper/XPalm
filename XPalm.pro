@@ -9,6 +9,7 @@ CONFIG += static
 #DEFINES += UNSAFE_RUN
 #DEFINES += WITH_TRACE FORCE_TRACE_ENUM
 #DEFINES += WITH_TRACE
+DEFINES += FORCE_TRACE_ENUM
 
 QMAKE_CXXFLAGS_RELEASE -= -O1
 QMAKE_CXXFLAGS_RELEASE -= -O2
@@ -95,7 +96,8 @@ HEADERS += \
     $$R_SRC_/plant/processes/meteo.h \
     $$R_SRC_/plant/processes/waterbalance.h \
     $$R_SRC_/plant/tree.h \
-    $$R_SRC_/sampleatomic.h
+    $$R_SRC_/sampleatomic.h \
+    $$R_SRC_/observer/PhytomerView.hpp
 
 SOURCES += \
     $$SRC_/qtapp/mainwindow.cpp \

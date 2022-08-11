@@ -32,7 +32,10 @@ public:
 
     enum external { TOTAL_PHYTOMER_NUMBER,
                     TREE_IC,
-                    TEFF };
+                    TREE_ASSIM,
+                    TREE_GROWTH_DEMAND,
+                    TEFF,
+                    NEWPHYTOMER};
 
 private:
     //     submodels
@@ -40,9 +43,10 @@ private:
     std::unique_ptr < Internode > internode;
     std::unique_ptr < Inflo > inflo;
 
+
     //     parameters
     double INACTIVE_PHYTOMER_NUMBER;
-    double RANG_D_ABLATION;
+    double LEAF_PRUNING_RANK;
 
     //     internals
     phytomer::phytomer_state state;
@@ -64,7 +68,10 @@ private:
     //   externals
     double total_phytomer_number;
     double tree_IC;
+    double tree_assim;
+    double tree_growth_demand;
     double TEff;
+    double newPhytomer;
 
 public:
     Phytomer() :
@@ -94,7 +101,12 @@ public:
         // externals
         External(TOTAL_PHYTOMER_NUMBER, &Phytomer::total_phytomer_number);
         External(TREE_IC, &Phytomer::tree_IC);
+        External(TREE_ASSIM, &Phytomer::tree_assim);
+         External(TREE_GROWTH_DEMAND, &Phytomer::tree_growth_demand);
         External(TEFF, &Phytomer::TEff);
+        External(NEWPHYTOMER, &Phytomer::newPhytomer);
+
+
     }
 
     virtual ~Phytomer()
@@ -110,34 +122,31 @@ public:
 
 
     void init(double t, const xpalm::ModelParameters& parameters){}
-    void init(double t, const xpalm::ModelParameters& parameters, int nb, int total_phyto_, bool st, double tree_age_at_creation_,
+    void init(double t, const xpalm::ModelParameters& parameters, int nb, int newPhytomer_, double tree_age_at_creation_,
               double tree_age, double prod_speed, double flo_tt, double harv_tt, double tt_ini_sen, double inflo_factor, double SF_fin_)
     {
         last_time = t-1;
 
         //parameters
         INACTIVE_PHYTOMER_NUMBER = parameters.get("INACTIVE_PHYTOMER_NUMBER");
-        RANG_D_ABLATION = parameters.get("RANG_D_ABLATION");
+        LEAF_PRUNING_RANK = parameters.get("LEAF_PRUNING_RANK");
 
 
         //predim
         number = nb;
+        newPhytomer=newPhytomer_;
         TT_ini_flowering = flo_tt;
         production_speed = prod_speed;
         SF_fin = SF_fin_;
         TT_ini_harvest=harv_tt;
 
-        rank = total_phyto_-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER) - number - INACTIVE_PHYTOMER_NUMBER;
 
-        //        state = st ? phytomer::INACTIVE : phytomer::ACTIVE;
+        rank = newPhytomer  - INACTIVE_PHYTOMER_NUMBER - number;
 
-        //        state= (rank > 0)
-        //                ? phytomer::ACTIVE
-        //                : phytomer::INACTIVE;
 
         state=phytomer::ACTIVE;
 
-        if(rank > 60 && state == phytomer::ACTIVE)
+        if(rank > LEAF_PRUNING_RANK && state == phytomer::ACTIVE)
             state = phytomer::INACTIVE;
 
         tree_age_at_creation = tree_age_at_creation_;
@@ -165,15 +174,17 @@ public:
         //         rank = total_phytomer_number - INACTIVE_PHYTOMER_NUMBER - number - 1;
 
         //        rank = (number>0)
-        //                ? total_phytomer_number- (RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER + number) - INACTIVE_PHYTOMER_NUMBER
-        //                : total_phytomer_number-(RANG_D_ABLATION +INACTIVE_PHYTOMER_NUMBER - number) + INACTIVE_PHYTOMER_NUMBER;
+        //                ? total_phytomer_number- (LEAF_PRUNING_RANK + INACTIVE_PHYTOMER_NUMBER + number) - INACTIVE_PHYTOMER_NUMBER
+        //                : total_phytomer_number-(LEAF_PRUNING_RANK +INACTIVE_PHYTOMER_NUMBER - number) + INACTIVE_PHYTOMER_NUMBER;
 
-        rank = total_phytomer_number-(RANG_D_ABLATION + INACTIVE_PHYTOMER_NUMBER) - number - INACTIVE_PHYTOMER_NUMBER;
+        //        rank = total_phytomer_number-(LEAF_PRUNING_RANK + INACTIVE_PHYTOMER_NUMBER) - number - INACTIVE_PHYTOMER_NUMBER;
+
+        rank = newPhytomer  - INACTIVE_PHYTOMER_NUMBER - number;
 
         //        if(rank > 0 && state == phytomer::INACTIVE)
         //            state = phytomer::ACTIVE;
 
-        if(rank > 60 && state == phytomer::ACTIVE)
+        if(rank > LEAF_PRUNING_RANK && state == phytomer::ACTIVE)
             state = phytomer::INACTIVE;
 
         //        if(state == phytomer::DEAD) //TODO remove to include leaf/internode in demand when inactive
@@ -210,6 +221,8 @@ public:
         inflo->put<double>(t, Inflo::NUMBER, number);
         inflo->put<double>(t, Inflo::TT_SINCE_APPEARANCE, TT_since_appearance);
         inflo->put<double>(t, Inflo::TREE_IC, tree_IC);
+        inflo->put<double>(t, Inflo::TREE_ASSIM, tree_assim);
+        inflo->put<double>(t, Inflo::TREE_GROWTH_DEMAND, tree_growth_demand);
 
         //set by tree
         //        inflo->put<double>(t, Inflo::FTSW, ftsw);

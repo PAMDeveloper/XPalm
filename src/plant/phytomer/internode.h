@@ -33,12 +33,12 @@ private:
     xpalm::ModelParameters _parameters;
 
     //      parameters
-    double STEM_RAYON;
+    double STEM_RADIUS;
     double STEM_APPARENT_DENSITY;
-    double COUT_RESPI_INTERNODE;
+    double RESPIRATION_COST_INTERNODE;
     double PLASTICITY_INTERNODE_IC;
     double TEFF_INI ;
-    double REPRO_CONSTRUCTION_COST;
+    double CONSTRUCTION_COST_INFLO;
     double INACTIVE_PHYTOMER_NUMBER;
 
     //     internals
@@ -95,12 +95,12 @@ public:
         _parameters = parameters;
 
         //        parameters
-        COUT_RESPI_INTERNODE = parameters.get("COUT_RESPI_INTERNODE");
-        PLASTICITY_INTERNODE_IC = parameters.get("PLASTICITY_INTERNODE_IC");
-        STEM_RAYON = parameters.get("STEM_RAYON"); //cm
+        RESPIRATION_COST_INTERNODE = parameters.get("RESPIRATION_COST_INTERNODE");
+//        PLASTICITY_INTERNODE_IC = parameters.get("PLASTICITY_INTERNODE_IC");
+        STEM_RADIUS = parameters.get("STEM_RADIUS"); //cm
         STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY"); //(g cm-3)
         TEFF_INI = parameters.get("T_EFF_INI");
-        REPRO_CONSTRUCTION_COST = parameters.get("REPRO_CONSTRUCTION_COST");
+        CONSTRUCTION_COST_INFLO = parameters.get("CONSTRUCTION_COST_INFLO");
         INACTIVE_PHYTOMER_NUMBER = parameters.get("INACTIVE_PHYTOMER_NUMBER");
 
         //        internals
@@ -116,11 +116,11 @@ public:
 
 
         // ini
-        double DEBUT_CROISSANCE_EN = parameters.get("DEBUT_CROISSANCE_EN") * 365;
-        double FIN_CROISSANCE_EN = parameters.get("FIN_CROISSANCE_EN") * 365;
-        double EN_LENGTH_ADULTE = parameters.get("EN_LENGTH_ADULTE") ; //cm
-        double EN_LENGTH_INI = parameters.get("EN_LENGTH_INI"); //cm
-        max_length_pot = age_relative_var(tree_age_at_phyto_creation + phytomer_age, DEBUT_CROISSANCE_EN, FIN_CROISSANCE_EN, EN_LENGTH_INI, EN_LENGTH_ADULTE); // cm
+        double INTERNODE_START_GROWTH = parameters.get("INTERNODE_START_GROWTH") * 365;
+        double INTERNODE_STOP_GROWTH = parameters.get("INTERNODE_STOP_GROWTH") * 365;
+        double INTERNODE_LENGTH_ADULT = parameters.get("INTERNODE_LENGTH_ADULT") ; //cm
+        double INTERNODE_LENGTH_INI = parameters.get("INTERNODE_LENGTH_INI"); //cm
+        max_length_pot = age_relative_var(tree_age_at_phyto_creation + phytomer_age, INTERNODE_START_GROWTH, INTERNODE_STOP_GROWTH, INTERNODE_LENGTH_INI, INTERNODE_LENGTH_ADULT); // cm
 
         TT_internode_dev_duration = 20 / production_speed; //20 ranks to grow TODO convert into param if necessary
 
@@ -131,8 +131,8 @@ public:
             double fr_allongement = min(1.0, (TT_since_appearance - TT_ini_elongation) / TT_internode_dev_duration );
 
             length = fr_allongement * max_length_pot; //cm
-            biomass =  length * _PI * pow( STEM_RAYON, 2)* STEM_APPARENT_DENSITY; //gCH2O
-            demand =  max_length_pot * _PI * pow( STEM_RAYON, 2)* STEM_APPARENT_DENSITY * REPRO_CONSTRUCTION_COST * ( TEFF_INI / TT_internode_dev_duration );
+            biomass =  length * _PI * pow( STEM_RADIUS, 2)* STEM_APPARENT_DENSITY; //gCH2O
+            demand =  max_length_pot * _PI * pow( STEM_RADIUS, 2)* STEM_APPARENT_DENSITY * CONSTRUCTION_COST_INFLO * ( TEFF_INI / TT_internode_dev_duration );
         }
 
 
@@ -146,14 +146,14 @@ public:
 
         assimilate_supply = demand * fr_reste; //compute_assimilate_supply
         length += length_increase_pot * fr_reste; //compute_length
-        biomass += assimilate_supply / COUT_RESPI_INTERNODE; //compute_biomass
+        biomass += assimilate_supply / RESPIRATION_COST_INTERNODE; //compute_biomass
 
 
 
         if (TT_since_appearance >= TT_ini_elongation && TT_since_appearance< (TT_ini_elongation+TT_internode_dev_duration)){
             length_increase_pot =  max_length_pot * TEff / TT_internode_dev_duration; //cm
-            biomass =  length * _PI * pow( STEM_RAYON, 2)* STEM_APPARENT_DENSITY; //gCH2O
-            demand =  max_length_pot * _PI * pow( STEM_RAYON, 2)* STEM_APPARENT_DENSITY * COUT_RESPI_INTERNODE * ( TEff/ TT_internode_dev_duration );
+            biomass =  length * _PI * pow( STEM_RADIUS, 2)* STEM_APPARENT_DENSITY; //gCH2O
+            demand =  max_length_pot * _PI * pow( STEM_RADIUS, 2)* STEM_APPARENT_DENSITY * RESPIRATION_COST_INTERNODE * ( TEff/ TT_internode_dev_duration );
         }
         else{
             demand=0;
@@ -162,17 +162,6 @@ public:
 
 
 
-
-        //        if (TT_since_appearance < duree_allongement) {
-        //            length_increase_pot = ( max_length_pot * TEff ) / duree_allongement;
-        //        } else {
-        //            length_increase_pot = 0;
-        //        }
-
-        //        double volume_pot = _PI * pow( STEM_RAYON, 2) * length_increase_pot; //cm3
-        //        demand =  volume_pot * STEM_APPARENT_DENSITY * COUT_RESPI_INTERNODE ; //gCH20
-
-        //        gain_TEff_jour = TEff;
     }
 };
 } //namespace model

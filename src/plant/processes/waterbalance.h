@@ -79,15 +79,15 @@ public:
 private:
     xpalm::ModelParameters _parameters;
 //      parameters
-    double H_CR;
-    double H_PF_Z1;
+    double H_FC;
+    double H_WP_Z1;
     double Z1;
-    double H_PF;
+    double H_WP;
     double Z2;
     double H_0;
     double KC;
-    double SEUIL_EVAP;
-    double SEUIL_TRANSPI;
+    double TRESH_EVAP;
+    double TRESH_FTSW_TRANSPI;
 
 //     internals
     double a_C1;
@@ -201,28 +201,28 @@ public:
         last_time = t-1;
         _parameters = parameters;
 //        parameters
-        H_CR = parameters.get("H_CR");
-        H_PF_Z1 = parameters.get("H_PF_Z1");
+        H_FC = parameters.get("H_FC");
+        H_WP_Z1 = parameters.get("H_WP_Z1");
         Z1 = parameters.get("Z1");
-        H_PF = parameters.get("H_PF");
+        H_WP = parameters.get("H_WP");
         Z2 = parameters.get("Z2");
         H_0 = parameters.get("H_0");
         KC = parameters.get("KC");
-        SEUIL_EVAP = parameters.get("SEUIL_EVAP");
-        SEUIL_TRANSPI = parameters.get("SEUIL_TRANSPI");
+        TRESH_EVAP = parameters.get("TRESH_EVAP");
+        TRESH_FTSW_TRANSPI = parameters.get("TRESH_FTSW_TRANSPI");
 
 
 //        internals
-        TailleC1 = ( H_CR - H_PF_Z1 ) * Z1;
-        TailleVap = H_PF_Z1 * Z1;
+        TailleC1 = ( H_FC - H_WP_Z1 ) * Z1;
+        TailleVap = H_WP_Z1 * Z1;
         TailleC1moinsVap = TailleC1 - TailleVap;
-        TailleC2 = ( H_CR  - H_PF ) * Z2;
+        TailleC2 = ( H_FC  - H_WP ) * Z2;
         TailleC =  TailleC2 + TailleC1 - TailleVap;
-        a_C1 = min(TailleC1, (H_0 - H_PF_Z1 ) * Z1);
+        a_C1 = min(TailleC1, (H_0 - H_WP_Z1 ) * Z1);
         qte_H2O_C1 = max(0., a_C1 );
-        a_vap = min(TailleVap , (H_0 - H_PF_Z1 ) * Z1 );
+        a_vap = min(TailleVap , (H_0 - H_WP_Z1 ) * Z1 );
         qte_H2O_Vap = max (0., a_vap);
-        a_C2 = min(TailleC2, (H_0 - H_PF ) * Z2);
+        a_C2 = min(TailleC2, (H_0 - H_WP ) * Z2);
         qte_H2O_C2 = max(0., a_C2);
         a_C = qte_H2O_C1 + qte_H2O_C2 - qte_H2O_Vap;
         qte_H2O_C = max(0., a_C);
@@ -338,7 +338,7 @@ public:
         compute_fraction();
 
 //       compute_BH_apres_Evap
-        Evap = EvapMax * (FractionC1 > SEUIL_EVAP ? 1 : FractionC1 / SEUIL_EVAP ) ;
+        Evap = EvapMax * (FractionC1 > TRESH_EVAP ? 1 : FractionC1 / TRESH_EVAP ) ;
         if ( qte_H2O_C1moinsVap - Evap >=0 ){
             qte_H2O_C1moinsVap +=  - Evap;
             EvapC1moinsVap = Evap;
@@ -363,7 +363,7 @@ public:
         compute_fraction();
 
 //      compute_BH_Racines_apres_Transpi
-        Transpi = Transp_Max * (ftsw > SEUIL_TRANSPI ? 1 : ftsw / SEUIL_TRANSPI) ;
+        Transpi = Transp_Max * (ftsw > TRESH_FTSW_TRANSPI ? 1 : ftsw / TRESH_FTSW_TRANSPI) ;
         if (qte_H2O_C2_Racines > 0)
             TranspiC2 = min( Transpi * ( qte_H2O_C2_Racines / ( qte_H2O_C2_Racines + qte_H2O_C1moinsVap_Racines ) ), qte_H2O_C2_Racines );
         else

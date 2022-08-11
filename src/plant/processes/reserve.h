@@ -70,18 +70,18 @@ public:
 private:
 
     //      parameters
-    double POURCENT_NSC_ST_MAX;
-    double POURCENT_NSC_ST_MIN;
-    double SLW_max;
-    double SLW_min;
-    double SLW_ini;
-    double POURC_FOLIOLE;
-    double COUT_RESERVE;
-    double REALL_COST;
+    double NSC_STEM_MAX;
+    double NSC_STEM_MIN;
+    double SPECIFIC_LEAFLET_WEIGHT_MAX;
+    double SPECIFIC_LEAFLET_WEIGHT_MIN;
+    double SPECIFIC_LEAFLET_WEIGHT_INI;
+    double LEAFLET_BIOMASS_CONTRIBUTION;
+    double COST_RESERVE_STORAGE;
+    double COST_RESERVE_MOBILISATION;
 //    double MOB_RATE_MAX;
-    double POURCENT_NSC_ST_INI;
+    double NSC_STEM_INI;
     double STEM_APPARENT_DENSITY;
-    double STEM_RAYON;
+    double STEM_RADIUS;
 
     //     internals
     double reserve;
@@ -124,7 +124,6 @@ public:
         Internal(LEAVES_RES_POT, &Reserve::leaves_res_pot);
         Internal(LEAVES_RES_AVAI, &Reserve::leaves_res_avai);
         Internal(LEAVES_RES_EXCESS, &Reserve::leaves_res_excess);
-
         Internal(TRUNK_RES, &Reserve::trunk_res);
         Internal(TRUNK_RES_MIN, &Reserve::trunk_res_min);
         Internal(TRUNK_RES_MAX, &Reserve::trunk_res_max);
@@ -168,22 +167,22 @@ public:
         last_time = t-1;
 
         //        parameters
-        POURCENT_NSC_ST_INI = parameters.get("POURCENT_NSC_ST_INI");
-        POURCENT_NSC_ST_MAX = parameters.get("POURCENT_NSC_ST_MAX");
-        POURCENT_NSC_ST_MIN = parameters.get("POURCENT_NSC_ST_MIN");
-        SLW_max = parameters.get("SLW_max") * 10; //kg.m-2
-        SLW_ini = parameters.get("SLW_ini") * 10; //kg.m-2
-        SLW_min = parameters.get("SLW_min") * 10; //kg.m-2
-        POURC_FOLIOLE = parameters.get("POURC_FOLIOLE");
-        COUT_RESERVE = parameters.get("COUT_RESERVE");
-        REALL_COST = parameters.get("REALL_COST");
+        NSC_STEM_INI = parameters.get("NSC_STEM_INI");
+        NSC_STEM_MAX = parameters.get("NSC_STEM_MAX");
+        NSC_STEM_MIN = parameters.get("NSC_STEM_MIN");
+        SPECIFIC_LEAFLET_WEIGHT_MAX = parameters.get("SPECIFIC_LEAFLET_WEIGHT_MAX") * 10000; //g.cm-2 *100000 = g.m-2
+        SPECIFIC_LEAFLET_WEIGHT_INI = parameters.get("SPECIFIC_LEAFLET_WEIGHT_INI") * 10000; //g.m-2
+        SPECIFIC_LEAFLET_WEIGHT_MIN = parameters.get("SPECIFIC_LEAFLET_WEIGHT_MIN") * 10000; //g.m-2
+        LEAFLET_BIOMASS_CONTRIBUTION = parameters.get("LEAFLET_BIOMASS_CONTRIBUTION");
+        COST_RESERVE_STORAGE = parameters.get("COST_RESERVE_STORAGE");
+        COST_RESERVE_MOBILISATION = parameters.get("COST_RESERVE_MOBILISATION");
 //        MOB_RATE_MAX = parameters.get("MOB_RATE_MAX");
         STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
-        STEM_RAYON = parameters.get("STEM_RAYON");
+        STEM_RADIUS = parameters.get("STEM_RADIUS");
 
         //externals
         trunk_initial_height= trunk_initial_height_;
-        trunk_biomass= STEM_APPARENT_DENSITY * _PI * pow( STEM_RAYON, 2) * trunk_initial_height;
+        trunk_biomass= STEM_APPARENT_DENSITY * _PI * pow( STEM_RADIUS, 2) * trunk_initial_height; //g.cm-3 * cm2 * cm = g
         assim_avai=0;
         leaves_non_structural_biomass=0;
         plantLeafArea=plantLeafArea_;
@@ -191,15 +190,15 @@ public:
 
         //internals
         //        leaves_non_structural_biomass=0;
-        trunk_res = POURCENT_NSC_ST_INI * trunk_biomass;
+        trunk_res = NSC_STEM_INI * trunk_biomass;
         leaves_res = total_leaves_initial_res_;
         reserve = trunk_res + leaves_res;
-        leaves_res_max = (SLW_max - SLW_min) * plantLeafArea *10000 / POURC_FOLIOLE; //gDM
+        leaves_res_max = (SPECIFIC_LEAFLET_WEIGHT_MAX - SPECIFIC_LEAFLET_WEIGHT_MIN) * plantLeafArea/ LEAFLET_BIOMASS_CONTRIBUTION; //g.m-2 x m 2 = gDM
         leaves_res_min = 0;
         leaves_res_pot = leaves_res_max - leaves_res;
         leaves_res_avai=leaves_res - leaves_res_min;
-        trunk_res_min = POURCENT_NSC_ST_MIN * trunk_biomass;
-        trunk_res_max = POURCENT_NSC_ST_MAX * trunk_biomass;
+        trunk_res_min = NSC_STEM_MIN * trunk_biomass;
+        trunk_res_max = NSC_STEM_MAX * trunk_biomass;
         trunk_res_pot = trunk_res_max - trunk_res;
         trunk_res_avai = trunk_res - trunk_res_min;
         reserve_min = trunk_res_min;
@@ -235,11 +234,11 @@ public:
         //            compute_reserve_max_min
 
         leaves_res_min = 0;
-        leaves_res_max = plantLeafArea * 10000 * (SLW_max - SLW_min) / POURC_FOLIOLE; // m2 *10000 * (g.cm-2) = g
+        leaves_res_max = plantLeafArea * (SPECIFIC_LEAFLET_WEIGHT_MAX - SPECIFIC_LEAFLET_WEIGHT_MIN) / LEAFLET_BIOMASS_CONTRIBUTION; // m2  g.m-2) = g
         leaves_res = leaves_non_structural_biomass; // update to take into account the removed leaf and the new openned leaf
 
-        trunk_res_min = POURCENT_NSC_ST_MIN * trunk_biomass;
-        trunk_res_max = POURCENT_NSC_ST_MAX * trunk_biomass;
+        trunk_res_min = NSC_STEM_MIN * trunk_biomass;
+        trunk_res_max = NSC_STEM_MAX * trunk_biomass;
         reserve_max = leaves_res_max + trunk_res_max;
         reserve_min = leaves_res_min + trunk_res_min;
         reserve_pot = reserve_max - reserve;
@@ -274,7 +273,7 @@ public:
             maintenance_respi_res-=assim_avai;
             assim_avai = 0;
 
-            res_to_respi = min ( maintenance_respi_res/ REALL_COST, reserve ) * REALL_COST;
+            res_to_respi = min ( maintenance_respi_res/ COST_RESERVE_MOBILISATION, reserve ) * COST_RESERVE_MOBILISATION;
             maintenance_respi_res -= (res_to_respi);
 
             trunk_res -= (res_to_respi * trunk_mob_pct);
@@ -295,14 +294,14 @@ public:
 
         double delta_L=0;
         if(leaves_res_avai < 0 && assim_avai > 0) {
-            delta_L = min(-leaves_res_avai, assim_avai * COUT_RESERVE);
+            delta_L = min(-leaves_res_avai, assim_avai * COST_RESERVE_STORAGE);
             assim_avai -= delta_L;
             leaves_res += delta_L;
         }
 
         double delta_T=0;
         if(trunk_res_avai < 0 && assim_avai > 0) {
-            delta_T = min(-trunk_res_avai, assim_avai * COUT_RESERVE);
+            delta_T = min(-trunk_res_avai, assim_avai * COST_RESERVE_STORAGE);
             assim_avai -= delta_T;
             trunk_res += delta_T;
         }
@@ -331,7 +330,7 @@ public:
         assim_to_growth=0;
         res_to_growth=0;
 
-        if (assim_avai < growth_demand_res) {
+        if (growth_offer < growth_demand) {
 
             //assim consumed for growth
             assim_to_growth = assim_avai;
@@ -343,7 +342,7 @@ public:
             //rate of reserve per compartment (trunk and leaved) than can be allocate for growth
             trunk_mob_pct = reserve_avai > 0 ? trunk_res_avai / reserve_avai : 0;
             leaves_mob_pct = reserve_avai > 0 ? leaves_res_avai / reserve_avai : 0;
-            res_to_growth = min ( growth_demand_res / REALL_COST, reserve_avai) * REALL_COST;
+            res_to_growth = min ( growth_demand_res / COST_RESERVE_MOBILISATION, reserve_avai) * COST_RESERVE_MOBILISATION;
 
             growth_demand_res -= res_to_growth;
 
@@ -365,7 +364,7 @@ public:
             //            reserve_pot = trunk_res_pot + leaves_res_pot;
             //            double trunk_sink_pct = trunk_res_pot / reserve_pot;
             //            double leaves_sink_pct = leaves_res_pot / reserve_pot;
-            //            assim_res_avai = min ( assim_avai * COUT_RESERVE, reserve_pot);
+            //            assim_res_avai = min ( assim_avai * COST_RESERVE_STORAGE, reserve_pot);
             //            trunk_res += (assim_res_avai * trunk_sink_pct);
             //            leaves_res += (assim_res_avai * leaves_sink_pct);
             //            assim_to_res = assim_res_avai;
@@ -374,13 +373,13 @@ public:
 
             // version avec hierarchy
             //first fill reserves in leaves
-            double assim_avai_res_L= min (assim_avai * COUT_RESERVE, leaves_res_pot);
+            double assim_avai_res_L= min (assim_avai * COST_RESERVE_STORAGE, leaves_res_pot);
             leaves_res += assim_avai_res_L;
             assim_avai -= assim_avai_res_L;
 
             //then fill reserves in trunk
 
-            double assim_avai_res_T= min (assim_avai * COUT_RESERVE, trunk_res_pot);
+            double assim_avai_res_T= min (assim_avai * COST_RESERVE_STORAGE, trunk_res_pot);
             trunk_res += assim_avai_res_T;
             assim_avai -= assim_avai_res_T;
 
