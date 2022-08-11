@@ -282,9 +282,7 @@ typedef artis::observer::Observer < artis::utils::DoubleTime, xpalm::ModelParame
 
 typedef artis::observer::View < artis::utils::DoubleTime, xpalm::ModelParameters > View;
 
-typedef artis::kernel::Simulator
-< Tree, artis::utils::DoubleTime, xpalm::ModelParameters, GlobalParameters >
-XPalmSimulator;
+typedef artis::kernel::Simulator < Tree, artis::utils::DoubleTime, xpalm::ModelParameters, GlobalParameters > XPalmSimulator;
 
 typedef artis::context::Context < artis::utils::DoubleTime > XPalmContext;
 #endif

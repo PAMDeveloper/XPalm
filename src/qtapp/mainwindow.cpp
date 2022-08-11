@@ -347,15 +347,24 @@ void MainWindow::on_actionLaunch_simulation_triggered()
 //    load_simulation(settings->value("simulation_folder", "").toString());
 
     ::Trace::trace().clear();
+
+
+
+
     GlobalParameters globalParameters;
     XPalmContext context(parameters.get("BeginDate"), parameters.get("EndDate"));
-//    XPalmContext context(parameters.get("BeginDate"), parameters.get("BeginDate")+4);
     Tree * m = new Tree;
     XPalmSimulator simulator(m, globalParameters);
     observer::PlantView *view = new observer::PlantView();
     simulator.attachView("plant", view);
+
     simulator.init(parameters.get("BeginDate"), parameters);
+
     simulator.run(context);
+
+
+
+
 
 //    ResultParser * parser = new ResultParser();
 //    std::map <std::string, std::vector<double> > resultMap = parser->resultsToMap(&simulator);
