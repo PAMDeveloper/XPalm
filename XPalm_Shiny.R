@@ -22,7 +22,6 @@ lapply(packs, InstIfNec)
 
 
 
-
 # inputs ------------------------------------------------------------------
 
 
@@ -40,22 +39,18 @@ table_state=table_state%>%
          INFLO_STATUS=as.numeric(INFLO_STATUS))
 
 
-
-# parameters = data.table::fread("../parameters/XPalm_parameters.txt")%>%
-#   select(-2)
-
-parameters = read.csv("../parameters/XPalm_parameters.txt",header=F,sep='=')
+parameters = read.csv("./parameters/XPalm_parameters.txt",header=F,sep='=')
 
 colnames(parameters)=c('parameter','value')
 
-paramDef=data.table::fread("../parameters/parameters_def.csv")%>%
+paramDef=data.table::fread("./parameters/parameters_def.csv")%>%
   mutate(parameter=paste0(parameter,' '))
 
 
 parameters=merge(parameters,paramDef,all.x=T)
 
 
-varDef=data.table::fread("../parameters/variables_def.csv")
+varDef=data.table::fread("./parameters/variables_def.csv")
 
 # -------------------------------------------------------------------------
 

@@ -371,11 +371,11 @@ pre code {
 <div id="xpalm-installation" class="section level1">
 <h1>XPalm installation</h1>
 <ol style="list-style-type: decimal">
-<li><p>Install XPalm in a folder called XPalm inside the unziped
-folder</p></li>
+<li><p>Install XPalm via XPalm_setup.exe and replace the XPalm.exe in
+the Xpalm folder created</p></li>
 <li><p>Open the shiny folder, and double-click on
 <code>Xpalm.Rproj</code> to open RStudio on project mode.</p></li>
-<li><p>Install the XPalm R package:</p>
+<li><p>Install the XPalm R package (need R version 4.0 or upper)</p>
 <ol style="list-style-type: decimal">
 <li>In RStudio, open the Packages window</li>
 <li>Click on Install</li>
@@ -393,7 +393,7 @@ the root folder)</li>
 <div id="run-xpalm-on-the-shiny-application" class="section level1">
 <h1>run XPalm on the shiny application</h1>
 <ol style="list-style-type: decimal">
-<li><p>Opne a meteo file with the browse button</p></li>
+<li><p>Open a meteo file with the browse button</p></li>
 <li><p>Edit parameters in the tab ‘edit parameters’, otherwise let
 parameters value to default</p></li>
 <li><p>Click on the Run XPalm button (simulation progress can be follow
@@ -402,6 +402,795 @@ on the Rstudio console)</p></li>
 <li><p>To run a new simulation reload first the shiny app (circle arrow
 in the top of the app)</p></li>
 </ol>
+</div>
+<div id="parameters-and-ouput-variables" class="section level1">
+<h1>Parameters and ouput variables</h1>
+<table>
+<caption>XPalm parameters</caption>
+<colgroup>
+<col width="22%" />
+<col width="9%" />
+<col width="12%" />
+<col width="55%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">parameter</th>
+<th align="right">value</th>
+<th align="left">unit</th>
+<th align="left">definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ABORTION_RATE_MAX</td>
+<td align="right">0.8000000</td>
+<td align="left">percent</td>
+<td align="left">maximal abortion rate</td>
+</tr>
+<tr class="even">
+<td align="left">ABORTION_RATE_REF</td>
+<td align="right">0.2000000</td>
+<td align="left">percent</td>
+<td align="left">reference abortion rate</td>
+</tr>
+<tr class="odd">
+<td align="left">AGE_INI</td>
+<td align="right">2.0000000</td>
+<td align="left">year</td>
+<td align="left">age of the plant when simulation starts</td>
+</tr>
+<tr class="even">
+<td align="left">AGE_INTERNODE_START_GROWTH</td>
+<td align="right">4.0000000</td>
+<td align="left">year</td>
+<td align="left">age of the plant when internode starts growing in
+length</td>
+</tr>
+<tr class="odd">
+<td align="left">AGE_INTERNODE_STOP_GROWTH</td>
+<td align="right">8.0000000</td>
+<td align="left">year</td>
+<td align="left">age of the plant when internode stops growing in
+length</td>
+</tr>
+<tr class="even">
+<td align="left">ALTITUDE</td>
+<td align="right">50.0000000</td>
+<td align="left">m</td>
+<td align="left">site altitude</td>
+</tr>
+<tr class="odd">
+<td align="left">BUNCH_AFFINITY</td>
+<td align="right">1.5000000</td>
+<td align="left"></td>
+<td align="left">sink force of bunch for assimilate demand</td>
+</tr>
+<tr class="even">
+<td align="left">CONSTRUCTION_COST_INFLO</td>
+<td align="right">1.4400000</td>
+<td align="left">g.gDM-1</td>
+<td align="left">structural cost of infloresences</td>
+</tr>
+<tr class="odd">
+<td align="left">COST_OLEOSYNTHESIS</td>
+<td align="right">3.2000000</td>
+<td align="left">g.gDM-1</td>
+<td align="left">cost of oleosynthesis</td>
+</tr>
+<tr class="even">
+<td align="left">COST_RESERVE_MOBILISATION</td>
+<td align="right">0.6000000</td>
+<td align="left">g.gDM-1</td>
+<td align="left">cost to mobilize reserve</td>
+</tr>
+<tr class="odd">
+<td align="left">COST_RESERVE_STORAGE</td>
+<td align="right">0.7500000</td>
+<td align="left">g.gDM-1</td>
+<td align="left">cost to store assimilate</td>
+</tr>
+<tr class="even">
+<td align="left">DENS</td>
+<td align="right">143.0000000</td>
+<td align="left">plants.ha-1</td>
+<td align="left">planting density</td>
+</tr>
+<tr class="odd">
+<td align="left">FRACTION_PERIOD_DEV_PEDUNCLE</td>
+<td align="right">0.2000000</td>
+<td align="left">percent</td>
+<td align="left">fraction of the peduncle developpement period that
+corresponds to spikelet formation</td>
+</tr>
+<tr class="even">
+<td align="left">FRACTION_PERIOD_OLEOSYNTHESIS</td>
+<td align="right">0.8000000</td>
+<td align="left">percent</td>
+<td align="left">fraction of the bunch developpement period that
+corresponds to oleosynthesis</td>
+</tr>
+<tr class="odd">
+<td align="left">FRUIT_NUMBER_ADULT</td>
+<td align="right">1600.0000000</td>
+<td align="left"></td>
+<td align="left">number of fruit per bunch at plant maturity</td>
+</tr>
+<tr class="even">
+<td align="left">H_0</td>
+<td align="right">0.1500000</td>
+<td align="left">percent</td>
+<td align="left">initial soil humidity</td>
+</tr>
+<tr class="odd">
+<td align="left">H_FC</td>
+<td align="right">0.2300000</td>
+<td align="left">percent</td>
+<td align="left">soil humidity at field capacity</td>
+</tr>
+<tr class="even">
+<td align="left">H_WP</td>
+<td align="right">0.1000000</td>
+<td align="left">percent</td>
+<td align="left">soil humidity at wilting point</td>
+</tr>
+<tr class="odd">
+<td align="left">H_WP_Z1</td>
+<td align="right">0.0500000</td>
+<td align="left">percent</td>
+<td align="left">soil humidity at wilting point in the evaportaive
+layer</td>
+</tr>
+<tr class="even">
+<td align="left">INACTIVE_PHYTOMER_NUMBER</td>
+<td align="right">60.0000000</td>
+<td align="left"></td>
+<td align="left">number of inactive phytomer (below rank0)</td>
+</tr>
+<tr class="odd">
+<td align="left">IND_FRUIT_WEIGHT</td>
+<td align="right">6.5000000</td>
+<td align="left">g</td>
+<td align="left">individual fruit weigth</td>
+</tr>
+<tr class="even">
+<td align="left">INTERNODE_LENGTH_ADULT</td>
+<td align="right">3.0000000</td>
+<td align="left">cm</td>
+<td align="left">internode length at plant maturity</td>
+</tr>
+<tr class="odd">
+<td align="left">INTERNODE_LENGTH_INI</td>
+<td align="right">1.0000000</td>
+<td align="left">cm</td>
+<td align="left">internode length of seedlings</td>
+</tr>
+<tr class="even">
+<td align="left">K</td>
+<td align="right">0.5000000</td>
+<td align="left"></td>
+<td align="left">extinction coefficient (Beer Lambert law)</td>
+</tr>
+<tr class="odd">
+<td align="left">KC</td>
+<td align="right">1.0000000</td>
+<td align="left"></td>
+<td align="left">cultural coefficient</td>
+</tr>
+<tr class="even">
+<td align="left">LATITUDE</td>
+<td align="right">0.9700000</td>
+<td align="left">degree</td>
+<td align="left">site latitude</td>
+</tr>
+<tr class="odd">
+<td align="left">LEAF_EXPANSION_INFLEXION_POINT</td>
+<td align="right">6750.0000000</td>
+<td align="left">degreeC days</td>
+<td align="left">thermal time since leaf initiation when leaf expansion
+is maximal</td>
+</tr>
+<tr class="even">
+<td align="left">LEAF_EXPANSION_SLOPE</td>
+<td align="right">100.0000000</td>
+<td align="left">m2.degreeC days-1</td>
+<td align="left">maximal leaf expansion</td>
+</tr>
+<tr class="odd">
+<td align="left">LEAF_PRUNING_RANK</td>
+<td align="right">50.0000000</td>
+<td align="left"></td>
+<td align="left">leaf rank at pruning</td>
+</tr>
+<tr class="even">
+<td align="left">LEAFAREA_ADULT</td>
+<td align="right">12.0000000</td>
+<td align="left">m2</td>
+<td align="left">reference leaf area at plant maturity</td>
+</tr>
+<tr class="odd">
+<td align="left">LEAFLET_BIOMASS_CONTRIBUTION</td>
+<td align="right">0.3500000</td>
+<td align="left">percent</td>
+<td align="left">fraction of leaf biomass corresponding to leaflets</td>
+</tr>
+<tr class="even">
+<td align="left">MALE_INFLO_FINAL_BIOMASS</td>
+<td align="right">1200.0000000</td>
+<td align="left">g</td>
+<td align="left">male infloresence biomass at plant maturity</td>
+</tr>
+<tr class="odd">
+<td align="left">NSC_STEM_INI</td>
+<td align="right">0.0700000</td>
+<td align="left">g.gDM-1</td>
+<td align="left">initial fraction of non structural carbohydrates in
+stem biomass</td>
+</tr>
+<tr class="even">
+<td align="left">NSC_STEM_MAX</td>
+<td align="right">0.3000000</td>
+<td align="left">g.gDM-1</td>
+<td align="left">maximal fraction of non structural carbohydrates in
+stem biomass</td>
+</tr>
+<tr class="odd">
+<td align="left">NSC_STEM_MIN</td>
+<td align="right">0.0500000</td>
+<td align="left">g.gDM-1</td>
+<td align="left">minimal fraction of non structural carbohydrates in
+stem biomass</td>
+</tr>
+<tr class="even">
+<td align="left">OIL_CONTENT</td>
+<td align="right">0.2500000</td>
+<td align="left">percent</td>
+<td align="left">oil content in the mesocarp</td>
+</tr>
+<tr class="odd">
+<td align="left">PERIOD_ABORTION</td>
+<td align="right">540.0000000</td>
+<td align="left">degreeC days</td>
+<td align="left">period before flowering during which abortion can
+occur</td>
+</tr>
+<tr class="even">
+<td align="left">PERIOD_DEV_SPIKELET</td>
+<td align="right">675.0000000</td>
+<td align="left">degreeC days</td>
+<td align="left">period before flowering during which the number of
+spikelet is determined</td>
+</tr>
+<tr class="odd">
+<td align="left">PERIOD_FRUIT_SET</td>
+<td align="right">405.0000000</td>
+<td align="left">degreeC days</td>
+<td align="left">period after flowering during which fruit setting is
+established</td>
+</tr>
+<tr class="even">
+<td align="left">PERIOD_MALE_INFLO</td>
+<td align="right">1800.0000000</td>
+<td align="left">degreeC days</td>
+<td align="left">period after flowering during which male inflo is not
+yert scenesent</td>
+</tr>
+<tr class="odd">
+<td align="left">PERIOD_SEX_DETERMINATION</td>
+<td align="right">1350.0000000</td>
+<td align="left">degreeC days</td>
+<td align="left">period before sexualisation during which IC can
+modulate inflorescence sex</td>
+</tr>
+<tr class="even">
+<td align="left">PRODUCTION_SPEED_ADULT</td>
+<td align="right">0.0074074</td>
+<td align="left">leaf.degreeC days-1</td>
+<td align="left">phyllochron at plant maturity (5 year old)</td>
+</tr>
+<tr class="odd">
+<td align="left">PRODUCTION_SPEED_INITIAL</td>
+<td align="right">0.0111111</td>
+<td align="left">leaf.degreeC days-1</td>
+<td align="left">initial phyllochron (for seedlings)</td>
+</tr>
+<tr class="even">
+<td align="left">RESPIRATION_COST_INFLO</td>
+<td align="right">0.0044000</td>
+<td align="left">g.gDM-1</td>
+<td align="left">respiration cost of inflorescences</td>
+</tr>
+<tr class="odd">
+<td align="left">RESPIRATION_COST_INTERNODE</td>
+<td align="right">1.4400000</td>
+<td align="left">g.gDM-1</td>
+<td align="left">respiration cost of internode</td>
+</tr>
+<tr class="even">
+<td align="left">RESPIRATION_COST_LEAF</td>
+<td align="right">1.4400000</td>
+<td align="left">g.gDM-1</td>
+<td align="left">respiration cost of leaf</td>
+</tr>
+<tr class="odd">
+<td align="left">RESPIRATION_COST_LEAF_MAINTENANCE</td>
+<td align="right">0.0044000</td>
+<td align="left">g.gDM-1</td>
+<td align="left">maintenance respiration of leaf</td>
+</tr>
+<tr class="even">
+<td align="left">RESPIRATION_COST_STEM</td>
+<td align="right">0.0010000</td>
+<td align="left">g.gDM-1</td>
+<td align="left">respiration cost of the stem</td>
+</tr>
+<tr class="odd">
+<td align="left">ROOTS_GROWTH_DEPTH</td>
+<td align="right">0.3000000</td>
+<td align="left">mm.degreeC days-1</td>
+<td align="left">root growth in depth</td>
+</tr>
+<tr class="even">
+<td align="left">RUE</td>
+<td align="right">4.8000000</td>
+<td align="left">g.MJ-1</td>
+<td align="left">radiation use efficiency</td>
+</tr>
+<tr class="odd">
+<td align="left">SEED</td>
+<td align="right">1.0000000</td>
+<td align="left"></td>
+<td align="left">seed for stochasticity in random processes. Generate a
+unique plant</td>
+</tr>
+<tr class="even">
+<td align="left">SEX_RATIO_MIN</td>
+<td align="right">0.2000000</td>
+<td align="left">percent</td>
+<td align="left">minimal sex ratio</td>
+</tr>
+<tr class="odd">
+<td align="left">SEX_RATIO_REF</td>
+<td align="right">0.6000000</td>
+<td align="left">percent</td>
+<td align="left">reference sex ratio</td>
+</tr>
+<tr class="even">
+<td align="left">SPECIFIC_LEAFLET_WEIGHT_INI</td>
+<td align="right">0.0125000</td>
+<td align="left">g.m-2</td>
+<td align="left">initial specific leaflet weight</td>
+</tr>
+<tr class="odd">
+<td align="left">SPECIFIC_LEAFLET_WEIGHT_MAX</td>
+<td align="right">0.0200000</td>
+<td align="left">g.m-2</td>
+<td align="left">maximal specific leaflet weight</td>
+</tr>
+<tr class="even">
+<td align="left">SPECIFIC_LEAFLET_WEIGHT_MIN</td>
+<td align="right">0.0080000</td>
+<td align="left">g.m-2</td>
+<td align="left">minimal specific leaflet weight</td>
+</tr>
+<tr class="odd">
+<td align="left">STALK_FINAL_BIOMASS</td>
+<td align="right">2100.0000000</td>
+<td align="left">g</td>
+<td align="left">stalk biomass at plant matudity</td>
+</tr>
+<tr class="even">
+<td align="left">STEM_APPARENT_DENSITY</td>
+<td align="right">0.1500000</td>
+<td align="left">g.cm-3</td>
+<td align="left">stem density to estimate biomass and demand</td>
+</tr>
+<tr class="odd">
+<td align="left">STEM_RADIUS</td>
+<td align="right">30.0000000</td>
+<td align="left">cm</td>
+<td align="left">radius of stem</td>
+</tr>
+<tr class="even">
+<td align="left">T_BASE</td>
+<td align="right">15.0000000</td>
+<td align="left">degreeC</td>
+<td align="left">base temperature for thermal time calculation</td>
+</tr>
+<tr class="odd">
+<td align="left">T_EFF_INI</td>
+<td align="right">9.0000000</td>
+<td align="left">degreeC days</td>
+<td align="left">daily thermal time for computing exisitng phytomer at
+initialisation</td>
+</tr>
+<tr class="even">
+<td align="left">T_LIM</td>
+<td align="right">40.0000000</td>
+<td align="left">degreeC</td>
+<td align="left">limit temperature for thermal time calculation</td>
+</tr>
+<tr class="odd">
+<td align="left">T_OPT1</td>
+<td align="right">25.0000000</td>
+<td align="left">degreeC</td>
+<td align="left">starting optimal temperature for thermal time
+calculation</td>
+</tr>
+<tr class="even">
+<td align="left">T_OPT2</td>
+<td align="right">30.0000000</td>
+<td align="left">degreeC</td>
+<td align="left">ending optimal temperature for thermal time
+calculation</td>
+</tr>
+<tr class="odd">
+<td align="left">TRESH_EVAP</td>
+<td align="right">0.5000000</td>
+<td align="left"></td>
+<td align="left">fraction of water content in the evaporative layer
+below which evaporation is reduced</td>
+</tr>
+<tr class="even">
+<td align="left">TRESH_FTSW_PHOTO_REDUC</td>
+<td align="right">0.6000000</td>
+<td align="left"></td>
+<td align="left">ftsw treshold below which photosynthesis is
+reduced</td>
+</tr>
+<tr class="odd">
+<td align="left">TRESH_FTSW_SLOW_PHYLO</td>
+<td align="right">0.3000000</td>
+<td align="left"></td>
+<td align="left">ftsw treshold below which the phyllochron is
+reduced</td>
+</tr>
+<tr class="even">
+<td align="left">TRESH_FTSW_SLOW_ROOTS</td>
+<td align="right">0.2000000</td>
+<td align="left"></td>
+<td align="left">ftsw treshold below which roots growth is reduced</td>
+</tr>
+<tr class="odd">
+<td align="left">TRESH_FTSW_TRANSPI</td>
+<td align="right">0.5000000</td>
+<td align="left"></td>
+<td align="left">ftsw treshold below which transpiration is reduced</td>
+</tr>
+<tr class="even">
+<td align="left">TT_FLOWERING_ADULT</td>
+<td align="right">9430.0000000</td>
+<td align="left">degreeC days</td>
+<td align="left">thermal time needed to initiate flowering at plant
+maturity</td>
+</tr>
+<tr class="odd">
+<td align="left">TT_FLOWERING_INITIAL</td>
+<td align="right">6300.0000000</td>
+<td align="left">degreeC days</td>
+<td align="left">thermal time needed to initiate flowering at seedling
+stage</td>
+</tr>
+<tr class="even">
+<td align="left">TT_HARVEST_ADULT</td>
+<td align="right">12150.0000000</td>
+<td align="left">degreeC days</td>
+<td align="left">thermal time needed to harvest bunch at plant
+maturity</td>
+</tr>
+<tr class="odd">
+<td align="left">TT_HARVEST_INITIAL</td>
+<td align="right">8100.0000000</td>
+<td align="left">degreeC days</td>
+<td align="left">thermal time needed to harvest bunch at imature
+stage</td>
+</tr>
+<tr class="even">
+<td align="left">Z_INIT</td>
+<td align="right">1000.0000000</td>
+<td align="left">mm</td>
+<td align="left">inital depth of roots</td>
+</tr>
+<tr class="odd">
+<td align="left">Z1</td>
+<td align="right">200.0000000</td>
+<td align="left">mm</td>
+<td align="left">depth of evaporative layer</td>
+</tr>
+<tr class="even">
+<td align="left">Z2</td>
+<td align="right">2000.0000000</td>
+<td align="left">mm</td>
+<td align="left">maximal root depth</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>XPalm variables</caption>
+<colgroup>
+<col width="28%" />
+<col width="11%" />
+<col width="59%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">variable</th>
+<th align="left">unit</th>
+<th align="left">definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">PLANTLEAFAREA</td>
+<td align="left">m2</td>
+<td align="left">total plant leaf area</td>
+</tr>
+<tr class="even">
+<td align="left">ASSIM</td>
+<td align="left">g.plant-1.day-1</td>
+<td align="left">daily carbon assimilation</td>
+</tr>
+<tr class="odd">
+<td align="left">BIOMASS_BUNCH_NONOIL_HARVESTED</td>
+<td align="left">g</td>
+<td align="left">bunch structural biomass</td>
+</tr>
+<tr class="even">
+<td align="left">BIOMASS_BUNCH_OIL_HARVESTED</td>
+<td align="left">g</td>
+<td align="left">bunch oil biomass</td>
+</tr>
+<tr class="odd">
+<td align="left">BIOMASS_LEAVES_NON_STRUCTURAL_HARVESTED</td>
+<td align="left">g</td>
+<td align="left">leaf non structural biomass at harvesting</td>
+</tr>
+<tr class="even">
+<td align="left">BIOMASS_LEAVES_STRUCTURAL_HARVESTED</td>
+<td align="left">g</td>
+<td align="left">leaf structural biomass at harvesting</td>
+</tr>
+<tr class="odd">
+<td align="left">BIOMASS_MALE_HARVESTED</td>
+<td align="left">g</td>
+<td align="left">male inflorescence biomass at maturity</td>
+</tr>
+<tr class="even">
+<td align="left">BIOMASS_PEDUNCLE_HARVESTED</td>
+<td align="left">g</td>
+<td align="left">stalk biomass</td>
+</tr>
+<tr class="odd">
+<td align="left">BIOMASS_TRUNK</td>
+<td align="left">g</td>
+<td align="left">trunk biomass</td>
+</tr>
+<tr class="even">
+<td align="left">COMPETITION_INDEX</td>
+<td align="left"></td>
+<td align="left">index of competition (ratio source/sink)</td>
+</tr>
+<tr class="odd">
+<td align="left">DEMAND_BUNCHES</td>
+<td align="left">g</td>
+<td align="left">total bunches carbon demand</td>
+</tr>
+<tr class="even">
+<td align="left">DEMAND_GROWTH</td>
+<td align="left">g</td>
+<td align="left">total plant cardon demand</td>
+</tr>
+<tr class="odd">
+<td align="left">DEMAND_INTERNODE</td>
+<td align="left">g</td>
+<td align="left">internodes carbon demand</td>
+</tr>
+<tr class="even">
+<td align="left">DEMAND_LEAVES</td>
+<td align="left">g</td>
+<td align="left">total leaves carbon demand</td>
+</tr>
+<tr class="odd">
+<td align="left">DEMAND_MALES</td>
+<td align="left">g</td>
+<td align="left">total male inflorecences carbon demand</td>
+</tr>
+<tr class="even">
+<td align="left">DEMAND_PEDUNCLES</td>
+<td align="left">g</td>
+<td align="left">total peduncles carbon demand</td>
+</tr>
+<tr class="odd">
+<td align="left">FTSW</td>
+<td align="left"></td>
+<td align="left">fraction of transpirable soil water</td>
+</tr>
+<tr class="even">
+<td align="left">GROWTH_OFFER</td>
+<td align="left">g</td>
+<td align="left">total growth offer (after fullfilling respiration and
+minimum structural demand)</td>
+</tr>
+<tr class="odd">
+<td align="left">LAI</td>
+<td align="left">m2.m2</td>
+<td align="left">leaf area index</td>
+</tr>
+<tr class="even">
+<td align="left">LASTLEAFAREA</td>
+<td align="left">m2</td>
+<td align="left">leaf area of the leaf Rank 1</td>
+</tr>
+<tr class="odd">
+<td align="left">MAINTENANCE_RESPIRATION</td>
+<td align="left">g</td>
+<td align="left">total maintenance respiraiton</td>
+</tr>
+<tr class="even">
+<td align="left">NB_ABORTED</td>
+<td align="left"></td>
+<td align="left">total number of aborted inflorescence on the plant</td>
+</tr>
+<tr class="odd">
+<td align="left">NB_BUNCHES</td>
+<td align="left"></td>
+<td align="left">total number of bunches on the plant</td>
+</tr>
+<tr class="even">
+<td align="left">NB_LEAVES</td>
+<td align="left"></td>
+<td align="left">total number of leaves o, the plant</td>
+</tr>
+<tr class="odd">
+<td align="left">NB_MALES</td>
+<td align="left"></td>
+<td align="left">total number of male inflorescence on the plant</td>
+</tr>
+<tr class="even">
+<td align="left">NEWPHYTOMEREMERGENCE</td>
+<td align="left"></td>
+<td align="left">occurance of leaf initiation</td>
+</tr>
+<tr class="odd">
+<td align="left">NEWPHYTOMER</td>
+<td align="left"></td>
+<td align="left">total number of new phytomers created since
+AGE_INI</td>
+</tr>
+<tr class="even">
+<td align="left">RAIN</td>
+<td align="left">mm</td>
+<td align="left">rainfall</td>
+</tr>
+<tr class="odd">
+<td align="left">RG</td>
+<td align="left">MJ.m-2.day-1</td>
+<td align="left">global daily radiation</td>
+</tr>
+<tr class="even">
+<td align="left">RIE</td>
+<td align="left"></td>
+<td align="left">radiation interception efficiency</td>
+</tr>
+<tr class="odd">
+<td align="left">TEFF</td>
+<td align="left">degreeC days</td>
+<td align="left">daily thermal time</td>
+</tr>
+<tr class="even">
+<td align="left">TOTALPHYTOMERNUMBER</td>
+<td align="left"></td>
+<td align="left">total number of phytomer produced by the plant
+(including phytomers at initiation)</td>
+</tr>
+<tr class="odd">
+<td align="left">TREE_AGE</td>
+<td align="left">days</td>
+<td align="left">age of the plant</td>
+</tr>
+<tr class="even">
+<td align="left">STEM_HEIGHT</td>
+<td align="left">cm</td>
+<td align="left">stem height</td>
+</tr>
+<tr class="odd">
+<td align="left">LEAF_RANK</td>
+<td align="left"></td>
+<td align="left">leaf rank</td>
+</tr>
+<tr class="even">
+<td align="left">LEAF_NUMBER</td>
+<td align="left"></td>
+<td align="left">leaf number (phytomer number since simulation)</td>
+</tr>
+<tr class="odd">
+<td align="left">TREE_AGE_AT_CREATION</td>
+<td align="left">days</td>
+<td align="left">age of the plant when the phytomer is created</td>
+</tr>
+<tr class="even">
+<td align="left">STATE</td>
+<td align="left"></td>
+<td align="left">state of the inflorescence</td>
+</tr>
+<tr class="odd">
+<td align="left">TT_INI_ABORTION</td>
+<td align="left">degreeC days</td>
+<td align="left">thermal time needed to initiate abortion</td>
+</tr>
+<tr class="even">
+<td align="left">TT_INI_FLOWERING</td>
+<td align="left">degreeC days</td>
+<td align="left">thermal time needed to initiate flowering</td>
+</tr>
+<tr class="odd">
+<td align="left">FRUIT_NUMBER</td>
+<td align="left"></td>
+<td align="left">number of fruit per bunch</td>
+</tr>
+<tr class="even">
+<td align="left">BIOMASS_OIL</td>
+<td align="left">g</td>
+<td align="left">oil biomass of the bunch</td>
+</tr>
+<tr class="odd">
+<td align="left">BIOMASS_MALE</td>
+<td align="left">g</td>
+<td align="left">biomass of male inflorescence</td>
+</tr>
+<tr class="even">
+<td align="left">BIOMASS_BUNCH</td>
+<td align="left">g</td>
+<td align="left">biomass of the bunch</td>
+</tr>
+<tr class="odd">
+<td align="left">BIOMASS_STALK</td>
+<td align="left">g</td>
+<td align="left">biomass of the stalk</td>
+</tr>
+<tr class="even">
+<td align="left">DEMAND_MALE</td>
+<td align="left">g</td>
+<td align="left">carbon demand of the male inflorescence</td>
+</tr>
+<tr class="odd">
+<td align="left">DEMAND_BUNCH</td>
+<td align="left">g</td>
+<td align="left">carbon demand of the bunch</td>
+</tr>
+<tr class="even">
+<td align="left">DEMAND_STALK</td>
+<td align="left">g</td>
+<td align="left">carbon demand of the stalk</td>
+</tr>
+<tr class="odd">
+<td align="left">LEAF_AREA</td>
+<td align="left">m2</td>
+<td align="left">leaf area</td>
+</tr>
+<tr class="even">
+<td align="left">SEX_RATIO</td>
+<td align="left">percent</td>
+<td align="left">probablity of sex ratio oth the phytomer</td>
+</tr>
+<tr class="odd">
+<td align="left">ABORTION_RATE</td>
+<td align="left">percent</td>
+<td align="left">probablity of abortion of the phytomer</td>
+</tr>
+<tr class="even">
+<td align="left">Date</td>
+<td align="left"></td>
+<td align="left">Date</td>
+</tr>
+<tr class="odd">
+<td align="left">INFLO_DEV_FACTOR</td>
+<td align="left"></td>
+<td align="left">factor of organ size according to plant development
+(1=plant maturity)</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 

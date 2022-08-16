@@ -3,7 +3,7 @@ LATITUDE;degree;site latitude
 ALTITUDE;m;site altitude
 DENS;plants.ha-1;planting density
 SEED;;seed for stochasticity in random processes. Generate a unique plant
-AGE_INI;days;age of the plant when simulation starts
+AGE_INI;year;age of the plant when simulation starts
 T_BASE;degreeC;base temperature for thermal time calculation
 T_OPT1;degreeC;starting optimal temperature for thermal time calculation
 T_OPT2;degreeC;ending optimal temperature for thermal time calculation
