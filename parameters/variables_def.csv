@@ -1,0 +1,54 @@
+variable;unit;definition
+PLANTLEAFAREA;m2;total plant leaf area
+ASSIM;g.plant-1.day-1;daily carbon assimilation
+BIOMASS_BUNCH_NONOIL_HARVESTED;g;bunch structural biomass
+BIOMASS_BUNCH_OIL_HARVESTED;g;bunch oil biomass
+BIOMASS_LEAVES_NON_STRUCTURAL_HARVESTED;g;leaf non structural biomass at harvesting
+BIOMASS_LEAVES_STRUCTURAL_HARVESTED;g;leaf structural biomass at harvesting
+BIOMASS_MALE_HARVESTED;g;male inflorescence biomass at maturity
+BIOMASS_PEDUNCLE_HARVESTED;g;stalk biomass
+BIOMASS_TRUNK;g;trunk biomass
+COMPETITION_INDEX;;index of competition (ratio source/sink)
+DEMAND_BUNCHES;g;total bunches carbon demand
+DEMAND_GROWTH;g;total plant cardon demand
+DEMAND_INTERNODE;g;internodes carbon demand
+DEMAND_LEAVES;g;total leaves carbon demand
+DEMAND_MALES;g;total male inflorecences carbon demand
+DEMAND_PEDUNCLES;g;total peduncles carbon demand
+FTSW;;fraction of transpirable soil water
+GROWTH_OFFER;g;total growth offer (after fullfilling respiration and minimum structural demand)
+LAI;m2.m2;leaf area index
+LASTLEAFAREA;m2;leaf area of the leaf Rank 1
+MAINTENANCE_RESPIRATION;g;total maintenance respiraiton
+NB_ABORTED;;total number of aborted inflorescence on the plant
+NB_BUNCHES;;total number of bunches on the plant 
+NB_LEAVES;;total number of leaves o, the plant
+NB_MALES;;total number of male inflorescence on the plant
+NEWPHYTOMEREMERGENCE;;occurance of leaf initiation
+NEWPHYTOMER;;total number of new phytomers created since AGE_INI
+RAIN;mm;rainfall
+RG;MJ.m-2.day-1;global daily radiation
+RIE;;radiation interception efficiency
+TEFF;degreeC days;daily thermal time 
+TOTALPHYTOMERNUMBER;;total number of phytomer produced by the plant (including phytomers at initiation)
+TREE_AGE;days;age of the plant
+STEM_HEIGHT;cm;stem height
+LEAF_RANK;;leaf rank
+LEAF_NUMBER;;leaf number (phytomer number since simulation)
+TREE_AGE_AT_CREATION;days;age of the plant when the phytomer is created
+STATE;;state of the inflorescence
+TT_INI_ABORTION;degreeC days;thermal time needed to initiate abortion
+TT_INI_FLOWERING;degreeC days;thermal time needed to initiate flowering
+FRUIT_NUMBER;;number of fruit per bunch
+BIOMASS_OIL;g;oil biomass of the bunch
+BIOMASS_MALE;g;biomass of male inflorescence
+BIOMASS_BUNCH;g;biomass of the bunch
+BIOMASS_STALK;g;biomass of the stalk
+DEMAND_MALE;g;carbon demand of the male inflorescence
+DEMAND_BUNCH;g;carbon demand of the bunch
+DEMAND_STALK;g;carbon demand of the stalk
+LEAF_AREA;m2;leaf area
+SEX_RATIO;percent;probablity of sex ratio oth the phytomer
+ABORTION_RATE;percent;probablity of abortion of the phytomer
+Date;;Date
+INFLO_DEV_FACTOR;;factor of organ size according to plant development  (1=plant maturity)

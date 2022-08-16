@@ -116,11 +116,11 @@ public:
 
 
         // ini
-        double INTERNODE_START_GROWTH = parameters.get("INTERNODE_START_GROWTH") * 365;
-        double INTERNODE_STOP_GROWTH = parameters.get("INTERNODE_STOP_GROWTH") * 365;
+        double AGE_INTERNODE_START_GROWTH = parameters.get("AGE_INTERNODE_START_GROWTH") * 365;
+        double AGE_INTERNODE_STOP_GROWTH = parameters.get("AGE_INTERNODE_STOP_GROWTH") * 365;
         double INTERNODE_LENGTH_ADULT = parameters.get("INTERNODE_LENGTH_ADULT") ; //cm
         double INTERNODE_LENGTH_INI = parameters.get("INTERNODE_LENGTH_INI"); //cm
-        max_length_pot = age_relative_var(tree_age_at_phyto_creation + phytomer_age, INTERNODE_START_GROWTH, INTERNODE_STOP_GROWTH, INTERNODE_LENGTH_INI, INTERNODE_LENGTH_ADULT); // cm
+        max_length_pot = age_relative_var(tree_age_at_phyto_creation + phytomer_age, AGE_INTERNODE_START_GROWTH, AGE_INTERNODE_STOP_GROWTH, INTERNODE_LENGTH_INI, INTERNODE_LENGTH_ADULT); // cm
 
         TT_internode_dev_duration = 20 / production_speed; //20 ranks to grow TODO convert into param if necessary
 
