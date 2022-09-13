@@ -44,9 +44,9 @@ private:
     double OIL_CONTENT;
     double COST_OLEOSYNTHESIS;
     double CONSTRUCTION_COST_INFLO;
-    double SENSITIVITY_IC_SPIKELET;
+//    double SENSITIVITY_IC_SPIKELET;
     //    double IC_spikelet_RANG_FIN;
-    double SENSITIVITY_IC_SETTING;
+//    double SENSITIVITY_IC_SETTING;
     double PERIOD_FRUIT_SET;
     double IND_FRUIT_WEIGHT;
     double FRUIT_NUMBER_ADULT;
@@ -147,8 +147,8 @@ public:
         OIL_CONTENT = parameters.get("OIL_CONTENT");
         COST_OLEOSYNTHESIS = parameters.get("COST_OLEOSYNTHESIS");
         CONSTRUCTION_COST_INFLO = parameters.get("CONSTRUCTION_COST_INFLO");
-        SENSITIVITY_IC_SPIKELET = parameters.get("SENSITIVITY_IC_SPIKELET");
-        SENSITIVITY_IC_SETTING = parameters.get("SENSITIVITY_IC_SETTING");
+//        SENSITIVITY_IC_SPIKELET = parameters.get("SENSITIVITY_IC_SPIKELET");
+//        SENSITIVITY_IC_SETTING = parameters.get("SENSITIVITY_IC_SETTING");
         PERIOD_FRUIT_SET= parameters.get("PERIOD_FRUIT_SET");
         IND_FRUIT_WEIGHT = parameters.get("IND_FRUIT_WEIGHT");
         FRUIT_NUMBER_ADULT = parameters.get("FRUIT_NUMBER_ADULT");
@@ -189,10 +189,11 @@ public:
         demand = 0;
 
 
-        fruit_number = int (inflo_dev_factor * FRUIT_NUMBER_ADULT);
-        masse_ind=IND_FRUIT_WEIGHT;
 
         if (inflo_status.is(inflo::FLOWERING) | inflo_status.is(inflo::OLEOSYNTHESIS)) {
+            fruit_number = int (inflo_dev_factor * FRUIT_NUMBER_ADULT);
+            masse_ind=IND_FRUIT_WEIGHT;
+
             double fr_bunch_dev = min (1.0 , (TT_since_appearance - TT_ini_flowering) / TT_bunch_dev_duration);
             nonoil_biomass = fruit_number * masse_ind * (1 - OIL_CONTENT ) * fr_bunch_dev;
             nonoil_demand = fruit_number * masse_ind * (1 - OIL_CONTENT ) * CONSTRUCTION_COST_INFLO  * ( Teff / TT_bunch_dev_duration );
@@ -247,13 +248,15 @@ public:
 
 
         if (TT_since_appearance < TT_ini_flowering)
-//            fruit_number =  min (IC_spikelet * pot_fruits_number, pot_fruits_number);
+            //            fruit_number =  min (IC_spikelet * pot_fruits_number, pot_fruits_number);
             fruit_number=0.0;
 
         else
-            if (TT_since_appearance >=  TT_ini_flowering+ PERIOD_FRUIT_SET) {
-            double IC_total_setting=2;
-                fruit_number = min (IC_spikelet * pot_fruits_number, pot_fruits_number) * min (1.0, IC_setting/IC_total_setting);
+            //            if (TT_since_appearance >=  TT_ini_flowering+ PERIOD_FRUIT_SET) {
+            if (TT_since_appearance >=  TT_ini_flowering) {
+                double fr_setting = min (1.0 , (TT_since_appearance - TT_ini_flowering) / PERIOD_FRUIT_SET);
+                double IC_total_setting=2;
+                fruit_number = fr_setting* min (IC_spikelet * pot_fruits_number, pot_fruits_number) * min (1.0, IC_setting/IC_total_setting);
             }
 
 

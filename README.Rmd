@@ -1,0 +1,82 @@
+---
+title: "XPALM INSTRUCTIONS"
+output: html_document
+date: '2022-08-16'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F,warning = F,message =  F)
+```
+
+```{r import, echo=FALSE, warning=F, include=FALSE}
+
+# Load packages -----------------------------------------------------------
+
+packs <- c('knitr','xtable','dplyr')
+InstIfNec<-function (pack) {
+  if (!do.call(require,as.list(pack))) {
+    do.call(install.packages,as.list(pack))  }
+  do.call(require,as.list(pack)) }
+lapply(packs, InstIfNec)
+
+```
+
+# XPalm installation
+
+1. Install XPalm via XPalm_setup.exe and replace the XPalm.exe in the Xpalm folder created
+
+
+2. Open the shiny folder, and double-click on `Xpalm.Rproj` to open RStudio on project mode.
+
+3. Install the XPalm R package (need R version 4.0 or upper)
+   1. In RStudio, open the Packages window
+   2. Click on Install
+   3. "Install from:" -> choose Package Archive File
+   4. Browse to the folder `XPalm_1.0.zip` and choose it (in the root folder)
+
+4. Run the shiny app:
+   1. Open the `XPalm_Shiny.R` script
+   2. Click on the `Run App` button in RStudio
+   
+   
+# run XPalm on the shiny application
+
+1. Open a meteo file with the browse button
+
+2. Edit parameters in the tab 'edit parameters', otherwise let parameters value to default
+
+3. Click on the Run XPalm button (simulation progress can be follow on the Rstudio console)
+
+4. Visualize outputs on the 3 first tabs
+
+5. To run a new simulation reload first the shiny app (circle arrow in the top of the app)
+
+# Parameters and ouput variables
+
+```{R, echo=FALSE}
+options(scipen = 999)
+
+parameters = read.csv("./parameters/XPalm_parameters.txt",header=F,sep='=')
+
+colnames(parameters)=c('parameter','value')
+
+paramDef=data.table::fread("./parameters/parameters_def.csv")%>%
+  mutate(parameter=paste0(parameter,' '))
+
+
+parameters=merge(parameters,paramDef,all.x=T)
+# %>%
+#   mutate(value=format(value, scientific = FALSE))
+
+knitr::kable(parameters,caption ='XPalm parameters')
+
+```
+
+```{R, echo=FALSE}
+
+varDef=data.table::fread("./parameters/variables_def.csv")
+
+knitr::kable(varDef,caption ='XPalm variables')
+
+
+

@@ -108,8 +108,8 @@ private:
     //      parameters
     double LEAF_PRUNING_RANK;
     double INACTIVE_PHYTOMER_NUMBER;
-    double INTERNODE_START_GROWTH;
-    double INTERNODE_STOP_GROWTH;
+    double AGE_INTERNODE_START_GROWTH;
+    double AGE_INTERNODE_STOP_GROWTH;
     double INTERNODE_LENGTH_ADULT;
     double INTERNODE_LENGTH_INI;
     double TEFF_INI;
@@ -310,8 +310,8 @@ public:
         //        AGE_START_PROD = parameters.get("AGE_START_PROD") * 365;
         //        AGE_PLANTING = parameters.get("AGE_PLANTING") * 365; // days (age when production speed starts to decrease)
         AGE_INI=parameters.get("AGE_INI")* 365;
-        INTERNODE_START_GROWTH = parameters.get("INTERNODE_START_GROWTH")* 365;
-        INTERNODE_STOP_GROWTH= parameters.get("INTERNODE_STOP_GROWTH")* 365;
+        AGE_INTERNODE_START_GROWTH = parameters.get("AGE_INTERNODE_START_GROWTH")* 365;
+        AGE_INTERNODE_STOP_GROWTH= parameters.get("AGE_INTERNODE_STOP_GROWTH")* 365;
         TEFF_INI = parameters.get("T_EFF_INI");
         INTERNODE_LENGTH_INI=parameters.get("INTERNODE_LENGTH_INI");
         INTERNODE_LENGTH_ADULT =parameters.get("INTERNODE_LENGTH_ADULT");
@@ -457,17 +457,17 @@ public:
 
         //init trunk dim
         trunk_initial_height=0;
-        if (age < INTERNODE_START_GROWTH){
+        if (age < AGE_INTERNODE_START_GROWTH){
             trunk_initial_height = INTERNODE_LENGTH_INI * age * TEFF_INI * PRODUCTION_SPEED_INITIAL ;
         }
-        else if (age < INTERNODE_STOP_GROWTH){
-            trunk_initial_height= INTERNODE_LENGTH_INI * INTERNODE_START_GROWTH * TEFF_INI * PRODUCTION_SPEED_INITIAL +
-                    (age-INTERNODE_START_GROWTH) * TEFF_INI * ((PRODUCTION_SPEED_INITIAL+PRODUCTION_SPEED_ADULT)/2);
+        else if (age < AGE_INTERNODE_STOP_GROWTH){
+            trunk_initial_height= INTERNODE_LENGTH_INI * AGE_INTERNODE_START_GROWTH * TEFF_INI * PRODUCTION_SPEED_INITIAL +
+                    (age-AGE_INTERNODE_START_GROWTH) * TEFF_INI * ((PRODUCTION_SPEED_INITIAL+PRODUCTION_SPEED_ADULT)/2);
         }
         else
-            trunk_initial_height= INTERNODE_LENGTH_INI * INTERNODE_START_GROWTH * TEFF_INI * PRODUCTION_SPEED_INITIAL +
-                    ((INTERNODE_LENGTH_INI+INTERNODE_LENGTH_ADULT)/2)*(INTERNODE_STOP_GROWTH-INTERNODE_START_GROWTH) * TEFF_INI * ((PRODUCTION_SPEED_INITIAL+PRODUCTION_SPEED_ADULT)/2)+
-                    INTERNODE_LENGTH_ADULT*(age-INTERNODE_STOP_GROWTH)* TEFF_INI * PRODUCTION_SPEED_ADULT;
+            trunk_initial_height= INTERNODE_LENGTH_INI * AGE_INTERNODE_START_GROWTH * TEFF_INI * PRODUCTION_SPEED_INITIAL +
+                    ((INTERNODE_LENGTH_INI+INTERNODE_LENGTH_ADULT)/2)*(AGE_INTERNODE_STOP_GROWTH-AGE_INTERNODE_START_GROWTH) * TEFF_INI * ((PRODUCTION_SPEED_INITIAL+PRODUCTION_SPEED_ADULT)/2)+
+                    INTERNODE_LENGTH_ADULT*(age-AGE_INTERNODE_STOP_GROWTH)* TEFF_INI * PRODUCTION_SPEED_ADULT;
 
 
         double STEM_APPARENT_DENSITY = parameters.get("STEM_APPARENT_DENSITY");
@@ -475,7 +475,7 @@ public:
 
         trunk_initial_biomass = STEM_APPARENT_DENSITY * _PI * pow( STEM_RADIUS, 2) * trunk_initial_height; //gDM
 
-        double NSC_STEM_INI = parameters.get("NSC_STEM_INI") ; //g.cm-2
+        double NSC_STEM_INI = parameters.get("NSC_STEM_INI") ;
         trunk_initial_res= NSC_STEM_INI * trunk_initial_biomass;
 
 
@@ -516,7 +516,7 @@ public:
         double TT_ini_male_senescence = TT_ini_flowering +PERIOD_MALE_INFLO;
 
         //        Leaf area increase with plant age
-        double first_LA=0.5;
+        double first_LA=0.05;
 
         double SF_ind = age_relative_var(age_at_creation, 0.0, AGE_ADULT, first_LA , LEAFAREA_ADULT);
 

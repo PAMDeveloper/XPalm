@@ -1,0 +1,77 @@
+parameter;unit;definition
+LATITUDE;degree;site latitude
+ALTITUDE;m;site altitude
+DENS;plants.ha-1;planting density
+SEED;;seed for stochasticity in random processes. Generate a unique plant
+AGE_INI;year;age of the plant when simulation starts
+T_BASE;degreeC;base temperature for thermal time calculation
+T_OPT1;degreeC;starting optimal temperature for thermal time calculation
+T_OPT2;degreeC;ending optimal temperature for thermal time calculation
+T_LIM;degreeC;limit temperature for thermal time calculation
+T_EFF_INI;degreeC days;daily thermal time for computing exisitng phytomer at initialisation
+Z1;mm;depth of evaporative layer
+Z2;mm;maximal root depth
+Z_INIT;mm;inital depth of roots
+H_FC;percent;soil humidity at field capacity
+H_WP;percent;soil humidity at wilting point
+H_0;percent;initial soil humidity
+H_WP_Z1;percent;soil humidity at wilting point in the evaportaive layer
+ROOTS_GROWTH_DEPTH;mm.degreeC days-1;root growth in depth
+TRESH_FTSW_SLOW_ROOTS;;ftsw treshold below which roots growth is reduced
+TRESH_FTSW_TRANSPI;;ftsw treshold below which transpiration  is reduced
+TRESH_EVAP;;fraction of water content in the evaporative layer below which evaporation is reduced 
+TRESH_FTSW_SLOW_PHYLO;;ftsw treshold below which the phyllochron is reduced
+TRESH_FTSW_PHOTO_REDUC;;ftsw treshold below which photosynthesis  is reduced
+PRODUCTION_SPEED_INITIAL;leaf.degreeC days-1;initial phyllochron (for seedlings)
+PRODUCTION_SPEED_ADULT;leaf.degreeC days-1;phyllochron at plant maturity (5 year old)
+RUE;g.MJ-1;radiation use efficiency
+K;;extinction coefficient (Beer Lambert law)
+KC;;cultural coefficient
+INACTIVE_PHYTOMER_NUMBER; ;number of inactive phytomer (below rank0)
+LEAF_PRUNING_RANK;;leaf rank at pruning
+BUNCH_AFFINITY;;sink force of bunch for assimilate demand
+STEM_APPARENT_DENSITY;g.cm-3;stem density to estimate biomass and demand
+STEM_RADIUS;cm;radius of stem 
+INTERNODE_LENGTH_INI;cm;internode length of seedlings
+INTERNODE_LENGTH_ADULT;cm;internode length at plant maturity
+AGE_INTERNODE_START_GROWTH;year;age of the plant when internode starts  growing in length
+AGE_INTERNODE_STOP_GROWTH;year;age of the plant when internode stops  growing in length
+RESPIRATION_COST_STEM;g.gDM-1;respiration cost of the stem
+RESPIRATION_COST_INTERNODE;g.gDM-1;respiration cost of internode
+RESPIRATION_COST_LEAF_MAINTENANCE;g.gDM-1;maintenance respiration of leaf
+RESPIRATION_COST_LEAF;g.gDM-1;respiration cost of leaf 
+RESPIRATION_COST_INFLO;g.gDM-1;respiration cost of inflorescences
+CONSTRUCTION_COST_INFLO;g.gDM-1;structural cost of infloresences
+COST_OLEOSYNTHESIS;g.gDM-1;cost of oleosynthesis
+COST_RESERVE_STORAGE;g.gDM-1;cost to store assimilate
+COST_RESERVE_MOBILISATION;g.gDM-1;cost to mobilize reserve
+TT_FLOWERING_ADULT;degreeC days;thermal time needed  to initiate flowering at plant maturity 
+TT_FLOWERING_INITIAL;degreeC days;thermal time needed  to initiate flowering at seedling stage
+TT_HARVEST_ADULT;degreeC days;thermal time needed  to harvest bunch at plant maturity
+TT_HARVEST_INITIAL;degreeC days;thermal time needed  to harvest bunch at imature stage
+PERIOD_SEX_DETERMINATION;degreeC days;period before sexualisation during which IC can modulate inflorescence sex
+PERIOD_MALE_INFLO;degreeC days;period after flowering during which male inflo is not yert scenesent
+PERIOD_DEV_SPIKELET;degreeC days;period before flowering during which the number of spikelet is determined
+PERIOD_ABORTION;degreeC days;period before flowering during which abortion can occur
+PERIOD_FRUIT_SET;degreeC days;period after flowering during which fruit setting is established
+FRACTION_PERIOD_OLEOSYNTHESIS;percent;fraction of the bunch developpement period that corresponds to oleosynthesis
+FRACTION_PERIOD_DEV_PEDUNCLE;percent;fraction of the peduncle developpement period that corresponds to spikelet formation
+SEX_RATIO_REF;percent;reference sex ratio
+SEX_RATIO_MIN;percent;minimal sex ratio
+ABORTION_RATE_REF;percent;reference abortion rate
+ABORTION_RATE_MAX;percent;maximal abortion rate
+OIL_CONTENT;percent;oil content in the mesocarp
+IND_FRUIT_WEIGHT;g;individual fruit weigth 
+FRUIT_NUMBER_ADULT;;number of fruit per bunch at plant maturity
+NSC_STEM_MAX;g.gDM-1;maximal fraction of non structural carbohydrates in stem biomass
+NSC_STEM_MIN;g.gDM-1;minimal fraction of non structural carbohydrates in stem biomass
+NSC_STEM_INI;g.gDM-1;initial fraction of non structural carbohydrates in stem biomass
+MALE_INFLO_FINAL_BIOMASS;g;male infloresence biomass at plant maturity
+STALK_FINAL_BIOMASS;g;stalk biomass at plant matudity
+LEAFLET_BIOMASS_CONTRIBUTION;percent;fraction of leaf biomass corresponding to leaflets 
+SPECIFIC_LEAFLET_WEIGHT_MAX;g.m-2;maximal specific leaflet weight
+SPECIFIC_LEAFLET_WEIGHT_MIN;g.m-2;minimal specific leaflet weight
+SPECIFIC_LEAFLET_WEIGHT_INI;g.m-2;initial specific leaflet weight
+LEAFAREA_ADULT;m2;reference leaf area at plant maturity
+LEAF_EXPANSION_INFLEXION_POINT;degreeC days;thermal time since leaf initiation when leaf expansion is maximal
+LEAF_EXPANSION_SLOPE;m2.degreeC days-1;maximal leaf expansion 

@@ -54,7 +54,7 @@ private:
 
     //      parameters
     //    double RANG_DEBUT_CROISSANCE_PEDUNCULE;
-    double SENSITIVITY_IC_SPIKELET;
+//    double SENSITIVITY_IC_SPIKELET;
     double STALK_FINAL_BIOMASS;
     double CONSTRUCTION_COST_INFLO;
     double FRACTION_PERIOD_DEV_PEDUNCLE ;
@@ -125,7 +125,7 @@ public:
         TT_since_appearance=TT_since_appearance_;
 
         //        parameters
-        SENSITIVITY_IC_SPIKELET = parameters.get("SENSITIVITY_IC_SPIKELET");
+//        SENSITIVITY_IC_SPIKELET = parameters.get("SENSITIVITY_IC_SPIKELET");
         STALK_FINAL_BIOMASS = parameters.get("STALK_FINAL_BIOMASS");
         FRACTION_PERIOD_DEV_PEDUNCLE = parameters.get("FRACTION_PERIOD_DEV_PEDUNCLE");
         double TEff_ini = parameters.get("T_EFF_INI");

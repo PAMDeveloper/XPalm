@@ -21,9 +21,8 @@ public:
                      TT_INI_FLOWERING,
                      TT_INI_OLEO,
                      TT_INI_SEX,
-
                      TT_INI_ABORTION,
-
+                     TT_INI_SPIKELET,
                      TT_INI_HARVEST,
                      TT_INI_MALE_SENESCENCE,
                      BUNCH_BIOMASS,
@@ -67,8 +66,8 @@ private:
     xpalm::ModelParameters _parameters;
 
     //      parameters
-//    double PLASTICITY_BUNCH_IC_APRES_FLORAISON;
-//    double PLASTICITY_BUNCH_IC_AVANT_FLORAISON;
+    //    double PLASTICITY_BUNCH_IC_APRES_FLORAISON;
+    //    double PLASTICITY_BUNCH_IC_AVANT_FLORAISON;
     //    double SENS_FTSW;
     //    double SEUIL_MEDIAN_FTSW;
     //    double DEBUT_RANG_SENSITIVITY_NOUAISON;
@@ -84,7 +83,7 @@ private:
     //    double ICabort_RANG_FIN;
     double PERIOD_ABORTION;
     //    double Seuil_IC_sex;
-    double SENSITIVITY_SEX;
+    //    double SENSITIVITY_SEX;
     //    double Seuil_IC_abort;
     double ABORTION_RATE_MAX;
     double  ABORTION_RATE_REF;
@@ -109,6 +108,7 @@ private:
     double TT_ini_oleo;
     double TT_ini_sex;
     double TT_ini_abortion;
+    double TT_ini_spikelet;
     double TT_ini_harvest;
     double TT_ini_male_senescence;
     double production_speed;
@@ -198,6 +198,7 @@ public:
         Internal(TT_INI_OLEO, &Inflo::TT_ini_oleo);
         Internal(TT_INI_SEX, &Inflo::TT_ini_sex);
         Internal(TT_INI_ABORTION, &Inflo::TT_ini_abortion);
+        Internal(TT_INI_SPIKELET, &Inflo::TT_ini_spikelet);
         Internal(TT_INI_HARVEST, &Inflo::TT_ini_harvest);
         Internal(TT_INI_MALE_SENESCENCE, &Inflo::TT_ini_male_senescence);
         Internal(BUNCH_BIOMASS, &Inflo::bunch_biomass);
@@ -287,7 +288,7 @@ public:
         PERIOD_ABORTION = parameters.get("PERIOD_ABORTION");
         SEX_RATIO_REF = parameters.get("SEX_RATIO_REF");
         SEX_RATIO_MIN = parameters.get("SEX_RATIO_MIN");
-        SENSITIVITY_SEX = parameters.get("SENSITIVITY_SEX");
+        //        SENSITIVITY_SEX = parameters.get("SENSITIVITY_SEX");
         ABORTION_RATE_MAX = parameters.get("ABORTION_RATE_MAX");
         ABORTION_RATE_REF = parameters.get("ABORTION_RATE_REF");
         FRACTION_PERIOD_OLEOSYNTHESIS = parameters.get("FRACTION_PERIOD_OLEOSYNTHESIS");
@@ -318,7 +319,8 @@ public:
         TT_ini_male_senescence = TT_ini_senec;
         TT_since_appearance= TT_since_appearance_;
         TT_ini_oleo = TT_ini_flowering +(1-FRACTION_PERIOD_OLEOSYNTHESIS)*(TT_ini_harvest - TT_ini_flowering);
-        TT_ini_abortion = TT_ini_flowering-PERIOD_DEV_SPIKELET;
+        TT_ini_abortion = TT_ini_flowering-PERIOD_ABORTION;
+        TT_ini_spikelet = TT_ini_flowering-PERIOD_DEV_SPIKELET;
         TT_ini_sex = TT_ini_abortion - PERIOD_SEX_DETERMINATION;
 
         rank = rk;
@@ -560,9 +562,9 @@ public:
         //            TT_corrige += pow(fr_fruits, PLASTICITY_BUNCH_IC_APRES_FLORAISON) * TEff;
         //IC on sex determination
         if (TT_since_appearance >= TT_ini_sex-PERIOD_SEX_DETERMINATION && TT_since_appearance < TT_ini_sex ) {
-//            nb_joursICsex += 1;
-//            IC_sex_tot += tree_IC;
-//            IC_sex = IC_sex_tot / nb_joursICsex;
+            //            nb_joursICsex += 1;
+            //            IC_sex_tot += tree_IC;
+            //            IC_sex = IC_sex_tot / nb_joursICsex;
             assim_sex_tot+=tree_assim;
             growth_demand_sex_tot+=tree_growth_demand;
             IC_sex=assim_sex_tot/growth_demand_sex_tot;
@@ -571,9 +573,9 @@ public:
 
         //IC on abortion
         if (TT_since_appearance >= TT_ini_sex && TT_since_appearance < TT_ini_abortion) {
-//            nb_joursICabort += 1;
-//            IC_abort_tot += tree_IC;
-//            IC_abort = IC_abort_tot / nb_joursICabort;
+            //            nb_joursICabort += 1;
+            //            IC_abort_tot += tree_IC;
+            //            IC_abort = IC_abort_tot / nb_joursICabort;
             assim_abort_tot+=tree_assim;
             growth_demand_abort_tot+=tree_growth_demand;
             IC_abort=assim_abort_tot/growth_demand_abort_tot;
@@ -581,10 +583,10 @@ public:
         abortion_rate =max(0.0, min(ABORTION_RATE_MAX, ABORTION_RATE_MAX+IC_abort*(ABORTION_RATE_REF-ABORTION_RATE_MAX)));
 
         //IC on spikelet biomass
-        if (TT_since_appearance >= TT_ini_abortion && TT_since_appearance < TT_ini_flowering){
-//            nb_joursIC_spikelet += 1;
-//            IC_spikelet_tot += tree_IC;
-//            IC_spikelet = IC_spikelet_tot / nb_joursIC_spikelet;
+        if (TT_since_appearance >= TT_ini_spikelet && TT_since_appearance < TT_ini_flowering){
+            //            nb_joursIC_spikelet += 1;
+            //            IC_spikelet_tot += tree_IC;
+            //            IC_spikelet = IC_spikelet_tot / nb_joursIC_spikelet;
             assim_spikelet_tot+=tree_assim;
             growth_demand_spikelet_tot+=tree_growth_demand;
             IC_spikelet=assim_spikelet_tot/growth_demand_spikelet_tot;
@@ -592,9 +594,9 @@ public:
 
         //IC on fruit set
         if (TT_since_appearance >= TT_ini_flowering && TT_since_appearance < TT_ini_flowering+ PERIOD_FRUIT_SET) {
-//            nb_joursIC_setting += 1;
-//            IC_setting_tot += tree_IC;
-//            IC_setting = (IC_setting_tot) / nb_joursIC_setting;
+            //            nb_joursIC_setting += 1;
+            //            IC_setting_tot += tree_IC;
+            //            IC_setting = (IC_setting_tot) / nb_joursIC_setting;
             assim_setting_tot+=tree_assim;
             growth_demand_setting_tot+=tree_growth_demand;
             IC_setting=assim_setting_tot/growth_demand_setting_tot;
