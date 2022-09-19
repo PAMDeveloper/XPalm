@@ -17,3 +17,5 @@ debug
 /xpalm_plugin_import.cpp
 .vscode/
 RScripts/App_XpalmV0.R
+bin/
+XPalm_standalone.pro.user
